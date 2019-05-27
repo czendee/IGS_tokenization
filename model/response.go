@@ -1,6 +1,21 @@
 package model
 
 
+
+///////////////////response for validate token
+type ResponseTokenFile struct {    
+	StatusMessage string       `json:"status_message_file"`
+	Status       string       `json:"status_file"`
+	SucessDataEachRowToken   []ExitoDataTokenLine     `json:"sucess_data_each_row"`
+}
+
+type ExitoDataTokenLine struct {    
+    Line          string       `json:"line"`
+	StatusMessage string       `json:"status_message"`
+	Status       string       `json:"status"`
+	
+}
+
 ///////////////////response for payment
 type ResponsePayment struct {    
 	StatusMessage string       `json:"status_message"`

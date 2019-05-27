@@ -2,12 +2,13 @@ package main
 
 import (
 	"net/http"
+    "strconv"
+    "strings"
 //	"fmt"
 	"log"
 	"banwire/services/file_tokenizer/db"
 	"banwire/services/file_tokenizer/net"
 	modelito "banwire/services/file_tokenizer/model"
-    "strings"
 
 //  "banwire/services/file_tokenizer/model"
 //	"banwire/services/file_tokenizer/model/pgsql"
@@ -157,6 +158,9 @@ func serveJs01(w http.ResponseWriter, r *http.Request) {
    //post
 
    
+  //post
+
+   
 func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		db.Connection.Close(nil)
@@ -171,6 +175,9 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
 
     errorGeneral=""
+
+    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+
 //    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
         log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
@@ -202,7 +209,7 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-          log.Print("CZ before loop files")
+            log.Print("CZ before loop files")
 
             for i, _ := range files { // loop through the files one by one
                
@@ -225,13 +232,6 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
                 buf := bytes.NewBuffer(nil)
                 io.Copy(buf, file)
-//                if _, err := io.Copy(buf, file); err != nil {
-//                    return nil, err
-//                }                
-//                log.Print(buf) // print the content as 'bytes'
-
-                 // convert content to a 'string'
-               // str := buf.String()
 
                 micadenita := buf.String()
 
@@ -241,13 +241,26 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
                 lineas := 0
 
+                lineasWithErrors := 0
                 for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
-                    
+                    var u modelito.ExitoDataTokenLine
                     if lineas >= 1{
                         log.Printf("MGR Linea %d de datos", lineas)
 
                         lineas = lineas + 1
-                         campos_token (line, lineas)
+                         respuestaRes,cualfallo :=campos_token (line, lineas)
+                         if cualfallo ==0 {  //exito, todos los cmapos de la linea OK
+                            u.Line=strconv.Itoa(lineas)
+                            u.Status="OK"
+                            u.StatusMessage ="SUCESS"
+
+                         }else { //error, al menos un error en la linea
+                            u.Line=strconv.Itoa(lineas)
+                            u.Status="ERROR540"
+                            u.StatusMessage ="ERROR LINEA:"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            lineasWithErrors =1
+                         }
+                         linesStatus = append(linesStatus,u);
                     }
                     
                     if lineas == 0 {
@@ -260,16 +273,20 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
                        
                         
 
-                }
+                }//end  -loop through the lines
 
-                //log.Print("MGR dato por dado index")
+               if  lineasWithErrors ==1 { //al menos una linea  tuvo un error
+                     errorGeneral="ERROR FILE"
+                   
+               }else{
+                    if errorGeneral=="" {  
+    
+                        log.Print(w, "Files uploaded successfully : ")
+                        log.Print(w, files[i].Filename+"\n")
 
-                //for _, line := range strings.Split(strings.TrimSuffix(micadenita, ","), ",") {
-                //    log.Println(line)
-                //}
-     
-                //log.Print(str) // print the content as a 'string'                
+                    }    
 
+               }
                 //1.count number of lines in the file received
                 //2.for each line 
                 //      validate the content
@@ -279,49 +296,24 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
 
                 
-                if errorGeneral=="" {  
-  /*do not store the file in the server
-                    log.Print("CZ Start create temp file")
-                    log.Print("CZ Start  temp file nam:"+ files[i].Filename)
-                    out, err := os.Create("/tmp/" + files[i].Filename)
 
-                    defer out.Close()
-                    if err != nil {
-                        log.Print(w, "Unable to create the file for writing. Check your write access privilege")
-                        return
-                    }
+            }//end for - all the files received
 
-                    _, err = io.Copy(out, file) // file not files[i] !
-
-                    if err != nil {
-                        log.Print(w, err)
-                        return
-                    }
-*/
-                    log.Print(w, "Files uploaded successfully : ")
-                    log.Print(w, files[i].Filename+"\n")
-
-                }    
-
-            }//end for
         }//end if    
 //		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-         var  cardTokenized modelito.Card
-        fieldDataBytesJson,err := getJsonResponseValidateFileV2(cardTokenized)
-        w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}//end if
 	}
+
+
 	/// END
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
 		log.Print("CZ   STEP Get the ERROR response JSON ready")
 		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
+		// START
+		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
+
+        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
@@ -329,6 +321,15 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 			
 		}
 	
+    }else{
+        var  cardTokenized modelito.Card
+        fieldDataBytesJson,err := getJsonResponseValidateFileV2(cardTokenized)
+        w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}//end if
+
     } 
 					
 }//en function validate
@@ -409,36 +410,9 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 //                log.Print(buf) // print the content as 'bytes'
 
                  // convert content to a 'string'
-                //str := buf.String()
+                str := buf.String()
      
-                //log.Print(str) // print the content as a 'string'                
-
-                micadenita := buf.String()
-
-                log.Print(micadenita)
-
-                log.Print("MGR Paso linea por linea indexpay")
-
-                lineas := 0
-
-                for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
-                   
-                    if lineas >= 1{
-                        log.Printf("MGR Linea %d de datos", lineas)
-
-                        lineas = lineas + 1
-                        campos_payment (line, lineas)
-                    }
-
-                    if lineas == 0 {
-                        log.Print("MGR Linea 0 de textos")
-
-                        lineas = lineas + 1
-                    }
-                    
-                        log.Println(line)
-                        
-                }
+                log.Print(str) // print the content as a 'string'                
 
                 //1.count number of lines in the file received
                 //2.for each line 
@@ -711,27 +685,22 @@ func handlePostConsultaHistorial(w http.ResponseWriter, r *http.Request) {
 		}
 	
     } 
-			
+					
 }//end handlePostConsultaHistorial
+
 
 func campos_token (line string, lineas int)(string, int){
         log.Print("MGR campo por campo linea ", lineas - 1)
         numcampos := 0
         var resultado string
         var cualfallo int
+        resultado ="OK"
+        cualfallo =0
         for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
               log.Println(campo)
               numcampos = numcampos + 1
-              log.Print(numcampos)
               resultado, cualfallo = valida_campo_token(campo, numcampos)
         }
-         if numcampos < 5 {
-            resultado ="Missing fields in this line"
-        } 
-
-         if numcampos > 5 {
-            resultado ="More fields than required"
-        } 
         
         return resultado, cualfallo
 }
@@ -745,7 +714,7 @@ func valida_campo_token (campo string, numcampos int)(string, int){
                 if campo != "" {
                     if len(campo) > 30 {
                         resultado = "External identifier max leng is 30"
-                        log.Print(resultado)
+                        
                         cualfallo = 1
                     }
 
@@ -820,18 +789,8 @@ func campos_payment (line string, lineas int)(string, int){
         for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
               log.Println(campo)
               numcampos = numcampos + 1
-              log.Print(numcampos)
               resultado, cualfallo = valida_campo_pay(campo, numcampos)
         }
-        if numcampos < 6 {
-            resultado ="Missing fields in this line"
-            
-        } 
-
-         if numcampos > 6 {
-            resultado ="More fields than required"
-            
-        } 
         
         return resultado, cualfallo
 }
@@ -901,12 +860,11 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
 						resultado="Cvv must be 3 or 4 digits"
                         cualfallo = 5
 			        }
-
 				}else{
 					resultado="Cvv is required"
                     cualfallo = 5
 		        }
-            }
+            } 
             
 			if numcampos == 6{
                 if campo != "" {
