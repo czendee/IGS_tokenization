@@ -722,8 +722,16 @@ func campos_token (line string, lineas int)(string, int){
         for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
               log.Println(campo)
               numcampos = numcampos + 1
+              log.Print(numcampos)
               resultado, cualfallo = valida_campo_token(campo, numcampos)
         }
+         if numcampos < 5 {
+            resultado ="Missing fields in this line"
+        } 
+
+         if numcampos > 5 {
+            resultado ="More fields than required"
+        } 
         
         return resultado, cualfallo
 }
@@ -737,7 +745,7 @@ func valida_campo_token (campo string, numcampos int)(string, int){
                 if campo != "" {
                     if len(campo) > 30 {
                         resultado = "External identifier max leng is 30"
-                        
+                        log.Print(resultado)
                         cualfallo = 1
                     }
 
@@ -812,8 +820,18 @@ func campos_payment (line string, lineas int)(string, int){
         for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
               log.Println(campo)
               numcampos = numcampos + 1
+              log.Print(numcampos)
               resultado, cualfallo = valida_campo_pay(campo, numcampos)
         }
+        if numcampos < 6 {
+            resultado ="Missing fields in this line"
+            
+        } 
+
+         if numcampos > 6 {
+            resultado ="More fields than required"
+            
+        } 
         
         return resultado, cualfallo
 }
