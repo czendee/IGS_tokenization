@@ -1,0 +1,34 @@
+package pgsql
+
+import (
+	"banwire/dash/dashboard_banwire/db"
+)
+
+func (_db *Db) TestFunction() (err error) {
+
+	var tx, _ = _db.GetConnection().Begin()
+	defer func() {
+		if err == nil {
+			tx.Commit()
+		} else {
+			tx.Rollback()
+		}
+	}()
+
+	var _q = "SELECT app.test()"
+	var _p = db.PgParams()
+
+	if _, e := tx.Exec(_q, _p...); e != nil {
+		err = e
+		return
+	}
+
+	return
+}
+
+type TestTable struct {
+	Id_ db.DefaultInt64 `dbfield:"0,id_test"`
+
+	Id    int64  `dbfield:"1,id"`
+	Label string `dbfield:"2,label"`
+}

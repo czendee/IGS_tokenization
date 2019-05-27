@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Youtochi-Banwire File Tokenizer and Pay</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/logo_purple.png"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" href="/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/nya-bs-select.min.css">
+    <link rel="stylesheet" type="text/css" href="/ngToast.min.css">
+    <link rel="stylesheet" type="text/css" href="/ui-bootstrap-csp.css">
+    <link rel="stylesheet" type="text/css" href="/app.min.css">
+</head>
+
+  <style type="text/css">
+    #gmapsmio {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    left: 100px;
+     top: 100px;
+}
+.file-drop-zone {
+     border:2px dashed #ddd;
+     padding:30px;
+     text-align: center;
+     width: 250px;
+}
+.file-drop-zone-over {
+     border:2px dashed #aaa;
+     padding:30px;
+     text-align: center;
+     width: 250px;
+}
+.file-description {
+     vertical-align: text-top;
+     width: 250px;
+}
+.image-container {
+      width:  250px;
+       margin-top :30px;
+}
+
+.headerBanwire {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+  word-wrap: normal;
+
+  line-break: auto;
+     text-align: left;
+}
+  </style>
+<body >
+<script type="text/javascript" src="/angular.min.js"></script>
+<!-- Drag and drop -->
+
+              <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
+                     <span > BANWIRE: Herramienta de Consulta Token e Historial Pagos </span>
+              </div >
+
+<div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:100px;">
+              <div>
+                   <span >Client Reference: </span>
+                    
+   
+              </div> 
+              <div >
+                  <textarea class="textarea" ng-model="clientreference"></textarea >
+                   
+   
+              </div> 
+              <div>
+                   
+                   <button class="btn btn-primary" ng-click="validate()">Consultar Tokens</button> 
+                    
+   
+              </div> 
+              <div>
+                   <span >Token: </span>
+                    
+   
+              </div> 
+              <div >
+                  <textarea class="textarea" ng-model="token"></textarea >
+                    
+   
+              </div> 
+
+              <div>
+                   
+                   <button class="btn btn-primary" ng-click="save()">Consultar Historial Pagos del Token</button>
+                    
+   
+              </div> 
+              <div>
+                   <span>Respuesta: </span>
+              </div> 
+              <div>
+                    <textarea class="textarea" ng-model="respuesta"></textarea >
+   
+              </div> 
+              <div>
+                   <span>Cantidad de Pagos: </span>
+              </div> 
+              <div>
+                    <textarea class="textarea" ng-model="numtokenizadas"></textarea >
+   
+              </div> 
+
+              <div>
+                   <span>Status: </span>
+                    
+              </div> 
+              <div>
+                     <textarea class="textarea" ng-model="status"></textarea >
+              </div> 
+</div>
+
+
+<script type="text/javascript">
+     (function(){
+           'use strict';
+            var module = angular.module('module',[]);
+            module.controller('myCtrl',function($scope,$http){
+                $scope.files = [];
+                $scope.description='';
+                $scope.remove = function(index){
+                     var files = [];
+                     angular.forEach($scope.files, function(file,key){
+                          if(index != key){
+                             files.push(file);
+                          }             
+                          $scope.files =files;
+                     } );
+                }
+                $scope.save = function(){
+                        var fd = new FormData();
+
+                        //now add other data to fd
+                        fd.append('token',$scope.token);
+                       var request = $http ({
+                           method: 'POST',
+                           url : '/v1/consultarhistorialtokens',
+                            data : fd,
+                           transformRequest: angular.identity,
+                           headers : {
+                               'Content-Type' : undefined
+                           }
+                        });
+                        if($scope.token.length >0){
+                               request.then(
+                                 function(response){
+                                   console.log(JSON.stringify(response.data) );
+                                   $scope.respuesta =  response.data;
+                                   $scope.files = [];       
+                                 },
+
+                               )
+                               .catch(function (data) {
+                                   // Handle error here
+                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                  // $scope.files = [];
+                               });
+                        }
+
+                }
+                $scope.validate = function(){
+                        var fd = new FormData();
+                        //now add other data to fd
+                        fd.append('clientreference',$scope.clientreference);
+                       var request = $http ({
+                           method: 'POST',
+                           url : '/v1/consultartokens',
+                            data : fd,
+                           transformRequest: angular.identity,
+                           headers : {
+                               'Content-Type' : undefined
+                           }
+                        });
+                        if($scope.clientreference.length >0){
+                               request.then(
+                                 function(response){
+                                   console.log(JSON.stringify(response.data) );
+                                   var statusMssg =response.data.status_message;
+
+                                   if(statusMssg.indexOf("ERROR")>= 0 ){
+                                        $scope.respuesta = statusMssg;
+
+                                   }else{
+                                        $scope.respuesta = statusMssg;
+                                        
+                                   }
+                                 },
+
+                               )
+                               .catch(function (data) {
+                                   // Handle error here
+                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                  // $scope.files = [];
+                               });
+                        }
+
+                }
+
+            });
+//for drag and drop files
+
+            module.directive('fileDropzone',function(){
+                  return{
+                      restrict: 'A',
+                      scope:{
+                             filesToUpload:'='
+                       },
+                      link : function(scope,element,attributes){
+                            element.bind('dragover',function(e){
+                                  if(e !=null){
+                                      e.preventDefault();
+                                  }
+                                  e.dataTransfer.effectAllowed = 'copy';
+                                  element.attr('class','file-drop-zone-over');
+                             });
+                             element.bind('dragenter',function(e){
+                                  if(e !=null){
+                                      e.preventDefault();
+                                  }
+                                  e.dataTransfer.effectAllowed = 'copy';
+                                  element.attr('class','file-drop-zone-over');
+
+                             });
+                             element.bind('drop',function(e){
+                                  element.attr('class','file-drop-zone');
+                                  if(e !=null){
+                                      e.preventDefault();
+                                  }
+
+                                   var fileObjectsArray =[];
+                                   angular.forEach(e.dataTransfer.files, function(file){
+                                       //for the sake of previewing the files on the page before uploading          
+                                        var reader = new FileReader();
+                                         reader.onload=function(e){
+                                                 scope.$apply(function(){
+                                                       var newFilePreview = e.target.result;
+                                                       var newFileName = file.name;
+                                                       var newFileSize = file.size;
+                                                       var fileObject =  {
+                                                            file : file, //this is the exact file to be uploaded
+                                                            name : newFileName,
+                                                            size : newFileSize,
+                                                            preview: newFilePreview
+                                                       }
+                                                       fileObjectsArray.push(fileObject);
+                                                 });
+                                         }
+                                         reader.readAsDataURL(file);
+      
+                                   });
+                                   scope.filesToUpload = fileObjectsArray;
+                             });
+                      }
+                  }
+            });
+      }).call(this);
+</script>
+</body>
+</html>
