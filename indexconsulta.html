@@ -83,7 +83,7 @@
               </div> 
               <div>
                    
-                   <button class="btn btn-primary" ng-click="validate()">Consultar Tokens</button> 
+                   <button class="btn btn-primary" ng-click="consultok()">Consultar Tokens</button> 
                     
    
               </div> 
@@ -100,7 +100,7 @@
 
               <div>
                    
-                   <button class="btn btn-primary" ng-click="save()">Consultar Historial Pagos del Token</button>
+                   <button class="btn btn-primary" ng-click="consulhist()">Consultar Historial Pagos del Token</button>
                     
    
               </div> 
@@ -145,7 +145,7 @@
                           $scope.files =files;
                      } );
                 }
-                $scope.save = function(){
+                $scope.consulhist = function(){
                         var fd = new FormData();
 
                         //now add other data to fd
@@ -176,7 +176,7 @@
                         }
 
                 }
-                $scope.validate = function(){
+                $scope.consultok = function(){
                         var fd = new FormData();
                         //now add other data to fd
                         fd.append('clientreference',$scope.clientreference);

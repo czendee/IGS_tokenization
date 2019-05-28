@@ -82,7 +82,7 @@
               </div> 
               <div>
                    
-                   <button class="btn btn-primary" ng-click="validate()">Consultar Historial de Archivos</button> 
+                   <button class="btn btn-primary" ng-click="consultarhistclient()">Consultar Historial de Clientes</button> 
                        
               </div> 
               <div>
@@ -95,7 +95,7 @@
               </div> 
               <div>
                    
-                   <button class="btn btn-primary" ng-click="save()">Consultar Historial Archivos</button>
+                   <button class="btn btn-primary" ng-click="consultarhisttoken()">Consultar Historial Token</button>
                     
               </div> 
               <div>
@@ -109,7 +109,7 @@
               </div> 
               <div>
                    
-                   <button class="btn btn-primary" ng-click="consultarhistpay()">Consultar en Historial Archivos</button> 
+                   <button class="btn btn-primary" ng-click="consultarhistpay()">Consultar en Historial Pagos</button> 
                     
    
               </div> 
@@ -155,21 +155,21 @@
                           $scope.files =files;
                      } );
                 }
-                $scope.save = function(){
+                $scope.consultarhistclient = function(){
                         var fd = new FormData();
 
                         //now add other data to fd
-                        fd.append('token',$scope.token);
+                        fd.append('clientreference',$scope.clientreference);
                        var request = $http ({
                            method: 'POST',
-                           url : '/v1/consultarhistorialtokens',
+                           url : '/v1/consultarhistorialClientes',
                             data : fd,
                            transformRequest: angular.identity,
                            headers : {
                                'Content-Type' : undefined
                            }
                         });
-                        if($scope.token.length >0){
+                        if($scope.clientreference.length >0){
                                request.then(
                                  function(response){
                                    console.log(JSON.stringify(response.data) );
@@ -186,20 +186,58 @@
                         }
 
                 }
-                $scope.validate = function(){
+                $scope.consultarhisttoken = function(){
                         var fd = new FormData();
                         //now add other data to fd
-                        fd.append('clientreference',$scope.clientreference);
+                        fd.append('token',$scope.token);
                        var request = $http ({
                            method: 'POST',
-                           url : '/v1/consultartokens',
+                           url : '/v1/consultahistorialToken',
                             data : fd,
                            transformRequest: angular.identity,
                            headers : {
                                'Content-Type' : undefined
                            }
                         });
-                        if($scope.clientreference.length >0){
+                        if($scope.token.length >0){
+                               request.then(
+                                 function(response){
+                                   console.log(JSON.stringify(response.data) );
+                                   var statusMssg =response.data.status_message;
+
+                                   if(statusMssg.indexOf("ERROR")>= 0 ){
+                                        $scope.respuesta = statusMssg;
+
+                                   }else{
+                                        $scope.respuesta = statusMssg;
+                                        
+                                   }
+                                 },
+
+                               )
+                               .catch(function (data) {
+                                   // Handle error here
+                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                  // $scope.files = [];
+                               });
+                        }
+
+                }
+
+                $scope.consultarhistpay = function(){
+                        var fd = new FormData();
+                        //now add other data to fd
+                        fd.append('paymentreference',$scope.paymentreference);
+                       var request = $http ({
+                           method: 'POST',
+                           url : '/v1/consultarhistorialPagos',
+                            data : fd,
+                           transformRequest: angular.identity,
+                           headers : {
+                               'Content-Type' : undefined
+                           }
+                        });
+                        if($scope.paymentreference.length >0){
                                request.then(
                                  function(response){
                                    console.log(JSON.stringify(response.data) );
