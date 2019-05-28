@@ -11,6 +11,18 @@
 			]
 		},      
 		{
+			"type" : "envserver",
+			"nodes" : [
+				{
+					"active"   : true,
+                       "envlevel" : "dev",
+                       "envurl" : "https://8060-dot-3809294-dot-devshell.appspot.com",
+                       "envport" : ":8060",
+                       "envlog" : "3"
+				}
+			]
+		},         
+		{
 			"type" : "postgresql",
 			"nodes" : [
 				{

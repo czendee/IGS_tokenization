@@ -92,8 +92,7 @@ func getJsonResponseErrorValidateFile(fileStatusMsg, fileStatusNumber string, li
 
 
      	for _, d := range linesStatus {
-     		log.Print("el registor trae:")
-             
+     		             
 			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status}   //request.go
 			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
  		}

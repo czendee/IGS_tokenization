@@ -26,6 +26,11 @@ var Config_DB_port int
 var Config_WS_crbanwire_pass string
 var Config_WS_crbanwire_url string
 
+var Config_env_server string
+var Config_env_url string
+var Config_env_port string
+var Config_env_log string
+
 
 /*    const (
         DB_USER     = "lerepagr"        
@@ -40,7 +45,7 @@ var Config_WS_crbanwire_url string
 
 func init() {
 	flag.StringVar(&RunMode, "mode", "api", "Service mode run (Options: api, batch)")
-	flag.StringVar(&HTTPListen, "http", ":8095", "Path where HTTP Server will listening")
+//to be set later	flag.StringVar(&HTTPListen, "http", ":8095", "Path where HTTP Server will listening")
 	flag.StringVar(&configFile, "config", "./conf/config.json", "Path of configuration file")
 //	flag.StringVar(&configFile, "config", "config.json", "Path of configuration file")
 
@@ -67,6 +72,9 @@ func LoadConfiguration() {
 		//log.Panicf("Error in opening the configuration file: %s", e)
 			log.Print("Error in opening the configuration file %s", e)
 	}
+    //reset the port
+    	flag.StringVar(&HTTPListen, "http", Config_env_port, "Path where HTTP Server will listening")
+
 }
 
 // config is the configuration structure object
@@ -111,6 +119,27 @@ func (c *configDatabase) UnmarshalJSON(data []byte) error {
 				}
 				log.Print("UnmarshalJSON 2.06!")
 			}
+		case "envserver":
+			log.Print("UnmarshalJSON 2.04.2! envserver")
+			for _, n := range d.Nodes {
+							log.Print("UnmarshalJSON 2.05!")
+				if active, _ := n["active"].(bool); active {
+                    valenv,_:=n["envlevel"].(string)
+                    valurl,_:=n["envurl"].(string)
+                    valport,_:=n["envport"].(string)
+                    vallog,_:=n["envlog"].(string)
+                    log.Print("---- The value  was loaded"+valenv)
+
+                     Config_env_server = valenv
+                     Config_env_url = valurl
+                     Config_env_port = valport
+                     Config_env_log = vallog
+                    log.Print("---- The env level value  was assigned es "+Config_env_server)
+                    log.Print("---- The env level port  was assigned es "+Config_env_port)
+				}
+				log.Print("UnmarshalJSON 2.06! envserver")
+			}
+
 		case "postgresql":
 			log.Print("UnmarshalJSON 04!")
 			for _, n := range d.Nodes {

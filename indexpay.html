@@ -105,26 +105,42 @@
    
               </div> 
               <div>
-                   <span>Respuesta: </span>
+                   <span>Respuesta Validacion: </span>
               </div> 
               <div>
-                    <textarea class="textarea" ng-model="respuesta"></textarea >
+                    <textarea class="textarea" rows="5" cols="100" ng-model="respuesta"></textarea >
    
               </div> 
               <div>
-                   <span>Cantidad de Pagos: </span>
-              </div> 
-              <div>
-                    <textarea class="textarea" ng-model="numtokenizadas"></textarea >
-   
-              </div> 
-
-              <div>
-                   <span>Status: </span>
+                   <span>Status Validacion: </span>
                     
               </div> 
               <div>
                      <textarea class="textarea" ng-model="status"></textarea >
+              </div> 
+
+              <div>
+                   <span>Respuesta Pagos: </span>
+              </div> 
+              <div>
+                    <textarea class="textarea" rows="5" cols="100" ng-model="respuestapayment"></textarea >
+   
+              </div> 
+
+              <div>
+                   <span>Cantidad de Pagos: </span>
+              </div> 
+              <div>
+                    <textarea class="textarea" ng-model="numpayments"></textarea >
+   
+              </div> 
+
+              <div>
+                   <span>Status Pagos: </span>
+                    
+              </div> 
+              <div>
+                     <textarea class="textarea" ng-model="statuspayment"></textarea >
               </div> 
 </div>
 
@@ -153,9 +169,12 @@
                         });
                         //now add other data to fd
                         fd.append('description',$scope.description);
+                        $scope.respuesta = " "
+                        $scope.status =  " "
+
                        var request = $http ({
                            method: 'POST',
-                           url : '/v1/paymentfile',
+                           url : '/v1/processpaymentfile',
                             data : fd,
                            transformRequest: angular.identity,
                            headers : {
@@ -166,8 +185,35 @@
                                request.then(
                                  function(response){
                                    console.log(JSON.stringify(response.data) );
-                                   $scope.respuesta =  response.data;
-                                   $scope.files = [];       
+                                   var statusMssg =response.data.status_message_file;
+                                   var statusNbr =response.data.status_file;
+                                   var statusDataEachRow =response.data.sucess_data_each_row;
+
+                                   if(statusMssg.indexOf("ERROR")>= 0 ){
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+
+                                   }else{
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+
+
+                                        $scope.files = [];                                        
+                                   }
                                  },
 
                                )
@@ -187,6 +233,9 @@
                         });
                         //now add other data to fd
                         fd.append('description',$scope.description);
+                        $scope.respuesta = " "
+                        $scope.status =  " "
+
                        var request = $http ({
                            method: 'POST',
                            url : '/v1/validatepaymentfiles',
@@ -200,13 +249,32 @@
                                request.then(
                                  function(response){
                                    console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message;
+                                   var statusMssg =response.data.status_message_file;
+                                   var statusNbr =response.data.status_file;
+                                   var statusDataEachRow =response.data.sucess_data_each_row;
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
-                                        $scope.respuesta = statusMssg;
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
 
                                    }else{
-                                        $scope.respuesta = statusMssg;
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+
                                         $scope.files = [];                                        
                                    }
                                  },

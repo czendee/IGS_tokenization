@@ -53,7 +53,7 @@ func init() {
     r.Handle("/v1/consultarhistorialtokens", netHandle(handlePostConsultaHistorial, nil)).Methods("POST")   //logicbusiness.go
 
     r.Handle("/v1/processtokenfile", netHandle(handlePostProcessTokenFile, nil)).Methods("POST")   //logicbusiness.go
-//    r.Handle("/v1/processpaymentfile", netHandle(handlePostProcessPaymentFile, nil)).Methods("POST")   //logicbusiness.go
+    r.Handle("/v1/processpaymentfile", netHandle(handlePostProcessPaymentFile, nil)).Methods("POST")   //logicbusiness.go
 
 
 	r.Handle("/v1/fetchtokenizedcards", netHandle(handleDBPostGettokenizedcards, nil)).Methods("POST")   //logicbusiness.go
@@ -536,6 +536,191 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 					
 }//en function validate
 
+//  handlePostProcessTokenFile
+
+func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
+       	defer func() {
+		db.Connection.Close(nil)
+	}()
+    var errorGeneral string
+    var errorGeneralNbr string
+
+
+
+    
+//   	var requestData modelito.RequestTokenizedCards
+
+
+    errorGeneral=""
+
+    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+
+//    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
+    if errorGeneral!="" {
+        log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+    	errorGeneral="ERROR:100 -Missing parameter"	+errorGeneral
+    	errorGeneralNbr="100"
+    }
+	////////////////////////////////////////////////process business rules
+	/// START
+    if errorGeneral=="" {
+
+        log.Print("CZ  ProcessTokenFile  STEP Get the File")
+        log.Print(" ProcessTokenFile File Upload Endpoint Hit")
+
+        // Parse our multipart form, 10 << 20 specifies a maximum
+        // upload of 10 MB files.
+        err:= r.ParseMultipartForm(10 << 20)
+        if err != nil {
+            
+            log.Print("CZ ProcessTokenFile Error Retrieving the File")
+            log.Print(err)
+            errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
+            errorGeneralNbr="110"
+
+        } 
+        if errorGeneral=="" {  
+            log.Print("CZ ProcessTokenFile Start read the form data")
+            formdata := r.MultipartForm // ok, no problem so far, read the Form data
+
+            //get the *fileheaders
+            files := formdata.File["file0"] // grab the files, this files was set in the html 
+
+            log.Print("CZ ProcessTokenFile before loop files")
+
+            for i, _ := range files { // loop through the files one by one
+               
+               log.Print("CZ loop step 1")
+                var elfileindex string
+                
+                elfileindex = "file0"
+               log.Print("CZ Loop file")
+               log.Print("CZ Loop file:"+elfileindex)
+                file, err := files[i].Open()
+                log.Print("CZ open file")
+                defer file.Close()
+                if err != nil {
+                    log.Print(w, err)
+                    errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
+                    errorGeneralNbr="120"
+
+                }
+                //convert multipart file into buffer bytes
+
+                buf := bytes.NewBuffer(nil)
+                io.Copy(buf, file)
+
+                micadenita := buf.String()
+
+                log.Print(micadenita)
+
+                log.Print("ProcessTokenFile MGR Paso linea por linea index")
+
+                lineas := 0
+
+                lineasWithErrors := 0
+                for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
+                    var u modelito.ExitoDataTokenLine
+                    if lineas >= 1{
+                        log.Printf("MGR Linea %d de datos", lineas)
+
+                        lineas = lineas + 1
+                         respuestaRes,cualfallo :=campos_payment (line, lineas)
+                         if cualfallo ==0 {  //exito, todos los cmapos de la linea OK, y no errores previos
+                            u.Line=strconv.Itoa(lineas)
+                            u.Status="OK"
+                            u.StatusMessage ="SUCESS"
+
+                         }else { //error, al menos un error en la linea
+                            u.Line=strconv.Itoa(lineas)
+                            u.Status="ERROR540"
+                            u.StatusMessage ="ERROR LINEA:"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            lineasWithErrors =1
+                         }
+                         linesStatus = append(linesStatus,u);
+                    }
+                    
+                    if lineas == 0 {
+                        log.Print("MGR Linea 0 de textos")
+                        lineas = lineas + 1
+                    }
+
+                        log.Println(line)
+                       
+                        
+
+                }//end  -loop through the lines
+
+               if  lineasWithErrors ==1 { //al menos una linea  tuvo un error
+                     errorGeneral="ERROR FILE"
+                     errorGeneralNbr="540"
+                   
+               }else{
+                    if errorGeneral=="" {  
+    
+                        log.Print(w, " ProcessTokenFile Files uploaded successfully : ")
+                        log.Print(w, files[i].Filename+"\n")
+
+                    }    
+
+               }
+                //1.count number of lines in the file received
+                //2.for each line 
+                //      validate the content
+                //3.store in the db table AUDIT FILE VALIDATION
+                //         seq nbr ,  file name, size, content[all the bytes],commentsParam, validationStatus, validationStatusMessage,validationResponse[for each line,a response OK/Error] ,timestamp
+                //3.return result JSON
+
+
+                
+
+            }//end for - all the files received
+
+        }//end if    
+//		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
+	}
+
+
+	/// END
+    if errorGeneral!=""{
+    	//send error response if any
+    	//prepare an error JSON Response, if any
+		log.Print("CZ ProcessTokenFile  STEP Get the ERROR response JSON ready")
+		
+		// START
+		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
+
+        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}
+	
+    }else{
+
+/*        var  cardTokenized modelito.Card
+        fieldDataBytesJson,err := getJsonResponseValidateFileV2(cardTokenized)
+        w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}//end if
+*/
+        errorGeneral ="SUCCESS"
+        errorGeneralNbr ="OK"
+        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}
+
+    } 
+
+}
 
 
 func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
@@ -552,6 +737,9 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 
 
     errorGeneral=""
+
+    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+
 //    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
         log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
@@ -583,7 +771,7 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-          log.Print("CZ before loop files")
+            log.Print("CZ before loop files")
 
             for i, _ := range files { // loop through the files one by one
                
@@ -606,16 +794,61 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 
                 buf := bytes.NewBuffer(nil)
                 io.Copy(buf, file)
-//                if _, err := io.Copy(buf, file); err != nil {
-//                    return nil, err
-//                }                
-//                log.Print(buf) // print the content as 'bytes'
 
-                 // convert content to a 'string'
-                str := buf.String()
-     
-                log.Print(str) // print the content as a 'string'                
+                micadenita := buf.String()
 
+                log.Print(micadenita)
+
+                log.Print("MGR Paso linea por linea index")
+
+                lineas := 0
+
+                lineasWithErrors := 0
+                for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
+                    var u modelito.ExitoDataTokenLine
+                    if lineas >= 1{
+                        log.Printf("MGR Linea %d de datos", lineas)
+
+                        lineas = lineas + 1
+                         respuestaRes,cualfallo :=campos_payment (line, lineas)
+                         if cualfallo ==0 {  //exito, todos los cmapos de la linea OK, y no errores previos
+                            u.Line=strconv.Itoa(lineas)
+                            u.Status="OK"
+                            u.StatusMessage ="SUCESS"
+
+                         }else { //error, al menos un error en la linea
+                            u.Line=strconv.Itoa(lineas)
+                            u.Status="ERROR540"
+                            u.StatusMessage ="ERROR FIELD:"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            lineasWithErrors =1
+                         }
+                         linesStatus = append(linesStatus,u);
+                    }
+                    
+                    if lineas == 0 {
+                        log.Print("MGR Linea 0 de textos")
+                        lineas = lineas + 1
+                    }
+
+                        log.Println(line)
+                       
+                        
+
+                }//end  -loop through the lines
+
+               if  lineasWithErrors ==1 { //al menos una linea  tuvo un error
+                     errorGeneral="ERROR FILE"
+                     errorGeneralNbr="540"
+                   
+               }else{
+                    if errorGeneral=="" {  
+    
+                        log.Print(w, "Files uploaded successfully : ")
+                        log.Print(w, files[i].Filename+"\n")
+
+                    }    
+
+               }
                 //1.count number of lines in the file received
                 //2.for each line 
                 //      validate the content
@@ -625,49 +858,24 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 
 
                 
-                if errorGeneral=="" {  
-  /*do not store the file in the server
-                    log.Print("CZ Start create temp file")
-                    log.Print("CZ Start  temp file nam:"+ files[i].Filename)
-                    out, err := os.Create("/tmp/" + files[i].Filename)
 
-                    defer out.Close()
-                    if err != nil {
-                        log.Print(w, "Unable to create the file for writing. Check your write access privilege")
-                        return
-                    }
+            }//end for - all the files received
 
-                    _, err = io.Copy(out, file) // file not files[i] !
-
-                    if err != nil {
-                        log.Print(w, err)
-                        return
-                    }
-*/
-                    log.Print(w, "Files uploaded successfully : ")
-                    log.Print(w, files[i].Filename+"\n")
-
-                }    
-
-            }//end for
         }//end if    
 //		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-         var  cardTokenized modelito.Card
-        fieldDataBytesJson,err := getJsonResponseValidateFileV2(cardTokenized)
-        w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}//end if
 	}
+
+
 	/// END
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
 		log.Print("CZ   STEP Get the ERROR response JSON ready")
 		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
+		// START
+		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
+
+        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
@@ -675,9 +883,30 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 			
 		}
 	
+    }else{
+
+/*        var  cardTokenized modelito.Card
+        fieldDataBytesJson,err := getJsonResponseValidateFileV2(cardTokenized)
+        w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}//end if
+*/
+        errorGeneral ="SUCCESS"
+        errorGeneralNbr ="OK"
+        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}
+
     } 
 					
-}//end function validatepayment
+}//en function handlePostVaidatePaymentFiles
+
 
 
    
