@@ -10,6 +10,7 @@ import (
 	"banwire/services/file_tokenizer/db"
 	"banwire/services/file_tokenizer/net"
 	modelito "banwire/services/file_tokenizer/model"
+    utilito "banwire/services/file_tokenizer/util"
 
 //  "banwire/services/file_tokenizer/model"
 //	"banwire/services/file_tokenizer/model/pgsql"
@@ -55,9 +56,11 @@ func init() {
     r.Handle("/v1/processtokenfile", netHandle(handlePostProcessTokenFile, nil)).Methods("POST")   //logicbusiness.go
     r.Handle("/v1/processpaymentfile", netHandle(handlePostProcessPaymentFile, nil)).Methods("POST")   //logicbusiness.go
 
+
 	r.Handle("/v1/consultarhistorialClientes", netHandle(handlePostConsultahistorialClientes, nil)).Methods("POST")   //logicbusiness.go
     r.Handle("/v1/consultahistorialToken", netHandle(handlePostConsultaHistorialToken, nil)).Methods("POST")   //logicbusiness.go
     r.Handle("/v1/consultarhistorialPagos", netHandle(handlePostConsultaHistorialPagos, nil)).Methods("POST")   //logicbusiness.go
+
 
 	r.Handle("/v1/fetchtokenizedcards", netHandle(handleDBPostGettokenizedcards, nil)).Methods("POST")   //logicbusiness.go
 	r.Handle("/v1/processpayment", netHandle(v4handleDBPostProcesspayment, nil)).Methods("POST")           //logicbusiness.go    	   
@@ -70,7 +73,8 @@ func init() {
 //index html angular
 
 func dash01Handler(w http.ResponseWriter, r *http.Request) {
-    log.Print("cz  dash01Handler with param")
+    utilito.LevelLog(Config_env_log, "1", "cz  dash01Handler with param")
+ 
 //    log.Print("cz  dash01Handler with param"+Config_env_url)
     http.ServeFile(w,r,"index.html")
 /*     data := TodoPageData{
@@ -723,7 +727,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 
     } 
 
-} //end handlePostProcessPaymentFile
+}
 
 
 func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
@@ -909,6 +913,218 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
     } 
 					
 }//en function handlePostVaidatePaymentFiles
+
+
+
+   
+   // handleDBGettokenizedcards  receive and handle the request from client, access DB, and web
+func handleDBPostGettokenizedcards(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		db.Connection.Close(nil)
+	}()
+    var errorGeneral string
+    var errorGeneralNbr string
+    
+   	var requestData modelito.RequestTokenizedCards
+
+
+    errorGeneral=""
+    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
+
+	////////////////////////////////////////////////process business rules
+	/// START
+    if errorGeneral=="" {
+
+		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
+	}
+	/// END
+    if errorGeneral!=""{
+    	//send error response if any
+    	//prepare an error JSON Response, if any
+		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		
+			/// START
+		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}
+	
+    } 
+					
+}
+
+
+
+
+// handleGeneratetokenized for receive and handle the request from client
+func handleDBPostGeneratetokenized(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		db.Connection.Close(nil)
+	}()
+     var requestData modelito.RequestTokenized
+     var errorGeneral string
+     var errorGeneralNbr string
+     
+    errorGeneral=""
+
+
+    requestData,errorGeneral =obtainPostParmsGeneratetokenized(r,errorGeneral)   //logicrequest_post.go
+
+
+
+	////////////////////////////////////////////////validate parms
+	/// START
+    
+    if errorGeneral=="" {
+
+		errorGeneral,errorGeneralNbr= ProcessGeneratetokenized(w , requestData)
+	}
+
+    if errorGeneral!=""{
+    	//send error response if any
+    	//prepare an error JSON Response, if any
+		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		
+			/// START
+		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}
+	
+    } 
+					
+}
+
+
+
+///////////////////////////////v4
+///////////////////////////////v4
+
+
+
+// v4handleDBProcesspayment  receive and handle the request from client, access DB
+func v4handleDBPostProcesspayment(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		db.Connection.Close(nil)
+	}()
+    var errorGeneral string
+    var errorGeneralNbr string
+    var requestData modelito.RequestPayment
+    
+    errorGeneral=""
+requestData,errorGeneral =obtainPostParmsProcessPayment(r,errorGeneral)  //logicrequest_post.go
+
+	////////////////////////////////////////////////validate parms
+	/// START
+	////////////////////////////////////////////////validate parms
+	/// START
+    
+    if errorGeneral=="" {
+
+		errorGeneral,errorGeneralNbr= v4ProcessProcessPayment(w , requestData)    //logicbusiness.go 
+	}
+ 
+    if errorGeneral!=""{
+    	//send error response if any
+    	//prepare an error JSON Response, if any
+		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		
+			/// START
+		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}
+	
+    } 
+					
+}
+
+   // handlePostConsultaTokens  receive and handle the request from client, access DB, and web
+func handlePostConsultaTokens(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		db.Connection.Close(nil)
+	}()
+    var errorGeneral string
+    var errorGeneralNbr string
+    
+   	var requestData modelito.RequestTokenizedCards
+
+
+    errorGeneral=""
+    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
+
+	////////////////////////////////////////////////process business rules
+	/// START
+    if errorGeneral=="" {
+
+		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
+	}
+	/// END
+    if errorGeneral!=""{
+    	//send error response if any
+    	//prepare an error JSON Response, if any
+		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		
+			/// START
+		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}
+	
+    } 
+					
+}//end handlePostConsultaTokens
+
+   // handlePostConsultaHistorial  receive and handle the request from client, access DB, and web
+func handlePostConsultaHistorial(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		db.Connection.Close(nil)
+	}()
+    var errorGeneral string
+    var errorGeneralNbr string
+    
+   	var requestData modelito.RequestTokenizedCards
+
+
+    errorGeneral=""
+    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
+
+	////////////////////////////////////////////////process business rules
+	/// START
+    if errorGeneral=="" {
+
+		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
+	}
+	/// END
+    if errorGeneral!=""{
+    	//send error response if any
+    	//prepare an error JSON Response, if any
+		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		
+			/// START
+		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		if(err!=nil){
+			
+		}
+	
+    } 
+					
+}//end handlePostConsultaHistorial
 
 //func handlePostConsultahistorialClientes
 
@@ -1458,217 +1674,6 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
 
 
 }//end function handlePostConsultaHistorialPagos
-
-   
-   // handleDBGettokenizedcards  receive and handle the request from client, access DB, and web
-func handleDBPostGettokenizedcards(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		db.Connection.Close(nil)
-	}()
-    var errorGeneral string
-    var errorGeneralNbr string
-    
-   	var requestData modelito.RequestTokenizedCards
-
-
-    errorGeneral=""
-    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
-
-	////////////////////////////////////////////////process business rules
-	/// START
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-	}
-	/// END
-    if errorGeneral!=""{
-    	//send error response if any
-    	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
-		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
-		//////////    write the response (ERROR)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}
-	
-    } 
-					
-}
-
-
-
-
-// handleGeneratetokenized for receive and handle the request from client
-func handleDBPostGeneratetokenized(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		db.Connection.Close(nil)
-	}()
-     var requestData modelito.RequestTokenized
-     var errorGeneral string
-     var errorGeneralNbr string
-     
-    errorGeneral=""
-
-
-    requestData,errorGeneral =obtainPostParmsGeneratetokenized(r,errorGeneral)   //logicrequest_post.go
-
-
-
-	////////////////////////////////////////////////validate parms
-	/// START
-    
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= ProcessGeneratetokenized(w , requestData)
-	}
-
-    if errorGeneral!=""{
-    	//send error response if any
-    	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
-		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
-		//////////    write the response (ERROR)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}
-	
-    } 
-					
-}
-
-
-
-///////////////////////////////v4
-///////////////////////////////v4
-
-
-
-// v4handleDBProcesspayment  receive and handle the request from client, access DB
-func v4handleDBPostProcesspayment(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		db.Connection.Close(nil)
-	}()
-    var errorGeneral string
-    var errorGeneralNbr string
-    var requestData modelito.RequestPayment
-    
-    errorGeneral=""
-requestData,errorGeneral =obtainPostParmsProcessPayment(r,errorGeneral)  //logicrequest_post.go
-
-	////////////////////////////////////////////////validate parms
-	/// START
-	////////////////////////////////////////////////validate parms
-	/// START
-    
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= v4ProcessProcessPayment(w , requestData)    //logicbusiness.go 
-	}
- 
-    if errorGeneral!=""{
-    	//send error response if any
-    	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
-		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
-		//////////    write the response (ERROR)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}
-	
-    } 
-					
-}
-
-   // handlePostConsultaTokens  receive and handle the request from client, access DB, and web
-func handlePostConsultaTokens(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		db.Connection.Close(nil)
-	}()
-    var errorGeneral string
-    var errorGeneralNbr string
-    
-   	var requestData modelito.RequestTokenizedCards
-
-
-    errorGeneral=""
-    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
-
-	////////////////////////////////////////////////process business rules
-	/// START
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-	}
-	/// END
-    if errorGeneral!=""{
-    	//send error response if any
-    	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
-		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
-		//////////    write the response (ERROR)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}
-	
-    } 
-					
-}//end handlePostConsultaTokens
-
-   // handlePostConsultaHistorial  receive and handle the request from client, access DB, and web
-func handlePostConsultaHistorial(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		db.Connection.Close(nil)
-	}()
-    var errorGeneral string
-    var errorGeneralNbr string
-    
-   	var requestData modelito.RequestTokenizedCards
-
-
-    errorGeneral=""
-    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
-
-	////////////////////////////////////////////////process business rules
-	/// START
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-	}
-	/// END
-    if errorGeneral!=""{
-    	//send error response if any
-    	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
-		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
-		//////////    write the response (ERROR)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}
-	
-    } 
-					
-}//end handlePostConsultaHistorial
-
 
 func campos_token (line string, lineas int)(string, int){
         log.Print("MGR campo por campo linea de: ", line)

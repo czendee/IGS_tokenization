@@ -44,7 +44,6 @@
       width:  250px;
        margin-top :30px;
 }
-
 .headerBanwire {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 20px;
@@ -57,7 +56,6 @@
   letter-spacing: normal;
   word-spacing: normal;
   word-wrap: normal;
-
   line-break: auto;
      text-align: left;
 }
@@ -147,7 +145,6 @@
                 }
                 $scope.consulhist = function(){
                         var fd = new FormData();
-
                         //now add other data to fd
                         fd.append('token',$scope.token);
                        var request = $http ({
@@ -166,7 +163,6 @@
                                    $scope.respuesta =  response.data;
                                    $scope.files = [];       
                                  },
-
                                )
                                .catch(function (data) {
                                    // Handle error here
@@ -174,7 +170,6 @@
                                   // $scope.files = [];
                                });
                         }
-
                 }
                 $scope.consultok = function(){
                         var fd = new FormData();
@@ -194,16 +189,13 @@
                                  function(response){
                                    console.log(JSON.stringify(response.data) );
                                    var statusMssg =response.data.status_message;
-
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.respuesta = statusMssg;
-
                                    }else{
                                         $scope.respuesta = statusMssg;
                                         
                                    }
                                  },
-
                                )
                                .catch(function (data) {
                                    // Handle error here
@@ -211,12 +203,9 @@
                                   // $scope.files = [];
                                });
                         }
-
                 }
-
             });
 //for drag and drop files
-
             module.directive('fileDropzone',function(){
                   return{
                       restrict: 'A',
@@ -237,14 +226,12 @@
                                   }
                                   e.dataTransfer.effectAllowed = 'copy';
                                   element.attr('class','file-drop-zone-over');
-
                              });
                              element.bind('drop',function(e){
                                   element.attr('class','file-drop-zone');
                                   if(e !=null){
                                       e.preventDefault();
                                   }
-
                                    var fileObjectsArray =[];
                                    angular.forEach(e.dataTransfer.files, function(file){
                                        //for the sake of previewing the files on the page before uploading          
