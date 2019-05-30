@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+    "strings"
+    "strconv"
 	//"log"
     utilito "banwire/services/file_tokenizer/util"
 	"banwire/services/file_tokenizer/db"
@@ -9,6 +11,8 @@ import (
 //	"time"
 //	"encoding/json"
 	 _ "github.com/lib/pq"   //use go get github.com/lib/pq
+    "io"
+    "bytes"
 
 )
 
@@ -388,3 +392,346 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
  utilito.LevelLog(Config_env_log, "3", "CZ  END   handler Listening DB  realizarpago  2")
      return errorGeneral, errorGeneralNbr
 }
+
+func validateFiles(typeFile string, r *http.Request) ( string, string, []modelito.ExitoDataTokenLine) {
+    var errorGeneral string
+    var errorGeneralNbr string
+
+
+    errorGeneral=""
+
+    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+
+    //start  logic
+    
+    if errorGeneral=="" {
+
+        utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3", "File Upload Endpoint Hit")
+
+        // Parse our multipart form, 10 << 20 specifies a maximum
+        // upload of 10 MB files.
+        err:= r.ParseMultipartForm(10 << 20)
+        if err != nil {
+            
+            utilito.LevelLog(Config_env_log, "3", "CZ Error Retrieving the File")
+            utilito.LevelLog(Config_env_log, "3",  err.Error())
+            errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
+            errorGeneralNbr="110"
+
+        } 
+        if errorGeneral=="" {  
+            utilito.LevelLog(Config_env_log, "3", "CZ Start read the form data")
+            formdata := r.MultipartForm // ok, no problem so far, read the Form data
+
+            //get the *fileheaders
+            files := formdata.File["file0"] // grab the files, this files was set in the html 
+
+            utilito.LevelLog(Config_env_log, "3", "CZ before loop files")
+
+            for i, _ := range files { // loop through the files one by one
+               
+                utilito.LevelLog(Config_env_log, "3", "CZ loop step 1")
+                var elfileindex string
+                
+                elfileindex = "file0"
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file")
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file:"+elfileindex)
+                file, err := files[i].Open()
+                utilito.LevelLog(Config_env_log, "3", "CZ open file")
+                defer file.Close()
+                if err != nil {
+                    utilito.LevelLog(Config_env_log, "3",  err.Error())
+                    errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
+                    errorGeneralNbr="120"
+
+                }
+                //convert multipart file into buffer bytes
+
+                buf := bytes.NewBuffer(nil)
+                io.Copy(buf, file)
+
+                micadenita := buf.String()
+
+                utilito.LevelLog(Config_env_log, "3", micadenita)
+
+                utilito.LevelLog(Config_env_log, "3", "MGR Paso linea por linea index")
+
+                lineas := 0
+
+                lineasWithErrors := 0
+                for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
+                    var u modelito.ExitoDataTokenLine
+                    if lineas >= 1{
+                        utilito.LevelLog(Config_env_log, "3", "MGR linea de datos")
+
+                        lineas = lineas + 1
+                         respuestaRes,cualfallo :=campos_token (line, lineas)
+                         if cualfallo ==0 {  //exito, todos los cmapos de la linea OK, y no errores previos
+                            u.Line=strconv.Itoa(lineas)
+                            u.Status="OK"
+                            u.StatusMessage ="SUCESS"
+
+                         }else { //error, al menos un error en la linea
+                            u.Line=strconv.Itoa(lineas)
+                            u.Status="ERROR540"
+                            u.StatusMessage ="ERROR FIELD:"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            lineasWithErrors =1
+                         }
+                         linesStatus = append(linesStatus,u);
+                    }
+                    
+                    if lineas == 0 {
+                        utilito.LevelLog(Config_env_log, "3", "MGR Nombres de campos")
+                        lineas = lineas + 1
+                    }
+
+                        utilito.LevelLog(Config_env_log, "3", line)
+                       
+                        
+
+                }//end  -loop through the lines
+
+               if  lineasWithErrors ==1 { //al menos una linea  tuvo un error
+                     errorGeneral="ERROR FILE"
+                     errorGeneralNbr="540"
+                   
+               }else{
+                    if errorGeneral=="" {  
+    
+                        utilito.LevelLog(Config_env_log, "3", "Files uploaded successfully : ")
+                        utilito.LevelLog(Config_env_log, "3", files[i].Filename+"\n")
+
+                    }    
+
+               }
+                //1.count number of lines in the file received
+                //2.for each line 
+                //      validate the content
+                //3.store in the db table AUDIT FILE VALIDATION
+                //         seq nbr ,  file name, size, content[all the bytes],commentsParam, validationStatus, validationStatusMessage,validationResponse[for each line,a response OK/Error] ,timestamp
+                //3.return result JSON
+
+
+                
+
+            }//end for - all the files received
+
+        }//end if    
+        //errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
+	}
+
+    //end   logic
+    return errorGeneral,errorGeneralNbr ,linesStatus 
+}
+
+//Función campos_token
+func campos_token (line string, lineas int)(string, int){
+        utilito.LevelLog(Config_env_log, "3", "MGR campo por campo")
+        numcampos := 0
+        var resultado string
+        var cualfallo int
+        resultado ="OK"
+        cualfallo =0
+        for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
+              
+              numcampos = numcampos + 1
+
+              var campoValue string
+//              campoValue = strings.Replace(campo, "\n", "", -1) // only works with a single character
+//              re := regexp.MustCompile(`\r?\n`)
+//              campoValue = re.ReplaceAllString(campoValue, "y")
+
+              campoValue = strings.Replace(campo, "\"", "", -1) // only works with a single character
+              var largo string
+              largo = strconv.Itoa ( len(campoValue))
+              utilito.LevelLog(Config_env_log, "3", "largo del campo es:"+largo+":valor del campo es:"+campoValue)
+              
+              resultado, cualfallo = valida_campo_token(campoValue, numcampos)
+
+              if cualfallo >0 {
+                  
+                  utilito.LevelLog(Config_env_log, "3", "fallo es valor en :"+campo)
+                  break
+              }
+        }
+        
+        return resultado, cualfallo
+} //end campos_token
+
+//Función valida_campo_token
+func valida_campo_token (campo string, numcampos int)(string, int){
+    utilito.LevelLog(Config_env_log, "3", "MGR valida campo token nbr"+strconv.Itoa(numcampos)+" with value:"+campo+"*")
+    var resultado string
+    var cualfallo int 
+    cualfallo = 0
+            if numcampos == 1{
+                if campo != "" {
+                    if len(campo) > 30 {
+                        resultado = "External identifier max leng is 30"
+                        
+                        cualfallo = 1
+                    }
+
+                }else{
+                    resultado = "External Identifier is required"
+                    cualfallo = 1
+                }
+            }
+            
+            if numcampos == 2{
+            	if campo != "" {
+					if len(campo) >100 {
+	
+						resultado="Customer reference max lenght is 100"
+                        cualfallo = 2
+			        }
+				}else{
+					resultado="Client reference is required"
+                    cualfallo = 2
+		        }
+                
+            }
+
+            if numcampos == 3{
+                if campo != "" {
+					if len(campo) >100 {
+	
+						resultado="Payment reference max lenght is 100"
+                        cualfallo = 3
+			        }
+				}else{
+					resultado="Payment reference is required"
+                    cualfallo = 3
+		        }
+            }
+
+            if numcampos == 4{
+                if campo != "" {
+					if len(campo)==16 || len(campo)==15{
+	
+					}else{
+						resultado="Card Number must be 16 digits:"+campo
+                        cualfallo = 4
+			        }
+				}else{
+					resultado="Card is required"
+                    cualfallo = 4
+		        }
+            }
+
+            if numcampos == 5{
+                utilito.LevelLog(Config_env_log, "3", "\n")
+                if campo != "" {
+					if  len(campo)==4 || len(campo)==5 { // 2 for the double quotes and 1 for the end of line
+	
+					}else{
+						resultado="Valid Thru  4 digits"
+                        cualfallo = 5
+			        }
+				}else{
+					resultado="Valid Thru is required"
+                    cualfallo = 5
+		        }
+            }
+    return resultado, cualfallo
+} //end func valida_campo_token
+
+//Función campos_payment
+func campos_payment (line string, lineas int)(string, int){
+        utilito.LevelLog(Config_env_log, "3", "MGR campo por campo")
+        numcampos := 0
+        var resultado string
+        var cualfallo int
+        for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
+              utilito.LevelLog(Config_env_log, "3", campo)
+              numcampos = numcampos + 1
+              resultado, cualfallo = valida_campo_pay(campo, numcampos)
+        }
+        
+        return resultado, cualfallo
+} //end func campos_payment
+
+//Función valida_campo_pay
+func valida_campo_pay (campo string, numcampos int)(string, int){
+    utilito.LevelLog(Config_env_log, "3", "MGR valida campo payment")
+
+    var resultado string
+    var cualfallo int 
+    cualfallo = 0
+            if numcampos == 1{
+                if campo != "" {
+                    if len(campo) > 30 {
+                        resultado = "External identifier max leng is 30"
+                        cualfallo = 1
+                    }
+
+                }else{
+                    resultado = "External Identifier is required"
+                    cualfallo = 1
+                }
+            }
+            
+            if numcampos == 2{
+            	if campo != "" {
+					if len(campo) >100 {
+	
+						resultado="Client reference is required"
+                        cualfallo = 2
+			        }
+				}else{
+					resultado="Client reference is required"
+                    cualfallo = 2
+		        }
+
+            }
+
+            if numcampos == 3{
+                if campo != "" {
+					if len(campo) >100 {
+	
+						resultado="Payment reference max lenght is 100"
+                        cualfallo = 3
+			        }
+				}else{
+					resultado="Payment reference is required"
+                    cualfallo = 3
+		        }
+
+            }
+
+            if numcampos == 4{
+                if campo != "" {
+
+				}else{
+					resultado="Token is required"
+                    cualfallo = 4
+		        }
+            }
+
+            if numcampos == 5{
+                           
+                if campo != "" {
+					if len(campo)==3 ||  len(campo)==4 {
+	
+					}else{
+						resultado="Cvv must be 3 or 4 digits"
+                        cualfallo = 5
+			        }
+				}else{
+					resultado="Cvv is required"
+                    cualfallo = 5
+		        }
+            } 
+            
+			if numcampos == 6{
+                if campo != "" {
+
+				}else{
+					resultado="Amount is required"
+                    cualfallo = 6
+		        }
+            }	
+
+    return resultado, cualfallo
+}//end func valida_campo_pay
