@@ -3,7 +3,8 @@ package main
 import (
 	"banwire/services/file_tokenizer/net"
 	"flag"
-	"log"
+	//"log"
+    utilito "banwire/services/file_tokenizer/util"
 	"sync"
 )
 
@@ -25,7 +26,7 @@ func main() {
 	LoadConfiguration()
 
 	loaded.Done()
-	log.Print("Service is ready for run...")
+	utilito.LevelLog(Config_env_log, "3", "Service is ready for run...")
     
 	switch RunMode {
 	case BatchRunMode:
@@ -35,7 +36,7 @@ func main() {
 		startServer()
 		break
 	default:
-		log.Print("Run mode is unknown")
+		utilito.LevelLog(Config_env_log, "3", "Run mode is unknown")
 		break
 	}
 
@@ -44,6 +45,6 @@ func main() {
 
 
 func startServer() {
-	log.Printf("HTTP Listening: %s", HTTPListen)
+	utilito.LevelLog(Config_env_log, "3", "HTTP Listening: "+ HTTPListen)
 	net.HTTPListener(HTTPListen)
 }

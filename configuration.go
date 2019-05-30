@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"flag"
 	"io/ioutil"
-	"log"
+	//"log"
+    utilito "banwire/services/file_tokenizer/util"
 
 	"banwire/services/file_tokenizer/db"
 	"banwire/services/file_tokenizer/path"
@@ -55,22 +56,23 @@ func init() {
 
 // loadConfiguration loads the configuration file
 func LoadConfiguration() {
-	log.Print("Loading configuration...v3.5")
+    utilito.LevelLog(Config_env_log, "3", "Loading configuration...v3.5")
 
 	if d, e := ioutil.ReadFile(configFile); e == nil {
 		e := json.Unmarshal(d, &Config)
 		if e != nil {
 //			log.Panicf("Error in unmarshalling the configuration file: %s", e.Error())
-            log.Print("Configuration was not was loaded!")
+            utilito.LevelLog(Config_env_log, "3", "Configuration was not was loaded!")
 		}else{
-			log.Print("Configuration was YESS was loaded!")
+			utilito.LevelLog(Config_env_log, "3", "Configuration was YESS was loaded!")
 		}
 
         
-		log.Print("Configuration was loaded!(check previo")
+		utilito.LevelLog(Config_env_log, "3", "Configuration was loaded!(check previo")
 	} else {
 		//log.Panicf("Error in opening the configuration file: %s", e)
-			log.Print("Error in opening the configuration file %s", e)
+			utilito.LevelLog(Config_env_log, "3", "Error in opening the configuration file %s")
+            utilito.LevelLog(Config_env_log, "3", e.Error())
 	}
     //reset the port
     	flag.StringVar(&HTTPListen, "http", Config_env_port, "Path where HTTP Server will listening")
@@ -89,61 +91,61 @@ type configDatabase struct{}
 // UnmarshalJSON handles desearialization of configDatabase
 // and loads the othersources: database connections and webservices connections
 func (c *configDatabase) UnmarshalJSON(data []byte) error {
- log.Print("UnmarshalJSON 00!:othersources")
+ utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 00!:othersources")
 	var cc = []struct {
 		Type string                   `json:"type"`
 		Nodes []map[string]interface{} `json:"nodes"`
 	}{}
-			log.Print("UnmarshalJSON 01!")
+			utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 01!")
 	err := json.Unmarshal(data, &cc)
 	if err != nil {
 		return err
 	}
-			log.Print("UnmarshalJSON 02!")
+			utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 02!")
 	for _, d := range cc {
-					log.Print("UnmarshalJSON 03.!"+d.Type)
+					utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 03.!"+d.Type)
 		switch d.Type {
 		case "crbanwire":
-			log.Print("UnmarshalJSON 2.04.2!")
+			utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 2.04.2!")
 			for _, n := range d.Nodes {
-							log.Print("UnmarshalJSON 2.05!")
+							utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 2.05!")
 				if active, _ := n["active"].(bool); active {
                     passcrban,_:=n["passwordcrbanwire"].(string)
                     urlcrban,_:=n["urlcrbanwire"].(string)
                     
-                    log.Print("---- The value  was loaded"+passcrban)
+                    utilito.LevelLog(Config_env_log, "3", "---- The value  was loaded"+passcrban)
 
                      Config_WS_crbanwire_pass = passcrban
                      Config_WS_crbanwire_url = urlcrban
-                    log.Print("---- The crbanwire value  was assigned es "+Config_WS_crbanwire_pass)
+                    utilito.LevelLog(Config_env_log, "3", "---- The crbanwire value  was assigned es "+Config_WS_crbanwire_pass)
 				}
-				log.Print("UnmarshalJSON 2.06!")
+				utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 2.06!")
 			}
 		case "envserver":
-			log.Print("UnmarshalJSON 2.04.2! envserver")
+			utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 2.04.2! envserver")
 			for _, n := range d.Nodes {
-							log.Print("UnmarshalJSON 2.05!")
+							utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 2.05!")
 				if active, _ := n["active"].(bool); active {
                     valenv,_:=n["envlevel"].(string)
                     valurl,_:=n["envurl"].(string)
                     valport,_:=n["envport"].(string)
                     vallog,_:=n["envlog"].(string)
-                    log.Print("---- The value  was loaded"+valenv)
+                    utilito.LevelLog(Config_env_log, "3", "---- The value  was loaded"+valenv)
 
                      Config_env_server = valenv
                      Config_env_url = valurl
                      Config_env_port = valport
                      Config_env_log = vallog
-                    log.Print("---- The env level value  was assigned es "+Config_env_server)
-                    log.Print("---- The env level port  was assigned es "+Config_env_port)
+                    utilito.LevelLog(Config_env_log, "3", "---- The env level value  was assigned es "+Config_env_server)
+                    utilito.LevelLog(Config_env_log, "3", "---- The env level port  was assigned es "+Config_env_port)
 				}
-				log.Print("UnmarshalJSON 2.06! envserver")
+				utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 2.06! envserver")
 			}
 
 		case "postgresql":
-			log.Print("UnmarshalJSON 04!")
+			utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 04!")
 			for _, n := range d.Nodes {
-							log.Print("UnmarshalJSON 05!")
+							utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 05!")
 				if active, _ := n["active"].(bool); active {
 					host, _ := n["host"].(string)
 					port, _ := n["port"].(float64)
@@ -159,23 +161,23 @@ func (c *configDatabase) UnmarshalJSON(data []byte) error {
                     Config_DB_server =host
                     Config_DB_port =int(port)            
                     
-                    log.Print("---- The DB values  was assigned "+Config_DB_server)                    
-                    log.Print("---- The DB values  was assigned "+Config_DB_user)
-                    log.Print("---- The DB values  was assigned "+Config_DB_pass)
-                    log.Print("---- The DB values  was assigned "+Config_DB_name)
+                    utilito.LevelLog(Config_env_log, "3", "---- The DB values  was assigned "+Config_DB_server)                    
+                    utilito.LevelLog(Config_env_log, "3", "---- The DB values  was assigned "+Config_DB_user)
+                    utilito.LevelLog(Config_env_log, "3", "---- The DB values  was assigned "+Config_DB_pass)
+                    utilito.LevelLog(Config_env_log, "3", "---- The DB values  was assigned "+Config_DB_name)
 					if e := db.Connection.Set(db.NewPgDb(host, int(port), _db, user, pass)); e == nil {
-						log.Print("---- The postgresql database was loaded"+host)
-						log.Print("---- The postgresql database was loaded"+_db)
+						utilito.LevelLog(Config_env_log, "3", "---- The postgresql database was loaded"+host)
+						utilito.LevelLog(Config_env_log, "3", "---- The postgresql database was loaded"+_db)
 					} else {
 						return e
 					}
 				}
-							log.Print("UnmarshalJSON 06!")
+							utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 06!")
 			}
 
 			break
 		}
-			log.Print("UnmarshalJSON 07!")
+			utilito.LevelLog(Config_env_log, "3", "UnmarshalJSON 07!")
 	}
 
 	return nil

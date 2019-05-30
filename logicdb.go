@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
+	//"log"
 	"strings"
 	modelito "banwire/services/file_tokenizer/model"
 	 "database/sql"
 	 _ "github.com/lib/pq"   //use go get github.com/lib/pq
 	miu "banwire/services/file_tokenizer/util"
+    utilito "banwire/services/file_tokenizer/util"
 )
 
 /*
@@ -46,37 +47,37 @@ var errCards error
 					 // Create connection pool
 					db, errdb = sql.Open("postgres", connString)
 					if errdb != nil {
-						log.Print("Error creating connection pool: " + errdb.Error())
+						utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
 						errorGeneral=errdb.Error()
 					}
 					// Close the database connection pool after program executes
 					 defer db.Close()
 					if errdb == nil {
-						log.Print("Connected!\n")
+                        utilito.LevelLog(Config_env_log, "3", "Connected!\n")
 				
 					
 						errPing := db.Ping()
 						if errPing != nil {
-						  log.Print("Error: Could not establish a connection with the database:"+ errPing.Error())
+                            utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
 							  errorGeneral=errPing.Error()
 						}else{
-					         log.Print("Ping ok!\n")
+					         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
 //					         var misCards modelito.Card
 					         
 					         resultCards,errCards =modelito.GetCardsByCustomer(db,requestData.Cardreference)
-					         					         log.Print("regresa func  getCardsByCustomer ok!\n")
+					         				utilito.LevelLog(Config_env_log, "3", "regresa func  getCardsByCustomer ok!\n")
 							if errCards != nil {
-							  log.Print("Error: :"+ errCards.Error())
+							  utilito.LevelLog(Config_env_log, "3", "Error: :"+ errCards.Error())
 							  errorGeneral=errCards.Error()
 							}
 							var cuantos int
 							cuantos = 0
 				         	for _, d := range resultCards {
-				         		log.Print("el registor trae:"+d.Token+" "+d.Bin)
+				         		utilito.LevelLog(Config_env_log, "3", "el registor trae:"+d.Token+" "+d.Bin)
 							    cuantos =1
 			         		}
 							if cuantos == 0 {
-							  log.Print("DB: records not found")
+							  utilito.LevelLog(Config_env_log, "3", "DB: records not found")
 							  errorGeneral="Not cards found for the customer reference received"
 							}		
 
@@ -110,60 +111,60 @@ var errCards error
 					 // Create connection pool
 					db, errdb = sql.Open("postgres", connString)
 					if errdb != nil {
-						log.Print("Error creating connection pool: " + errdb.Error())
+						utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
 						errorGeneral =errdb.Error()
 					}
 					// Close the database connection pool after program executes
 					 defer db.Close()
 					if errdb == nil {
-						log.Print("Connected!\n")
+						utilito.LevelLog(Config_env_log, "3", "Connected!\n")
 				
 					
 						errPing:= db.Ping()
 						if errPing != nil {
-						  log.Print("Error: Could not establish a connection with the database:"+ errPing.Error())
+						  utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
 						  errorGeneral= errPing.Error()
 						}else{
-						         log.Print("Ping ok!\n")
+						         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
 						         var miCustomer modelito.Customer
 						         miCustomer.Reference = requestData.Clientreference 
 						         errCustomer:= miCustomer.GetCustomerByReference01(db)
 						         //in miCustomer.ID is the value of the id_customer 
 								if errCustomer != nil {
-								  log.Print("Error: get customer:"+ errCustomer.Error())
+								  utilito.LevelLog(Config_env_log, "3", "Error: get customer:"+ errCustomer.Error())
 								  errorGeneral =errCustomer.Error()
 	                               
 								} else{
-						         log.Print("Ping ok!\n")
+						         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
                                     //verifica si ya existe ese tiken con algun otro cliente
                                     //START
 //	                                 var miCard modelito.Card//to return the bin, last, brand, type_card GetCardByToken
-							          log.Print(" verificar si ya existe ese token en tabla cards 01!\n")
+							         utilito.LevelLog(Config_env_log, "3", " verificar si ya existe ese token en tabla cards 01!\n")
 							         miCard.Token = dataObtained.Token //from the webservice cr.banwire.com method ADD
 //							         errCard:= miCard.GetCardByToken(db)
 							         errCard:= miCard.GetCardByTokenAndCust(db,miCustomer.ID)							         
 							         
 							         
-						          	log.Print(" verificar si ya existe ese token en tabla cards  para el mismo cliente 02!\n")
+						          	utilito.LevelLog(Config_env_log, "3", " verificar si ya existe ese token en tabla cards  para el mismo cliente 02!\n")
 									if errCard != nil {
 										 if strings.Contains(errCard.Error(),"no rows in result set") {
                                           //no existe, entocnes procede a insertarlo
-                                          log.Print(" TOKEN does not exist for the same customer"+errCard.Error())
+                                          utilito.LevelLog(Config_env_log, "3", " TOKEN does not exist for the same customer"+errCard.Error())
 											//no existe ese token para algun customer reference, proceder a insertar en cards table
 											//START
-									             log.Print("Listo para insertar card!\n")
+									             utilito.LevelLog(Config_env_log, "3", "Listo para insertar card!\n")
 										         milast,errLast :=miu.ObtainLast4fromCard (requestData.Card) //utils.go
 										         mibin,errBin :=miu.ObtainBINfromCard (requestData.Card) //utils.go
 												if(errLast!=""){
 													errorGeneral =errLast
-									                log.Print("error obatining the last 4!\n")
+									               utilito.LevelLog(Config_env_log, "3", "error obatining the last 4!\n")
 												}else if(errBin!=""){
 													errorGeneral =errBin
-									                log.Print("error obatining the BIN!\n")
+									                utilito.LevelLog(Config_env_log, "3", "error obatining the BIN!\n")
 												}else{
-									                log.Print(" todo ok para insertar!\n")
+									                utilito.LevelLog(Config_env_log, "3", " todo ok para insertar!\n")
 											         miCard.ID ="888"   //current value +1  o un random
-									                log.Print(" todo ok para insertar, el parametro de token es !\n"+dataObtained.Token +"   : "+dataObtained.Type)
+									                utilito.LevelLog(Config_env_log, "3", " todo ok para insertar, el parametro de token es !\n"+dataObtained.Token +"   : "+dataObtained.Type)
 											         miCard.Token =dataObtained.Token// value returned by the internal webservice 
 											         miCard.Last =milast//ulitmos 4 digitos de card
 											         miCard.Bin =mibin //6 basic digits in a card
@@ -173,9 +174,9 @@ var errCards error
 											         miCard.Brand = miu.GetCardType(requestData.Card)
 											         miCard.Type = dataObtained.Type
 											         errUpdate:=miCard.CreateCard(db)
-											          log.Print("regresa func  updateCard ok!\n")
+											          utilito.LevelLog(Config_env_log, "3", "regresa func  updateCard ok!\n")
 													if errUpdate != nil {
-													  log.Print("Error: :"+ errUpdate.Error())
+													  utilito.LevelLog(Config_env_log, "3", "Error: :"+ errUpdate.Error())
 														errorGeneral =errUpdate.Error()
 													}
 													
@@ -184,15 +185,15 @@ var errCards error
                                           //end if strings.contains 
 										 }else{
 										 	//error de la DB
-											  log.Print("Error: Checking token-customer:customer."+errCard.Error() )
+											  utilito.LevelLog(Config_env_log, "3", "Error: Checking token-customer:customer."+errCard.Error())
 											  errorGeneral ="Error: Checking token-customer:TOKEN already exists for this customer."+errCard.Error() 
 										 }
 										 
 									} else{
 										
-										log.Print(" ya existe table card  token:!\n"+miCard.Token)
-										log.Print(" ya existe table card  bin:!\n"+miCard.Bin)
-										log.Print(" ya existe table card customer:!\n"+miCard.Customer)
+										utilito.LevelLog(Config_env_log, "3", " ya existe table card  token:!\n"+miCard.Token)
+										utilito.LevelLog(Config_env_log, "3", " ya existe table card  bin:!\n"+miCard.Bin)
+										utilito.LevelLog(Config_env_log, "3", " ya existe table card customer:!\n"+miCard.Customer)
 /*									         miCard.Token 
 									         miCard.Last 
 									         miCard.Bin 
@@ -202,7 +203,7 @@ var errCards error
 									         miCard.Brand 
 									         miCard.Type 
 */									         
-									  log.Print("Error: Checking token-customer:TOKEN already exists for this customer.")
+									  utilito.LevelLog(Config_env_log, "3", "Error: Checking token-customer:TOKEN already exists for this customer.")
 									  errorGeneral ="Error: Checking token-customer:TOKEN already exists for this customer."
 
 								    }
@@ -251,39 +252,39 @@ var errPayments error
 					 // Create connection pool
 					db, errdb = sql.Open("postgres", connString)
 					if errdb != nil {
-						log.Print("Error creating connection pool: " + errdb.Error())
+						utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
 						errorGeneral=errdb.Error()
 					}
 					// Close the database connection pool after program executes
 					 defer db.Close()
 					if errdb == nil {
-						log.Print("Connected!\n")
+						utilito.LevelLog(Config_env_log, "3", "Connected!\n")
 				
 					
 						errPing := db.Ping()
 						if errPing != nil {
-						  log.Print("Error: Could not establish a connection with the database:"+ errPing.Error())
+						  utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
 							  errorGeneral=errPing.Error()
 						}else{
-					         log.Print("Ping ok!\n")
+					         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
 				
 					         resultPayments,errPayments =modelito.GetTodayPaymentsByTokenCard(db,requestData.Token)
-					         					         log.Print("regresa func  GetTodayPaymentsByTokenCard ok!\n")
+					         				utilito.LevelLog(Config_env_log, "3", "regresa func  GetTodayPaymentsByTokenCard ok!\n")
 							if errPayments != nil {
-							  log.Print("Error: :"+ errPayments.Error())
+							  utilito.LevelLog(Config_env_log, "3", "Error: :"+ errPayments.Error())
 							  errorGeneral=errPayments.Error()
 							}
 							var cuantos int
 							cuantos = 0
 				         	for _, d := range resultPayments {
-				         		log.Print("el registor trae:"+d.Token+" "+d.Amount)
+				         		utilito.LevelLog(Config_env_log, "3", "el registor trae:"+d.Token+" "+d.Amount)
 							    cuantos =cuantos +1
 			         		}
 							if cuantos == 0 {
-							  log.Print("DB: records not found")
+							  utilito.LevelLog(Config_env_log, "3", "DB: records not found")
 							  
 							}else if cuantos >=3{
-							  log.Print("DB: Max daily payments for this Credit Card exceeded")
+							  utilito.LevelLog(Config_env_log, "3", "DB: Max daily payments for this Credit Card exceeded")
 							  errorGeneral="Not more payments can be processed today for this Credit Card. Max number of payments reached"
                                 
                             }	
@@ -317,20 +318,20 @@ var errPayments error
 			 // Create connection pool
 				db, errdb = sql.Open("postgres", connString)
 				if errdb != nil {
-					log.Print("Error creating connection pool: " + errdb.Error())
+					utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
 				}
 				// Close the database connection pool after program executes
 				 defer db.Close()
 				if errdb == nil {
-					log.Print("Connected!\n")
+					utilito.LevelLog(Config_env_log, "3", "Connected!\n")
 			
 				
 					errPing:= db.Ping()
 					if errPing != nil {
-					  log.Print("Error: Could not establish a connection with the database:"+ errPing.Error())
+					  utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
 					  errorGeneral =errPing.Error()
 					}else{
-				         log.Print("Ping ok!\n")
+				         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
 				         var miCustomer modelito.Customer
 				         miCustomer.Reference = requestData.Clientreference 
 				         errCustomer:= miCustomer.GetCustomerByReference01(db)
@@ -338,42 +339,42 @@ var errPayments error
 						if errCustomer != nil {
 							//the customer does not exist to score this payment
 							
-						  log.Print("Error: Customer does not Exists, payment done, buit score not updated: "+ errCustomer.Error())
+						  utilito.LevelLog(Config_env_log, "3", "Error: Customer does not Exists, payment done, buit score not updated: "+ errCustomer.Error())
 						  errorGeneral ="Error: Customer does not Exists. Payment applied, but card score not increased: "+ errCustomer.Error()
                            
 						} else{
 							//the customer exists
-					         log.Print("the customer exists, ID interno es "+miCustomer.ID)
+					         utilito.LevelLog(Config_env_log, "3", "the customer exists, ID interno es "+miCustomer.ID)
 					         miCard.Token =requestData.Token
 					         errUpdate:=miCard.IncreaseScoreCardAndCust(db,miCustomer.ID )
-					         log.Print("regresa func  IncreaseScoreCard ok!\n")
+					         utilito.LevelLog(Config_env_log, "3", "regresa func  IncreaseScoreCard ok!\n")
 							 if errUpdate != nil {
-								  log.Print("Error: increasing the score for this card:"+ errUpdate.Error())
+								  utilito.LevelLog(Config_env_log, "3", "Error: increasing the score for this card:"+ errUpdate.Error())
 							      errorGeneral =errUpdate.Error()
  							 }else{
                                     //the increase was done, now try record the payment for rule (3max payments for tcd a day)
-                                    log.Print("About record Payment info in DB, the customer exists, ID interno es "+miCustomer.ID)
+                                    utilito.LevelLog(Config_env_log, "3", "About record Payment info in DB, the customer exists, ID interno es "+miCustomer.ID)
                                     miPayment.Token =requestData.Token
                                     miPayment.Amount =requestData.Amount
                                     errInsertPay:=miPayment.CreatePayment(db )
-                                    log.Print("regresa func  CreatePayment ok!\n")
+                                    utilito.LevelLog(Config_env_log, "3", "regresa func  CreatePayment ok!\n")
                                     if errInsertPay != nil {
-                                        log.Print("Error: Recording the payment info in the DB:"+ errInsertPay.Error())
+                                        utilito.LevelLog(Config_env_log, "3", "Error: Recording the payment info in the DB:"+ errInsertPay.Error())
                                         errorGeneral =errInsertPay.Error()
                                     }else{
                                         //increase ok and the payment detail recorded  ok
-                                        log.Print(" se ejecuta  select table card to get bin, last, brand. type  01!\n")
+                                        utilito.LevelLog(Config_env_log, "3", " se ejecuta  select table card to get bin, last, brand. type  01!\n")
                                             miCard.Token = requestData.Token
                                             errCard:= miCard.GetCardByToken(db)
-                                        log.Print(" se ejecuta select table card to get bin, last, brand. type  02!\n")
+                                        utilito.LevelLog(Config_env_log, "3", " se ejecuta select table card to get bin, last, brand. type  02!\n")
                                             if errCard != nil {
-                                            log.Print("Error: after payment was applied and score increased,There was a problem getting the customer:"+ errCard.Error())
+                                            utilito.LevelLog(Config_env_log, "3", "Error: after payment was applied and score increased,There was a problem getting the customer:"+ errCard.Error())
                                             errorGeneral ="Error: after payment was applied and score increased,There was a problem getting the customer:"+ errCard.Error()
                                             
                                             } else{
-                                              log.Print(" select table card to get token:!\n"+miCard.Token)
-                                              log.Print(" select table card to get bin:!\n"+miCard.Bin)
-                                              log.Print(" select table card to get last:!\n"+miCard.Last)
+                                              utilito.LevelLog(Config_env_log, "3", " select table card to get token:!\n"+miCard.Token)
+                                              utilito.LevelLog(Config_env_log, "3", " select table card to get bin:!\n"+miCard.Bin)
+                                              utilito.LevelLog(Config_env_log, "3", " select table card to get last:!\n"+miCard.Last)
                                             }
 
                                     }                                  
@@ -414,27 +415,27 @@ resultMssg=""
 					 // Create connection pool
 					db, errdb = sql.Open("postgres", connString)
 					if errdb != nil {
-						log.Print("Error creating connection pool: " + errdb.Error())
+						utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
 						errorGeneral=errdb.Error()
 					}
 					// Close the database connection pool after program executes
 					 defer db.Close()
 					if errdb == nil {
-						log.Print("Connected!\n")
+						utilito.LevelLog(Config_env_log, "3", "Connected!\n")
 				
 					
 						errPing := db.Ping()
 						if errPing != nil {
-						  log.Print("Error: Could not establish a connection with the database:"+ errPing.Error())
+						  utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
 							  errorGeneral=errPing.Error()
 						}else{
                             //start else -get previous paymnets to check if card is deleted or not
-					         log.Print("Ping ok!\n")
+					         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
 				
 					         resultMssg,errPayments =modelito.GetAllPaymentsByTokenCard(db,requestData.Token)
-					         					         log.Print("regresa func  GetTodayPaymentsByTokenCard ok!\n")
+					         					         utilito.LevelLog(Config_env_log, "3", "regresa func  GetTodayPaymentsByTokenCard ok!\n")
 							if errPayments != nil {
-							  log.Print("Error: :"+ errPayments.Error())
+							  utilito.LevelLog(Config_env_log, "3", "Error: :"+ errPayments.Error())
 							  errorGeneral="Error: NO ABLE TO CHECK PREVIOUS PAYMENTS"+ errPayments.Error()
 							}
 							if resultMssg != "" {
@@ -444,13 +445,13 @@ resultMssg=""
                                 }else{
                                     //se debe borrar la card
                                     //the increase was done, now try record the payment for rule (3max payments for tcd a day)
-                                    log.Print("Delete card, as there was a problem with the payment and there are not previous payments ")
+                                    utilito.LevelLog(Config_env_log, "3", "Delete card, as there was a problem with the payment and there are not previous payments ")
                                     miCard.Token =requestData.Token
 
                                     errDeleteCard:=miCard.DeleteCard(db )
-                                    log.Print("regresa func  DeleteCard ok!\n")
+                                    utilito.LevelLog(Config_env_log, "3", "regresa func  DeleteCard ok!\n")
                                     if errDeleteCard != nil {
-                                        log.Print("Error: Deleting card info in the DB:"+ errDeleteCard.Error())
+                                        utilito.LevelLog(Config_env_log, "3", "Error: Deleting card info in the DB:"+ errDeleteCard.Error())
                                         errorGeneral ="Error: Deleting card info in the DB:"+ errDeleteCard.Error()
                                     }else{
                                         //card was removed succesfully,  ok

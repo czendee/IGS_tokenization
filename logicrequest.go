@@ -2,7 +2,8 @@ package main
 
 import (
 	"net/http"
-	"log"
+	//"log"
+    utilito "banwire/services/file_tokenizer/util"
 	"encoding/json"
 	modelito "banwire/services/file_tokenizer/model"
 	 _ "github.com/lib/pq"   //use go get github.com/lib/pq
@@ -16,14 +17,14 @@ import (
    	var requestData modelito.RequestTokenizedCards
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
-    log.Print("cz  handleDBGettokenizedcards")
+    utilito.LevelLog(Config_env_log, "3", "cz  handleDBGettokenizedcards")
 
-	    log.Print("CZ    handlerDB Listening test obtienetarjetastokenizadas")
+	    utilito.LevelLog(Config_env_log, "3", "CZ    handlerDB Listening test obtienetarjetastokenizadas")
 	    
     	err := r.ParseForm()
 		if err != nil {
 	    	//prepare response with error 100
-	    	log.Print("CZ    Prepare Response with 380. Missing parameter:"+errorGeneral)
+	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 380. Missing parameter:"+errorGeneral)
 	    	errorGeneral="ERROR:380 -"	+err.Error()
 		}
 		v := r.Form
@@ -40,13 +41,13 @@ import (
    	 var requestData modelito.RequestPayment
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
-    log.Print("cz  handleProcesspayment")
- 		 log.Print("CZ    handler Listening test realizarpago")
+    utilito.LevelLog(Config_env_log, "3", "cz  handleProcesspayment")
+ 		 utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago")
     		    
     	err := r.ParseForm()
 		if err != nil {
 	    	//prepare response with error 100
-	    	log.Print("CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
+	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
 	    	errorGeneral="ERROR:180 -"	+err.Error()
 		}
 		v := r.Form
@@ -65,13 +66,13 @@ import (
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
      var requestData modelito.RequestTokenized
-    log.Print("cz  handleGeneratetokenized")
-	    log.Print("CZ    handler Listening test handleGeneratetokenized")
+    utilito.LevelLog(Config_env_log, "3", "cz  handleGeneratetokenized")
+	    utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleGeneratetokenized")
     		    
     	err := r.ParseForm()
 		if err != nil {
 	    	//prepare response with error 280
-	    	log.Print("CZ    Prepare Response with 280. Error in JSON Request:"+errorGeneral)
+	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 280. Error in JSON Request:"+errorGeneral)
 	    	errorGeneral="ERROR :280 -Error in JSON Request-"	+err.Error()
 		}
 		v := r.Form
@@ -93,15 +94,15 @@ import (
    	var requestData modelito.RequestTokenizedCards
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
-    log.Print("cz  handleDBGettokenizedcards")
+    utilito.LevelLog(Config_env_log, "3", "cz  handleDBGettokenizedcards")
 
-	    log.Print("CZ    handlerDB Listening test obtienetarjetastokenizadas")
+	    utilito.LevelLog(Config_env_log, "3", "CZ    handlerDB Listening test obtienetarjetastokenizadas")
 	 
  			decoder := json.NewDecoder(r.Body)
 		
 			err := decoder.Decode(&requestData)
 			if err != nil {
-		    	log.Print("CZ    Prepare Response with 380. JSON format/Missing parameter:"+errorGeneral)
+		    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 380. JSON format/Missing parameter:"+errorGeneral)
 		    	errorGeneral="ERROR:380 -Input JSON format/Missing parameter"	+err.Error()
 
 			}
@@ -119,13 +120,13 @@ import (
    	 var requestData modelito.RequestPayment
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
-    log.Print("cz  handleProcesspayment")
- 		 log.Print("CZ    handler Listening test realizarpago")
+    utilito.LevelLog(Config_env_log, "3", "cz  handleProcesspayment")
+ 		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago")
  			decoder := json.NewDecoder(r.Body)
 		
 			err := decoder.Decode(&requestData)
 			if err != nil {
-		    	log.Print("CZ    Prepare Response with 180. JSON format/Missing parameter:"+errorGeneral)
+		    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. JSON format/Missing parameter:"+errorGeneral)
 		    	errorGeneral="ERROR:180 -Input JSON format/Missing parameter"	+err.Error()
 
 			}
@@ -139,13 +140,13 @@ import (
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
      var requestData modelito.RequestTokenized
-    log.Print("cz  handleGeneratetokenized")
-	    log.Print("CZ    handler Listening test handleGeneratetokenized")
+    utilito.LevelLog(Config_env_log, "3", "cz  handleGeneratetokenized")
+	    utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleGeneratetokenized")
  			decoder := json.NewDecoder(r.Body)
 		
 			err := decoder.Decode(&requestData)
 			if err != nil {
-		    	log.Print("CZ    Prepare Response with 280. JSON format/Missing parameter:"+errorGeneral)
+		    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 280. JSON format/Missing parameter:"+errorGeneral)
 		    	errorGeneral="ERROR:280 -Input JSON format/Missing parameter"	+err.Error()
 
 			}
@@ -281,4 +282,3 @@ import (
 
             return resultado
 	    }
-

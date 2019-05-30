@@ -19,6 +19,19 @@ func LevelLog(dato1 string, dato2 string, dato3 string){
     }
 
 }
+func LevelLogint(dato1 string, dato2 string, dato3 int){
+    var num1, num2 int
+	num1, err := strconv.Atoi(dato1)
+    
+	num2, err = strconv.Atoi(dato2)
+    if err== nil{
+    
+        if num2 > num1{
+            log.Println(dato3)
+        }
+    }
+
+}
 
 //     month,year, errorValid := convertMMYYintoMonthYear(requestData.Valid) 
      func ConvertMMYYintoMonthYear (validall string) (string,string, string){

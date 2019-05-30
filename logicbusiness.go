@@ -2,7 +2,8 @@ package main
 
 import (
 	"net/http"
-	"log"
+	//"log"
+    utilito "banwire/services/file_tokenizer/util"
 	"banwire/services/file_tokenizer/db"
 	modelito "banwire/services/file_tokenizer/model"
 //	"time"
@@ -25,13 +26,13 @@ func ProcessGettokenizedcards(w http.ResponseWriter,  requestData modelito.Reque
     if errorGeneral=="" {
 
 
-		log.Print("CZ   STEP Validate Parms")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Validate Parms")
 
 		/// START
 	        result ="OK realizarpago"+requestData.Cardreference
-		    log.Print("CZ    handler Listening fetch:"+result)
+		    utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening fetch:"+result)
 		    
-		     log.Print("CZ   STEP Validate paramters request")
+		     utilito.LevelLog(Config_env_log, "3", "CZ   STEP Validate paramters request")
 		    errorGeneral= validaReqFetchCards(requestData)
 		
 		
@@ -41,7 +42,7 @@ func ProcessGettokenizedcards(w http.ResponseWriter,  requestData modelito.Reque
 		        
     if errorGeneral!="" && errorGeneralNbr=="" {
     	//prepare response with error 300
-    	log.Print("CZ    Prepare Response with 300. Missing parameter:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 300. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:300 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="300"
     }
@@ -50,39 +51,39 @@ func ProcessGettokenizedcards(w http.ResponseWriter,  requestData modelito.Reque
 	//	    resultado,errfetchDB:= fetchFromDB ()
 	if errorGeneral==""{//continue next step
 
-       	    	log.Print("CZ   STEP Consume DB")
+       	    utilito.LevelLog(Config_env_log, "3", "CZ   STEP Consume DB")
          valoresParaResponder,errorGeneral =logicDBGettokenizedcardsV2(requestData, errorGeneral) 
 
 
     }				    
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 310
-    	log.Print("CZ    Prepare Response with 310. Error obtaining cards:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 310. Error obtaining cards:"+errorGeneral)
     	errorGeneral="ERROR:310 -  Error obtaining cards -"	+errorGeneral
 	    errorGeneralNbr="310"
     }
 
 		        
 	//response
-    log.Print("CZ    handler DB Listening test gettokenizedcards  2")					
+    utilito.LevelLog(Config_env_log, "3", "CZ    handler DB Listening test gettokenizedcards  2")					
 
 	//////////    format the response
     if errorGeneral==""{//continue next step
-		log.Print("CZ   STEP Validate Parms")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Validate Parms")
 			/// START
 		fieldDataBytesJson,err := getJsonResponseV2(valoresParaResponder)
 		
-		log.Print("CZ    handler Listening test gettokenizedcards  3")	
+		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test gettokenizedcards  3")	
 		
 		result ="OK gettokenizedcards"+requestData.Cardreference+"resultado"
 		//////////    write the response
 		w.Header().Set("Content-Type", "application/json")
 		 w.Write(fieldDataBytesJson)
 		 
-		 log.Print("CZ    handler Listening test gettokenizedcards  4"+"<html><body>"+ result+"</body></html>")
+		 utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test gettokenizedcards  4"+"<html><body>"+ result+"</body></html>")
 			         
         if err!=nil{
-        	log.Print("Eror en generando response")
+        	utilito.LevelLog(Config_env_log, "3", "Eror en generando response")
             errorGeneral= err.Error()
         }		
 		
@@ -91,7 +92,7 @@ func ProcessGettokenizedcards(w http.ResponseWriter,  requestData modelito.Reque
     }				    
 		 
     if errorGeneral!="" && errorGeneralNbr==""{//continue next step
-    	log.Print("CZ   prepare the JSON response for ERROR")
+    	utilito.LevelLog(Config_env_log, "3", "CZ   prepare the JSON response for ERROR")
 
 	    //  START 
 	    errorGeneral="ERROR:330 -Error preparing the response"	+errorGeneral
@@ -124,9 +125,9 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 	////////////////////////////////////////////////validate parms
 	/// START
     if errorGeneral==""{//continue next step
-		        result ="OK realizarpago"+requestData.Clientreference+"    :    " +requestData.Paymentreference+"    :    " +requestData.Card+"    :    " +requestData.Exp+"    :    " +requestData.Cvv
-    		    log.Print("CZ    handler Listening test handleGeneratetokenized:"+result)
-		     log.Print("CZ   STEP Validate paramters request")
+		    result ="OK realizarpago"+requestData.Clientreference+"    :    " +requestData.Paymentreference+"    :    " +requestData.Card+"    :    " +requestData.Exp+"    :    " +requestData.Cvv
+    		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleGeneratetokenized:"+result)
+		    utilito.LevelLog(Config_env_log, "3", "CZ   STEP Validate paramters request")
 		    errorGeneral= validaReqGenerateTokenized(requestData)	
 		/// END
 
@@ -134,7 +135,7 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 		              
     if errorGeneral!="" && errorGeneralNbr=="" {
     	//prepare response with error 800
-    	log.Print("CZ    Prepare Response with 200. Missing parameter:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 200. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR :200 -Missing parameter "	+errorGeneral
 		errorGeneralNbr="200"
     }
@@ -154,7 +155,7 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 210
-    	log.Print("CZ    Prepare Response with 210. Error processing payment:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 210. Error processing payment:"+errorGeneral)
     	errorGeneral="ERROR:210 -Error processing payment:"	+errorGeneral
 		errorGeneralNbr="210"
     }
@@ -166,32 +167,32 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 	//  Update if exist, if not insert in Customer
 
     if errorGeneral==""{//continue next stepjhlkjg 
-        	log.Print("CZ   el  token:"+obtainedDataWebservice.Token)
-    				resultCardTokenized, errorGeneral =logicGeneratetokenizedDBV2(requestData,obtainedDataWebservice , errorGeneral)
+        	utilito.LevelLog(Config_env_log, "3", "CZ   el  token:"+obtainedDataWebservice.Token)
+    			resultCardTokenized, errorGeneral =logicGeneratetokenizedDBV2(requestData,obtainedDataWebservice , errorGeneral)
     						
 	}					
 
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 220
-    	log.Print("CZ    Prepare Response with 220. Error generating token:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 220. Error generating token:"+errorGeneral)
     	errorGeneral="ERROR:220 -Error generating token:"	+errorGeneral
 		errorGeneralNbr="220"
     }
 
 	//response
     if errorGeneral==""{//continue next step
-		log.Print("CZ   STEP Post the response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Post the response JSON ready")
 		
 			/// START
 		fieldDataBytesJsonTokenize,err := getJsonResponseTokenizeV2(resultCardTokenized)
 			
-		log.Print("CZ    handler Listening test realizarpago  3")	
+		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago  3")	
 	    
 	    w.Header().Set("Content-Type", "application/json")
 	    w.Write(fieldDataBytesJsonTokenize)
-		log.Print("CZ    handler Listening test handleGeneratetokenized  4"+"<html><body>"+ result+"</body></html>")		         		         
+		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleGeneratetokenized  4"+"<html><body>"+ result+"</body></html>")
         if err!=nil{
-        	log.Print("Eror en generando response")
+        	utilito.LevelLog(Config_env_log, "3", "Eror en generando response")
 	        errorGeneral= err.Error()
         }
 				
@@ -200,12 +201,12 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 230
-    	log.Print("CZ    Prepare Response with 230. Error generating Response Tokenized:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 230. Error generating Response Tokenized:"+errorGeneral)
     	errorGeneral="ERROR:230 -Error generating Response Tokenized:"	+errorGeneral
 		errorGeneralNbr="230"
     }
     
-	 log.Print("CZ  ends func tokenized")
+	 utilito.LevelLog(Config_env_log, "3", "CZ  ends func tokenized")
 	 
 	return errorGeneral, errorGeneralNbr
 }
@@ -238,13 +239,13 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 	/// START
     
     if errorGeneral==""{//continue next step
-    	log.Print("CZ   STEP Validate Parms")
+    	utilito.LevelLog(Config_env_log, "3", "CZ   STEP Validate Parms")
 
 		/// START
 	        result ="OK realizarpago"+requestData.Clientreference+"    :    " +requestData.Paymentreference+"    :    " +requestData.Token+"    :    " +requestData.Cvv+"    :    " +requestData.Amount+"    :    "
-		    log.Print("CZ    handler Listening test realizarpago:"+result)
+		    utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago:"+result)
 		    
-		     log.Print("CZ   STEP Validate paramters request")
+		    utilito.LevelLog(Config_env_log, "3", "CZ   STEP Validate paramters request")
 		    errorGeneral= validaReqProcessPayment(requestData)
 		
 		
@@ -254,7 +255,7 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 		        
     if errorGeneral!="" {
     	//prepare response with error 100
-    	log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:100 - Missing parameter"	+errorGeneral
 		errorGeneralNbr="100"
     }
@@ -266,13 +267,13 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
  var valoresParaResponder  []modelito.Payment
 	if errorGeneral==""{//continue next step
 
-     	 log.Print("CZ   STEP Consume DB to check if more payments cvan be done today for this card")
+     	 utilito.LevelLog(Config_env_log, "3", "CZ   STEP Consume DB to check if more payments cvan be done today for this card")
          valoresParaResponder,errorGeneral =logicDBCheckNumberOfPaymentsToday(requestData, errorGeneral) 
 
     }				    
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 105
-    	log.Print("CZ    Prepare Response with 105. Error Max payments today for this card exceeded:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 105. Error Max payments today for this card exceeded:"+errorGeneral)
     	errorGeneral="ERROR 105 -  Error Max payments today for this card exceeded -"	+errorGeneral
 	    errorGeneralNbr="105"
     }
@@ -281,12 +282,12 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
      }
 		        
 	//response
-    log.Print("CZ    handler DB Listening test gettokenizedcards  2")					
+    utilito.LevelLog(Config_env_log, "3", "CZ    handler DB Listening test gettokenizedcards  2")
 
 	////////////////////////////////////////////////consume internal websrvice banwire
 	//////////////////            process payment
 	    if errorGeneral==""{//continue next step
-	    	log.Print("CZ   STEP Consume internal websrvice banwire")
+	    	utilito.LevelLog(Config_env_log, "3", "CZ   STEP Consume internal websrvice banwire")
 
 			/// START
 			
@@ -296,7 +297,7 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 	    }				    
 	    if errorGeneral!="" && errorGeneralNbr==""{
 	    	//prepare response with error 110
-	    	log.Print("CZ    Prepare Response with 110. Error processing payment:"+errorGeneral)
+	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 110. Error processing payment:"+errorGeneral)
 	    	errorGeneral="ERROR:110 - Error processing payment"	+errorGeneral
 			errorGeneralNbr="110"
 
@@ -311,17 +312,17 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
              var valoresParaResponder  string
              var errorGeneralRemoveCard string
 
-            log.Print("CZ   STEP Consume DB to Remove Card if failed first payment")
+            utilito.LevelLog(Config_env_log, "3", "CZ   STEP Consume DB to Remove Card if failed first payment")
             valoresParaResponder,errorGeneralRemoveCard =logicDBRemoveCardIfNotPreviousPayment(requestData, errorGeneral) 
 
             if errorGeneral!="" && errorGeneralRemoveCard==""{
                 //alredy  response, conitnue  with error 110,100
-                log.Print("CZ   NO Prepare Response. Continue with 100,110. Error removing card:"+errorGeneralRemoveCard)
+                utilito.LevelLog(Config_env_log, "3", "CZ   NO Prepare Response. Continue with 100,110. Error removing card:"+errorGeneralRemoveCard)
             }
             if valoresParaResponder == ""{
                 
             }else{
-                log.Print("CZ   Continue with error. Remove card for failed 1st payment:"+valoresParaResponder)
+                utilito.LevelLog(Config_env_log, "3", "CZ   Continue with error. Remove card for failed 1st payment:"+valoresParaResponder)
             }
 
 	    }//end if error first payment failed, or parameters for first payment are missing or wrong
@@ -335,12 +336,12 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 	//	    
 	var  dataObtainedCard  modelito.Card
 	    if errorGeneral==""{//continue next step
-	    	log.Print("CZ   STEP  update the score field: increase by 1")
+	    	utilito.LevelLog(Config_env_log, "3", "CZ   STEP  update the score field: increase by 1")
 			requestData, dataObtainedCard, errorGeneral= logicProcesspaymentDBV4(requestData , errorGeneral )  
 
-									log.Print(" medio token:!\n"+dataObtainedCard.Token)
-									log.Print(" medio bin:!\n"+dataObtainedCard.Bin)
-									log.Print(" medio last:!\n"+dataObtainedCard.Last)
+									utilito.LevelLog(Config_env_log, "3", " medio token:!\n"+dataObtainedCard.Token)
+									utilito.LevelLog(Config_env_log, "3", " medio bin:!\n"+dataObtainedCard.Bin)
+									utilito.LevelLog(Config_env_log, "3", " medio last:!\n"+dataObtainedCard.Last)
 		    resultadoPayment.Marca = dataObtainedCard.Brand
 		    resultadoPayment.Bin = dataObtainedCard.Bin
 		    resultadoPayment.LastDigits= dataObtainedCard.Last
@@ -350,7 +351,7 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 
 	    if errorGeneral!="" && errorGeneralNbr==""{
 	    	//prepare response with error 120
-	    	log.Print("CZ    Prepare Response with 120. Error recording results in DB:"+errorGeneral)
+	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 120. Error recording results in DB:"+errorGeneral)
 	    	errorGeneral="ERROR: 120 - Error recording results in DB"	+errorGeneral
 			errorGeneralNbr="120"
 	    }
@@ -361,29 +362,29 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 	//      prepare the JSON response
 	//	    
 	    if errorGeneral==""{//continue next step
-	    	log.Print("CZ   STEP  prepare the JSON response for SUCCESS")
+	    	utilito.LevelLog(Config_env_log, "3", "CZ   STEP  prepare the JSON response for SUCCESS")
 
 		    //  START 
 
 		    fieldDataBytesJsonPayment,err := getJsonResponsePaymentV2(resultadoPayment)					
 		        w.Header().Set("Content-Type", "application/json")
 		        w.Write(fieldDataBytesJsonPayment)
-				log.Print("CZ    handler Listening test handleProcesspayment  4"+"<html><body>"+ result+"</body></html>")		         
+				utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleProcesspayment  4"+"<html><body>"+ result+"</body></html>")
                 if err!=nil{
-                	log.Print("Eror en generando response")
+                	utilito.LevelLog(Config_env_log, "3", "Eror en generando response")
                     errorGeneral= err.Error()
                 }
 		    //  END
         }
 
 	    if errorGeneral!="" && errorGeneralNbr=="" {//continue next step
-	    	log.Print("CZ   prepare the JSON response for ERROR")
+	    	utilito.LevelLog(Config_env_log, "3", "CZ   prepare the JSON response for ERROR")
 
 		    //  START 
 		    errorGeneral="ERROR:130 -Error preparing the response"	+errorGeneral
 			errorGeneralNbr="130"
 		    //  END
         }
- log.Print("CZ  END   handler Listening DB  realizarpago  2")	
+ utilito.LevelLog(Config_env_log, "3", "CZ  END   handler Listening DB  realizarpago  2")
      return errorGeneral, errorGeneralNbr
 }

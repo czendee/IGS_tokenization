@@ -1,7 +1,7 @@
 package main
 
 import (
-	"banwire/services/gs_ivr_tokenization/db"
+	"banwire/services/file_tokenizer/db"
 )
 
 // BatchTest is a function only for test

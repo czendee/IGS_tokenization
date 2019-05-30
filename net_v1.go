@@ -6,7 +6,7 @@ import (
     "strings"
 //    "regexp"
 //	"fmt"
-	"log"
+	//"log"
 	"banwire/services/file_tokenizer/db"
 	"banwire/services/file_tokenizer/net"
 	modelito "banwire/services/file_tokenizer/model"
@@ -33,7 +33,7 @@ func init() {
 
     var r = net.GetRouter()
 	//route for test
-	    log.Print("cz  init net_v1")
+        utilito.LevelLog(Config_env_log, "3", "cz  init net_v1")
 
         r.Handle("/v1/index", netHandle(dash01Handler, nil)).Methods("GET")   
         r.Handle("/v1/indexpay", netHandle(dash01payHandler, nil)).Methods("GET")   
@@ -73,9 +73,8 @@ func init() {
 //index html angular
 
 func dash01Handler(w http.ResponseWriter, r *http.Request) {
-    utilito.LevelLog(Config_env_log, "1", "cz  dash01Handler with param")
+    utilito.LevelLog(Config_env_log, "1", "cz  dash01Handler with param"+Config_env_url)
  
-//    log.Print("cz  dash01Handler with param"+Config_env_url)
     http.ServeFile(w,r,"index.html")
 /*     data := TodoPageData{
 			PageTitle: Config_env_server,
@@ -83,14 +82,13 @@ func dash01Handler(w http.ResponseWriter, r *http.Request) {
      tmpl := template.Must(template.ParseFiles("index.html"))
      tmpl.Execute(w, data)
 */     
-    log.Print("CZ   STEP dash01Handler 01")
+    utilito.LevelLog(Config_env_log, "3", "CZ   STEP dash01Handler 01")
 }
 
 //index html angular
 
 func dash01payHandler(w http.ResponseWriter, r *http.Request) {
-    log.Print("cz  dash01payHandler with param")
-//    log.Print("cz  dash01Handler with param"+Config_env_url)
+    utilito.LevelLog(Config_env_log, "3", "cz  dash01payHandler with param")
     http.ServeFile(w,r,"indexpay.html")
 /*     data := TodoPageData{
 			PageTitle: Config_env_server,
@@ -98,14 +96,14 @@ func dash01payHandler(w http.ResponseWriter, r *http.Request) {
      tmpl := template.Must(template.ParseFiles("index.html"))
      tmpl.Execute(w, data)
 */     
-    log.Print("CZ   STEP dash01payHandler 01")
+    utilito.LevelLog(Config_env_log, "3", "CZ   STEP dash01payHandler 01")
 }
 
 
 //index html angular
 
 func dash01consultaHandler(w http.ResponseWriter, r *http.Request) {
-    log.Print("cz  dash01consultaHandler with param")
+    utilito.LevelLog(Config_env_log, "3", "cz  dash01consultaHandler with param")
 //    log.Print("cz  dash01Handler with param"+Config_env_url)
     http.ServeFile(w,r,"indexconsulta.html")
 /*     data := TodoPageData{
@@ -114,14 +112,14 @@ func dash01consultaHandler(w http.ResponseWriter, r *http.Request) {
      tmpl := template.Must(template.ParseFiles("index.html"))
      tmpl.Execute(w, data)
 */     
-    log.Print("CZ   STEP dash01consultaHandler 01")
+    utilito.LevelLog(Config_env_log, "3", "CZ   STEP dash01consultaHandler 01")
 }
 
 
 //index html angular
 
 func dash01consultafilesHandler(w http.ResponseWriter, r *http.Request) {
-    log.Print("cz  dash01consultafilesHandler with param")
+    utilito.LevelLog(Config_env_log, "3", "cz  dash01consultafilesHandler with param")
 //    log.Print("cz  dash01Handler with param"+Config_env_url)
     http.ServeFile(w,r,"indexconsultafiles.html")
 /*     data := TodoPageData{
@@ -130,7 +128,7 @@ func dash01consultafilesHandler(w http.ResponseWriter, r *http.Request) {
      tmpl := template.Must(template.ParseFiles("index.html"))
      tmpl.Execute(w, data)
 */     
-    log.Print("CZ   STEP dash01consultafilesHandler 01")
+    utilito.LevelLog(Config_env_log, "3", "CZ   STEP dash01consultafilesHandler 01")
 }
 
 
@@ -193,7 +191,7 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 
 //    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
-        log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+        utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:100 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="100"
     }
@@ -201,42 +199,42 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 	/// START
     if errorGeneral=="" {
 
-        log.Print("CZ  ProcessTokenFile  STEP Get the File")
-        log.Print(" ProcessTokenFile File Upload Endpoint Hit")
+        utilito.LevelLog(Config_env_log, "3", "CZ  ProcessTokenFile  STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3", " ProcessTokenFile File Upload Endpoint Hit")
 
         // Parse our multipart form, 10 << 20 specifies a maximum
         // upload of 10 MB files.
         err:= r.ParseMultipartForm(10 << 20)
         if err != nil {
             
-            log.Print("CZ ProcessTokenFile Error Retrieving the File")
-            log.Print(err)
+            utilito.LevelLog(Config_env_log, "3", "CZ ProcessTokenFile Error Retrieving the File")
+            utilito.LevelLog(Config_env_log, "3", err.Error())
             errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
             errorGeneralNbr="110"
 
         } 
         if errorGeneral=="" {  
-            log.Print("CZ ProcessTokenFile Start read the form data")
+            utilito.LevelLog(Config_env_log, "3", "CZ ProcessTokenFile Start read the form data")
             formdata := r.MultipartForm // ok, no problem so far, read the Form data
 
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-            log.Print("CZ ProcessTokenFile before loop files")
+            utilito.LevelLog(Config_env_log, "3", "CZ ProcessTokenFile before loop files")
 
             for i, _ := range files { // loop through the files one by one
                
-               log.Print("CZ loop step 1")
+               utilito.LevelLog(Config_env_log, "3", "CZ loop step 1")
                 var elfileindex string
                 
                 elfileindex = "file0"
-               log.Print("CZ Loop file")
-               log.Print("CZ Loop file:"+elfileindex)
+               utilito.LevelLog(Config_env_log, "3", "CZ Loop file")
+               utilito.LevelLog(Config_env_log, "3", "CZ Loop file:"+elfileindex)
                 file, err := files[i].Open()
-                log.Print("CZ open file")
+                utilito.LevelLog(Config_env_log, "3", "CZ open file")
                 defer file.Close()
                 if err != nil {
-                    log.Print(w, err)
+                    utilito.LevelLog(Config_env_log, "3",  err.Error())
                     errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
                     errorGeneralNbr="120"
 
@@ -248,9 +246,9 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 
                 micadenita := buf.String()
 
-                log.Print(micadenita)
+                utilito.LevelLog(Config_env_log, "3", micadenita)
 
-                log.Print("ProcessTokenFile MGR Paso linea por linea index")
+                utilito.LevelLog(Config_env_log, "3", "ProcessTokenFile MGR Paso linea por linea index")
 
                 lineas := 0
 
@@ -258,7 +256,7 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
                 for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
                     var u modelito.ExitoDataTokenLine
                     if lineas >= 1{
-                        log.Printf("MGR Linea %d de datos", lineas)
+                        utilito.LevelLog(Config_env_log, "3", "MGR linea de datos")
 
                         lineas = lineas + 1
                          respuestaRes,cualfallo :=campos_token (line, lineas)
@@ -277,11 +275,11 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
                     }
                     
                     if lineas == 0 {
-                        log.Print("MGR Linea 0 de textos")
+                        utilito.LevelLog(Config_env_log, "3","MGR Nombres de campos")
                         lineas = lineas + 1
                     }
 
-                        log.Println(line)
+                        utilito.LevelLog(Config_env_log, "3", line)
                        
                         
 
@@ -294,8 +292,8 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
                }else{
                     if errorGeneral=="" {  
     
-                        log.Print(w, " ProcessTokenFile Files uploaded successfully : ")
-                        log.Print(w, files[i].Filename+"\n")
+                        utilito.LevelLog(Config_env_log, "3", " ProcessTokenFile Files uploaded successfully : ")
+                        utilito.LevelLog(Config_env_log, "3", files[i].Filename+"\n")
 
                     }    
 
@@ -321,7 +319,7 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ ProcessTokenFile  STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ ProcessTokenFile  STEP Get the ERROR response JSON ready")
 		
 		// START
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -378,7 +376,7 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
 //    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
-        log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+        utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:100 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="100"
     }
@@ -386,42 +384,42 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 	/// START
     if errorGeneral=="" {
 
-        log.Print("CZ   STEP Get the File")
-        log.Print("File Upload Endpoint Hit")
+        utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3", "File Upload Endpoint Hit")
 
         // Parse our multipart form, 10 << 20 specifies a maximum
         // upload of 10 MB files.
         err:= r.ParseMultipartForm(10 << 20)
         if err != nil {
             
-            log.Print("CZ Error Retrieving the File")
-            log.Print(err)
+            utilito.LevelLog(Config_env_log, "3", "CZ Error Retrieving the File")
+            utilito.LevelLog(Config_env_log, "3",  err.Error())
             errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
             errorGeneralNbr="110"
 
         } 
         if errorGeneral=="" {  
-            log.Print("CZ Start read the form data")
+            utilito.LevelLog(Config_env_log, "3", "CZ Start read the form data")
             formdata := r.MultipartForm // ok, no problem so far, read the Form data
 
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-            log.Print("CZ before loop files")
+            utilito.LevelLog(Config_env_log, "3", "CZ before loop files")
 
             for i, _ := range files { // loop through the files one by one
                
-               log.Print("CZ loop step 1")
+                utilito.LevelLog(Config_env_log, "3", "CZ loop step 1")
                 var elfileindex string
                 
                 elfileindex = "file0"
-               log.Print("CZ Loop file")
-               log.Print("CZ Loop file:"+elfileindex)
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file")
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file:"+elfileindex)
                 file, err := files[i].Open()
-                log.Print("CZ open file")
+                utilito.LevelLog(Config_env_log, "3", "CZ open file")
                 defer file.Close()
                 if err != nil {
-                    log.Print(w, err)
+                    utilito.LevelLog(Config_env_log, "3",  err.Error())
                     errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
                     errorGeneralNbr="120"
 
@@ -433,9 +431,9 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
                 micadenita := buf.String()
 
-                log.Print(micadenita)
+                utilito.LevelLog(Config_env_log, "3", micadenita)
 
-                log.Print("MGR Paso linea por linea index")
+                utilito.LevelLog(Config_env_log, "3", "MGR Paso linea por linea index")
 
                 lineas := 0
 
@@ -443,7 +441,7 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
                 for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
                     var u modelito.ExitoDataTokenLine
                     if lineas >= 1{
-                        log.Printf("MGR Linea %d de datos", lineas)
+                        utilito.LevelLog(Config_env_log, "3", "MGR linea de datos")
 
                         lineas = lineas + 1
                          respuestaRes,cualfallo :=campos_token (line, lineas)
@@ -462,11 +460,11 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
                     }
                     
                     if lineas == 0 {
-                        log.Print("MGR Linea 0 de textos")
+                        utilito.LevelLog(Config_env_log, "3", "MGR Nombres de campos")
                         lineas = lineas + 1
                     }
 
-                        log.Println(line)
+                        utilito.LevelLog(Config_env_log, "3", line)
                        
                         
 
@@ -479,8 +477,8 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
                }else{
                     if errorGeneral=="" {  
     
-                        log.Print(w, "Files uploaded successfully : ")
-                        log.Print(w, files[i].Filename+"\n")
+                        utilito.LevelLog(Config_env_log, "3", "Files uploaded successfully : ")
+                        utilito.LevelLog(Config_env_log, "3", files[i].Filename+"\n")
 
                     }    
 
@@ -506,7 +504,7 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 		// START
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -564,7 +562,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 
 //    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
-        log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+        utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:100 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="100"
     }
@@ -572,42 +570,42 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 	/// START
     if errorGeneral=="" {
 
-        log.Print("CZ  ProcessTokenFile  STEP Get the File")
-        log.Print(" ProcessTokenFile File Upload Endpoint Hit")
+        utilito.LevelLog(Config_env_log, "3", "CZ  ProcessTokenFile  STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3", " ProcessTokenFile File Upload Endpoint Hit")
 
         // Parse our multipart form, 10 << 20 specifies a maximum
         // upload of 10 MB files.
         err:= r.ParseMultipartForm(10 << 20)
         if err != nil {
             
-            log.Print("CZ ProcessTokenFile Error Retrieving the File")
-            log.Print(err)
+            utilito.LevelLog(Config_env_log, "3", "CZ ProcessTokenFile Error Retrieving the File")
+            utilito.LevelLog(Config_env_log, "3",  err.Error())
             errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
             errorGeneralNbr="110"
 
         } 
         if errorGeneral=="" {  
-            log.Print("CZ ProcessTokenFile Start read the form data")
+            utilito.LevelLog(Config_env_log, "3", "CZ ProcessTokenFile Start read the form data")
             formdata := r.MultipartForm // ok, no problem so far, read the Form data
 
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-            log.Print("CZ ProcessTokenFile before loop files")
+            utilito.LevelLog(Config_env_log, "3", "CZ ProcessTokenFile before loop files")
 
             for i, _ := range files { // loop through the files one by one
                
-               log.Print("CZ loop step 1")
+                utilito.LevelLog(Config_env_log, "3", "CZ loop step 1")
                 var elfileindex string
                 
                 elfileindex = "file0"
-               log.Print("CZ Loop file")
-               log.Print("CZ Loop file:"+elfileindex)
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file")
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file:"+elfileindex)
                 file, err := files[i].Open()
-                log.Print("CZ open file")
+                utilito.LevelLog(Config_env_log, "3", "CZ open file")
                 defer file.Close()
                 if err != nil {
-                    log.Print(w, err)
+                    utilito.LevelLog(Config_env_log, "3",  err.Error())
                     errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
                     errorGeneralNbr="120"
 
@@ -619,9 +617,9 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 
                 micadenita := buf.String()
 
-                log.Print(micadenita)
+                utilito.LevelLog(Config_env_log, "3", micadenita)
 
-                log.Print("ProcessTokenFile MGR Paso linea por linea index")
+                utilito.LevelLog(Config_env_log, "3", "ProcessTokenFile MGR Paso linea por linea index")
 
                 lineas := 0
 
@@ -629,7 +627,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
                 for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
                     var u modelito.ExitoDataTokenLine
                     if lineas >= 1{
-                        log.Printf("MGR Linea %d de datos", lineas)
+                        utilito.LevelLog(Config_env_log, "3", "MGR linea datos")
 
                         lineas = lineas + 1
                          respuestaRes,cualfallo :=campos_payment (line, lineas)
@@ -648,11 +646,11 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
                     }
                     
                     if lineas == 0 {
-                        log.Print("MGR Linea 0 de textos")
+                        utilito.LevelLog(Config_env_log, "3", "MGR Nombres de campos")
                         lineas = lineas + 1
                     }
 
-                        log.Println(line)
+                        utilito.LevelLog(Config_env_log, "3", line)
                        
                         
 
@@ -665,8 +663,8 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
                }else{
                     if errorGeneral=="" {  
     
-                        log.Print(w, " ProcessTokenFile Files uploaded successfully : ")
-                        log.Print(w, files[i].Filename+"\n")
+                        utilito.LevelLog(Config_env_log, "3", " ProcessTokenFile Files uploaded successfully : ")
+                        utilito.LevelLog(Config_env_log, "3", files[i].Filename+"\n")
 
                     }    
 
@@ -692,7 +690,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ ProcessTokenFile  STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ ProcessTokenFile  STEP Get the ERROR response JSON ready")
 		
 		// START
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -749,7 +747,7 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 
 //    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
-        log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+        utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:100 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="100"
     }
@@ -757,42 +755,42 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 	/// START
     if errorGeneral=="" {
 
-        log.Print("CZ   STEP Get the File")
-        log.Print("File Upload Endpoint Hit")
+        utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3", "File Upload Endpoint Hit")
 
         // Parse our multipart form, 10 << 20 specifies a maximum
         // upload of 10 MB files.
         err:= r.ParseMultipartForm(10 << 20)
         if err != nil {
             
-            log.Print("CZ Error Retrieving the File")
-            log.Print(err)
+            utilito.LevelLog(Config_env_log, "3", "CZ Error Retrieving the File")
+            utilito.LevelLog(Config_env_log, "3",  err.Error())
             errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
             errorGeneralNbr="110"
 
         } 
         if errorGeneral=="" {  
-            log.Print("CZ Start read the form data")
+            utilito.LevelLog(Config_env_log, "3", "CZ Start read the form data")
             formdata := r.MultipartForm // ok, no problem so far, read the Form data
 
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-            log.Print("CZ before loop files")
+            utilito.LevelLog(Config_env_log, "3", "CZ before loop files")
 
             for i, _ := range files { // loop through the files one by one
                
-               log.Print("CZ loop step 1")
+                utilito.LevelLog(Config_env_log, "3", "CZ loop step 1")
                 var elfileindex string
                 
                 elfileindex = "file0"
-               log.Print("CZ Loop file")
-               log.Print("CZ Loop file:"+elfileindex)
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file")
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file:"+elfileindex)
                 file, err := files[i].Open()
-                log.Print("CZ open file")
+                utilito.LevelLog(Config_env_log, "3", "CZ open file")
                 defer file.Close()
                 if err != nil {
-                    log.Print(w, err)
+                    utilito.LevelLog(Config_env_log, "3",  err.Error())
                     errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
                     errorGeneralNbr="120"
 
@@ -804,9 +802,9 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 
                 micadenita := buf.String()
 
-                log.Print(micadenita)
+                utilito.LevelLog(Config_env_log, "3", micadenita)
 
-                log.Print("MGR Paso linea por linea index")
+                utilito.LevelLog(Config_env_log, "3", "MGR Paso linea por linea index")
 
                 lineas := 0
 
@@ -814,7 +812,7 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
                 for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
                     var u modelito.ExitoDataTokenLine
                     if lineas >= 1{
-                        log.Printf("MGR Linea %d de datos", lineas)
+                        utilito.LevelLog(Config_env_log, "3", "MGR Linea de datos")
 
                         lineas = lineas + 1
                          respuestaRes,cualfallo :=campos_payment (line, lineas)
@@ -833,11 +831,11 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
                     }
                     
                     if lineas == 0 {
-                        log.Print("MGR Linea 0 de textos")
+                        utilito.LevelLog(Config_env_log, "3", "MGR Linea nombre de campos")
                         lineas = lineas + 1
                     }
 
-                        log.Println(line)
+                        utilito.LevelLog(Config_env_log, "3", line)
                        
                         
 
@@ -850,8 +848,8 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
                }else{
                     if errorGeneral=="" {  
     
-                        log.Print(w, "Files uploaded successfully : ")
-                        log.Print(w, files[i].Filename+"\n")
+                        utilito.LevelLog(Config_env_log, "3",  "Files uploaded successfully : ")
+                        utilito.LevelLog(Config_env_log, "3", files[i].Filename+"\n")
 
                     }    
 
@@ -877,7 +875,7 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 		// START
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -941,7 +939,7 @@ func handleDBPostGettokenizedcards(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 			/// START
 		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -986,7 +984,7 @@ func handleDBPostGeneratetokenized(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 			/// START
 		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -1033,7 +1031,7 @@ requestData,errorGeneral =obtainPostParmsProcessPayment(r,errorGeneral)  //logic
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 			/// START
 		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -1072,7 +1070,7 @@ func handlePostConsultaTokens(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 			/// START
 		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -1111,7 +1109,7 @@ func handlePostConsultaHistorial(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 			/// START
 		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -1144,7 +1142,7 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
 
 	//    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
-        log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+        utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:100 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="100"
     }
@@ -1154,42 +1152,42 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
 	/// START
     if errorGeneral=="" {//if errorGeneral1
 
-        log.Print("CZ   STEP Get the File")
-        log.Print("File Upload Endpoint Hit")
+        utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3", "File Upload Endpoint Hit")
 
         // Parse our multipart form, 10 << 20 specifies a maximum
         // upload of 10 MB files.
         err:= r.ParseMultipartForm(10 << 20)
         if err != nil {
             
-            log.Print("CZ Error Retrieving the File")
-            log.Print(err)
+            utilito.LevelLog(Config_env_log, "3", "CZ Error Retrieving the File")
+            utilito.LevelLog(Config_env_log, "3",  err.Error())
             errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
             errorGeneralNbr="110"
 
         }
 
         if errorGeneral=="" {//if error general2
-            log.Print("CZ Start read the form data")
+            utilito.LevelLog(Config_env_log, "3", "CZ Start read the form data")
             formdata := r.MultipartForm // ok, no problem so far, read the Form data
             
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-            log.Print("CZ before loop files")
+            utilito.LevelLog(Config_env_log, "3", "CZ before loop files")
 
             for i, _ := range files { // loop through the files one by one
-                log.Print("CZ loop step 1")
+                utilito.LevelLog(Config_env_log, "3", "CZ loop step 1")
                 var elfileindex string
 
                 elfileindex = "file0"
-                log.Print("CZ Loop file")
-                log.Print("CZ Loop file:"+elfileindex)
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file")
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file:"+elfileindex)
                 file, err := files[i].Open()
-                log.Print("CZ open file")
+                utilito.LevelLog(Config_env_log, "3", "CZ open file")
                 defer file.Close()
                 if err != nil {
-                    log.Print(w, err)
+                    utilito.LevelLog(Config_env_log, "3",  err.Error())
                     errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
                     errorGeneralNbr="120"
 
@@ -1207,9 +1205,9 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
                 // convert content to a 'string'
                 str := buf.String()
 
-                log.Print(str) // print the content as a 'string'                
+                utilito.LevelLog(Config_env_log, "3", str)// print the content as a 'string'
 
-                log.Print("MGR paso linea por linea")
+                utilito.LevelLog(Config_env_log, "3", "MGR paso linea por linea")
 
                 lineas := 0
 
@@ -1218,7 +1216,7 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
                 for _, line := range strings.Split(strings.TrimSuffix(str, "\n"), "\n") {//inicio for
                     var u modelito.ExitoDataTokenLine
                     if lineas >= 1{ //if -data
-                        log.Printf("MGR Linea %d de datos", lineas)
+                        utilito.LevelLog(Config_env_log, "3", "MGR Linea de datos")
 
                         lineas = lineas + 1
 
@@ -1239,11 +1237,11 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
                     }//end -data
 
                     if lineas == 0 { //if -line name fields
-                        log.Print("MGR Linea 0 de textos")
+                        utilito.LevelLog(Config_env_log, "3", "MGR Linea 0 de textos")
                         lineas = lineas + 1
                     } //end if -line name fields
 
-                    log.Println(line)
+                    utilito.LevelLog(Config_env_log, "3", line)
 
                 }//end for
 
@@ -1252,8 +1250,8 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
                 }else{
                     if errorGeneral=="" {  
 
-                        log.Print(w, "Files uploaded successfully : ")
-                        log.Print(w, files[i].Filename+"\n")
+                        utilito.LevelLog(Config_env_log, "3", "Files uploaded successfully : ")
+                        utilito.LevelLog(Config_env_log, "3", files[i].Filename+"\n")
                     }
                 }//end else
 
@@ -1265,7 +1263,7 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
                 //3.return result JSON
 
                 //errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-                log.Println(lineasWithErrors)
+                utilito.LevelLogint(Config_env_log, "3", lineasWithErrors)
 
             }//end -loop through the files one by one
         
@@ -1281,7 +1279,7 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 		// START
         //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -1327,7 +1325,7 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
 
 	//    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
-        log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+        utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:100 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="100"
     }
@@ -1337,42 +1335,42 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
 	/// START
     if errorGeneral=="" {//if errorGeneral1
 
-        log.Print("CZ   STEP Get the File")
-        log.Print("File Upload Endpoint Hit")
+        utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3", "File Upload Endpoint Hit")
 
         // Parse our multipart form, 10 << 20 specifies a maximum
         // upload of 10 MB files.
         err:= r.ParseMultipartForm(10 << 20)
         if err != nil {
             
-            log.Print("CZ Error Retrieving the File")
-            log.Print(err)
+            utilito.LevelLog(Config_env_log, "3", "CZ Error Retrieving the File")
+            utilito.LevelLog(Config_env_log, "3", err.Error())
             errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
             errorGeneralNbr="110"
 
         }
 
         if errorGeneral=="" {//if error general2
-            log.Print("CZ Start read the form data")
+            utilito.LevelLog(Config_env_log, "3", "CZ Start read the form data")
             formdata := r.MultipartForm // ok, no problem so far, read the Form data
             
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-            log.Print("CZ before loop files")
+            utilito.LevelLog(Config_env_log, "3", "CZ before loop files")
 
             for i, _ := range files { // loop through the files one by one
-                log.Print("CZ loop step 1")
+                utilito.LevelLog(Config_env_log, "3", "CZ loop step 1")
                 var elfileindex string
 
                 elfileindex = "file0"
-                log.Print("CZ Loop file")
-                log.Print("CZ Loop file:"+elfileindex)
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file")
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file:"+elfileindex)
                 file, err := files[i].Open()
-                log.Print("CZ open file")
+                utilito.LevelLog(Config_env_log, "3", "CZ open file")
                 defer file.Close()
                 if err != nil {
-                    log.Print(w, err)
+                    utilito.LevelLog(Config_env_log, "3",  err.Error())
                     errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
                     errorGeneralNbr="120"
 
@@ -1390,9 +1388,9 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
                 // convert content to a 'string'
                 str := buf.String()
 
-                log.Print(str) // print the content as a 'string'                
+                utilito.LevelLog(Config_env_log, "3", str)// print the content as a 'string'            
 
-                log.Print("MGR paso linea por linea")
+                utilito.LevelLog(Config_env_log, "3", "MGR paso linea por linea")
 
                 lineas := 0
 
@@ -1401,7 +1399,7 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
                 for _, line := range strings.Split(strings.TrimSuffix(str, "\n"), "\n") {//inicio for
                     var u modelito.ExitoDataTokenLine
                     if lineas >= 1{ //if -data
-                        log.Printf("MGR Linea %d de datos", lineas)
+                        utilito.LevelLog(Config_env_log, "3", "MGR Linea de datos")
 
                         lineas = lineas + 1
 
@@ -1422,11 +1420,11 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
                     }//end -data
 
                     if lineas == 0 { //if -line name fields
-                        log.Print("MGR Linea 0 de textos")
+                        utilito.LevelLog(Config_env_log, "3", "MGR Linea nombres de campos")
                         lineas = lineas + 1
                     } //end if -line name fields
 
-                    log.Println(line)
+                    utilito.LevelLog(Config_env_log, "3", line)
 
                 }//end for
 
@@ -1435,8 +1433,8 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
                 }else{
                     if errorGeneral=="" {  
 
-                        log.Print(w, "Files uploaded successfully : ")
-                        log.Print(w, files[i].Filename+"\n")
+                        utilito.LevelLog(Config_env_log, "3",  "Files uploaded successfully : ")
+                        utilito.LevelLog(Config_env_log, "3",  files[i].Filename+"\n")
                     }
                 }//end else
 
@@ -1448,7 +1446,7 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
                 //3.return result JSON
 
                 //errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-                log.Println(lineasWithErrors)
+                utilito.LevelLogint(Config_env_log, "3", lineasWithErrors)
 
             }//end -loop through the files one by one
         
@@ -1464,7 +1462,7 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 		// START
         //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -1510,7 +1508,7 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
 
 	//    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
-        log.Print("CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
+        utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
     	errorGeneral="ERROR:100 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="100"
     }
@@ -1520,42 +1518,42 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
 	/// START
     if errorGeneral=="" {//if errorGeneral1
 
-        log.Print("CZ   STEP Get the File")
-        log.Print("File Upload Endpoint Hit")
+        utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3", "File Upload Endpoint Hit")
 
         // Parse our multipart form, 10 << 20 specifies a maximum
         // upload of 10 MB files.
         err:= r.ParseMultipartForm(10 << 20)
         if err != nil {
             
-            log.Print("CZ Error Retrieving the File")
-            log.Print(err)
+            utilito.LevelLog(Config_env_log, "3", "CZ Error Retrieving the File")
+            utilito.LevelLog(Config_env_log, "3", err.Error())
             errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
             errorGeneralNbr="110"
 
         }
 
         if errorGeneral=="" {//if error general2
-            log.Print("CZ Start read the form data")
+            utilito.LevelLog(Config_env_log, "3", "CZ Start read the form data")
             formdata := r.MultipartForm // ok, no problem so far, read the Form data
             
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
-            log.Print("CZ before loop files")
+            utilito.LevelLog(Config_env_log, "3", "CZ before loop files")
 
             for i, _ := range files { // loop through the files one by one
-                log.Print("CZ loop step 1")
+                utilito.LevelLog(Config_env_log, "3", "CZ loop step 1")
                 var elfileindex string
 
                 elfileindex = "file0"
-                log.Print("CZ Loop file")
-                log.Print("CZ Loop file:"+elfileindex)
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file")
+                utilito.LevelLog(Config_env_log, "3", "CZ Loop file:"+elfileindex)
                 file, err := files[i].Open()
-                log.Print("CZ open file")
+                utilito.LevelLog(Config_env_log, "3", "CZ open file")
                 defer file.Close()
                 if err != nil {
-                    log.Print(w, err)
+                    utilito.LevelLog(Config_env_log, "3", err.Error())
                     errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
                     errorGeneralNbr="120"
 
@@ -1573,9 +1571,9 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
                 // convert content to a 'string'
                 str := buf.String()
 
-                log.Print(str) // print the content as a 'string'                
+                utilito.LevelLog(Config_env_log, "3", str)// print the content as a 'string'             
 
-                log.Print("MGR paso linea por linea")
+                utilito.LevelLog(Config_env_log, "3", "MGR paso linea por linea")
 
                 lineas := 0
 
@@ -1584,7 +1582,7 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
                 for _, line := range strings.Split(strings.TrimSuffix(str, "\n"), "\n") {//inicio for
                     var u modelito.ExitoDataTokenLine
                     if lineas >= 1{ //if -data
-                        log.Printf("MGR Linea %d de datos", lineas)
+                        utilito.LevelLog(Config_env_log, "3", "MGR Linea de datos")
 
                         lineas = lineas + 1
 
@@ -1605,11 +1603,11 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
                     }//end -data
 
                     if lineas == 0 { //if -line name fields
-                        log.Print("MGR Linea 0 de textos")
+                        utilito.LevelLog(Config_env_log, "3", "MGR Linea nombres de campos")
                         lineas = lineas + 1
                     } //end if -line name fields
 
-                    log.Println(line)
+                    utilito.LevelLog(Config_env_log, "3", line)
 
                 }//end for
 
@@ -1618,8 +1616,8 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
                 }else{
                     if errorGeneral=="" {  
 
-                        log.Print(w, "Files uploaded successfully : ")
-                        log.Print(w, files[i].Filename+"\n")
+                        utilito.LevelLog(Config_env_log, "3", "Files uploaded successfully : ")
+                        utilito.LevelLog(Config_env_log, "3", files[i].Filename+"\n")
                     }
                 }//end else
 
@@ -1631,7 +1629,7 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
                 //3.return result JSON
 
                 //errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-                log.Println(lineasWithErrors)
+                utilito.LevelLogint(Config_env_log, "3", lineasWithErrors)
 
             }//end -loop through the files one by one
         
@@ -1647,7 +1645,7 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
     if errorGeneral!=""{
     	//send error response if any
     	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
+		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Get the ERROR response JSON ready")
 		
 		// START
         //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
@@ -1676,8 +1674,7 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
 }//end function handlePostConsultaHistorialPagos
 
 func campos_token (line string, lineas int)(string, int){
-        log.Print("MGR campo por campo linea de: ", line)
-//        log.Print("MGR campo por campo linea de: ", lineas - 1)
+        utilito.LevelLog(Config_env_log, "3", "MGR campo por campo")
         numcampos := 0
         var resultado string
         var cualfallo int
@@ -1695,13 +1692,13 @@ func campos_token (line string, lineas int)(string, int){
               campoValue = strings.Replace(campo, "\"", "", -1) // only works with a single character
               var largo string
               largo = strconv.Itoa ( len(campoValue))
-              log.Println("largo del campo es:"+largo+":valor del campo es:"+campoValue)
+              utilito.LevelLog(Config_env_log, "3", "largo del campo es:"+largo+":valor del campo es:"+campoValue)
               
               resultado, cualfallo = valida_campo_token(campoValue, numcampos)
 
               if cualfallo >0 {
                   
-                  log.Println("fallo es valor en :"+campo)
+                  utilito.LevelLog(Config_env_log, "3", "fallo es valor en :"+campo)
                   break
               }
         }
@@ -1710,7 +1707,7 @@ func campos_token (line string, lineas int)(string, int){
 }
 
 func valida_campo_token (campo string, numcampos int)(string, int){
-    log.Print("MGR valida campo token nbr"+strconv.Itoa(numcampos)+" with value:"+campo+"*")
+    utilito.LevelLog(Config_env_log, "3", "MGR valida campo token nbr"+strconv.Itoa(numcampos)+" with value:"+campo+"*")
     var resultado string
     var cualfallo int 
     cualfallo = 0
@@ -1770,7 +1767,7 @@ func valida_campo_token (campo string, numcampos int)(string, int){
             }
 
             if numcampos == 5{
-                log.Println()
+                utilito.LevelLog(Config_env_log, "3", "\n")
                 if campo != "" {
 					if  len(campo)==4 || len(campo)==5 { // 2 for the double quotes and 1 for the end of line
 	
@@ -1787,12 +1784,12 @@ func valida_campo_token (campo string, numcampos int)(string, int){
 }
 
 func campos_payment (line string, lineas int)(string, int){
-        log.Print("MGR campo por campo linea ", lineas - 1)
+        utilito.LevelLog(Config_env_log, "3", "MGR campo por campo")
         numcampos := 0
         var resultado string
         var cualfallo int
         for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
-              log.Println(campo)
+              utilito.LevelLog(Config_env_log, "3", campo)
               numcampos = numcampos + 1
               resultado, cualfallo = valida_campo_pay(campo, numcampos)
         }
@@ -1801,7 +1798,7 @@ func campos_payment (line string, lineas int)(string, int){
 }
 
 func valida_campo_pay (campo string, numcampos int)(string, int){
-    log.Print("MGR valida campo payment")
+    utilito.LevelLog(Config_env_log, "3", "MGR valida campo payment")
 
     var resultado string
     var cualfallo int 
