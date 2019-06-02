@@ -191,13 +191,19 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 		fieldDataBytesJsonTokenize,err := getJsonResponseTokenizeV2(resultCardTokenized)
 			
 		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago  3")	
-	    
+
+/* do not send response in this point, of the logic, 
+   return the[]bytes intoa string
+
 	    w.Header().Set("Content-Type", "application/json")
 	    w.Write(fieldDataBytesJsonTokenize)
+*/        
 		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleGeneratetokenized  4"+"<html><body>"+ result+"</body></html>")
         if err!=nil{
         	utilito.LevelLog(Config_env_log, "3", "Eror en generando response")
 	        errorGeneral= err.Error()
+        }else{
+            errorGeneral =string(fieldDataBytesJsonTokenize);
         }
 				
 		/// END
@@ -393,7 +399,10 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
      return errorGeneral, errorGeneralNbr
 }
 
-func validateFiles(typeFile string, r *http.Request) ( string, string, []modelito.ExitoDataTokenLine) {
+///---------------------------------------- File validations and file processing
+
+
+func validateFiles(typeFile string, r *http.Request) ( string, string, []modelito.ExitoDataTokenLine,[]modelito.RequestTokenized,[]modelito.RequestPayment) {
     var errorGeneral string
     var errorGeneralNbr string
 
@@ -401,6 +410,9 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
     errorGeneral=""
 
     linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+
+    linesDataTokens := []modelito.RequestTokenized{}   //structure to store the data for all the tokens (all the liens of the file   )     
+    linesDataPayments := []modelito.RequestPayment{}   //structure to store the data for all the payment (all the liens of the file   )     
 
     //start  logic
     
@@ -466,19 +478,35 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                         utilito.LevelLog(Config_env_log, "3", "MGR linea de datos")
 
                         lineas = lineas + 1
-                         respuestaRes,cualfallo :=campos_token (line, lineas)
+                        var respuestaRes string
+                        var cualfallo int
+                         eachLineaDataToken :=   modelito.RequestTokenized{}
+                        eachLineaDataPayment :=   modelito.RequestPayment{}
+                        if typeFile =="token" {
+                            eachLineaDataToken,respuestaRes,cualfallo =validateAndObtainCampos_token (line, lineas)
+                        }
+
+                        if typeFile =="payment" {
+                            eachLineaDataPayment, respuestaRes,cualfallo =validateAndObtainCampos_payment (line, lineas)
+                        }                        
+
                          if cualfallo ==0 {  //exito, todos los cmapos de la linea OK, y no errores previos
                             u.Line=strconv.Itoa(lineas)
                             u.Status="OK"
                             u.StatusMessage ="SUCESS"
+                            //the dataToken has the data for the line to be tokenized
+                            //the dataPaymentn has the data for the line to do the payments
 
                          }else { //error, al menos un error en la linea
                             u.Line=strconv.Itoa(lineas)
                             u.Status="ERROR540"
                             u.StatusMessage ="ERROR FIELD:"+strconv.Itoa(cualfallo)+" - "+respuestaRes
                             lineasWithErrors =1
+                            //the dataToken is set to "" when errors
                          }
                          linesStatus = append(linesStatus,u);
+                         linesDataTokens = append(linesDataTokens,eachLineaDataToken);
+                         linesDataPayments = append(linesDataPayments,eachLineaDataPayment);
                     }
                     
                     if lineas == 0 {
@@ -522,216 +550,8 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
 	}
 
     //end   logic
-    return errorGeneral,errorGeneralNbr ,linesStatus 
+    
+    return errorGeneral,errorGeneralNbr ,linesStatus, linesDataTokens,linesDataPayments
+    //return errorGeneral,errorGeneralNbr ,linesStatus
 }
 
-//Función campos_token
-func campos_token (line string, lineas int)(string, int){
-        utilito.LevelLog(Config_env_log, "3", "MGR campo por campo")
-        numcampos := 0
-        var resultado string
-        var cualfallo int
-        resultado ="OK"
-        cualfallo =0
-        for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
-              
-              numcampos = numcampos + 1
-
-              var campoValue string
-//              campoValue = strings.Replace(campo, "\n", "", -1) // only works with a single character
-//              re := regexp.MustCompile(`\r?\n`)
-//              campoValue = re.ReplaceAllString(campoValue, "y")
-
-              campoValue = strings.Replace(campo, "\"", "", -1) // only works with a single character
-              var largo string
-              largo = strconv.Itoa ( len(campoValue))
-              utilito.LevelLog(Config_env_log, "3", "largo del campo es:"+largo+":valor del campo es:"+campoValue)
-              
-              resultado, cualfallo = valida_campo_token(campoValue, numcampos)
-
-              if cualfallo >0 {
-                  
-                  utilito.LevelLog(Config_env_log, "3", "fallo es valor en :"+campo)
-                  break
-              }
-        }
-        
-        return resultado, cualfallo
-} //end campos_token
-
-//Función valida_campo_token
-func valida_campo_token (campo string, numcampos int)(string, int){
-    utilito.LevelLog(Config_env_log, "3", "MGR valida campo token nbr"+strconv.Itoa(numcampos)+" with value:"+campo+"*")
-    var resultado string
-    var cualfallo int 
-    cualfallo = 0
-            if numcampos == 1{
-                if campo != "" {
-                    if len(campo) > 30 {
-                        resultado = "External identifier max leng is 30"
-                        
-                        cualfallo = 1
-                    }
-
-                }else{
-                    resultado = "External Identifier is required"
-                    cualfallo = 1
-                }
-            }
-            
-            if numcampos == 2{
-            	if campo != "" {
-					if len(campo) >100 {
-	
-						resultado="Customer reference max lenght is 100"
-                        cualfallo = 2
-			        }
-				}else{
-					resultado="Client reference is required"
-                    cualfallo = 2
-		        }
-                
-            }
-
-            if numcampos == 3{
-                if campo != "" {
-					if len(campo) >100 {
-	
-						resultado="Payment reference max lenght is 100"
-                        cualfallo = 3
-			        }
-				}else{
-					resultado="Payment reference is required"
-                    cualfallo = 3
-		        }
-            }
-
-            if numcampos == 4{
-                if campo != "" {
-					if len(campo)==16 || len(campo)==15{
-	
-					}else{
-						resultado="Card Number must be 16 digits:"+campo
-                        cualfallo = 4
-			        }
-				}else{
-					resultado="Card is required"
-                    cualfallo = 4
-		        }
-            }
-
-            if numcampos == 5{
-                utilito.LevelLog(Config_env_log, "3", "\n")
-                if campo != "" {
-					if  len(campo)==4 || len(campo)==5 { // 2 for the double quotes and 1 for the end of line
-	
-					}else{
-						resultado="Valid Thru  4 digits"
-                        cualfallo = 5
-			        }
-				}else{
-					resultado="Valid Thru is required"
-                    cualfallo = 5
-		        }
-            }
-    return resultado, cualfallo
-} //end func valida_campo_token
-
-//Función campos_payment
-func campos_payment (line string, lineas int)(string, int){
-        utilito.LevelLog(Config_env_log, "3", "MGR campo por campo")
-        numcampos := 0
-        var resultado string
-        var cualfallo int
-        for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
-              utilito.LevelLog(Config_env_log, "3", campo)
-              numcampos = numcampos + 1
-              resultado, cualfallo = valida_campo_pay(campo, numcampos)
-        }
-        
-        return resultado, cualfallo
-} //end func campos_payment
-
-//Función valida_campo_pay
-func valida_campo_pay (campo string, numcampos int)(string, int){
-    utilito.LevelLog(Config_env_log, "3", "MGR valida campo payment")
-
-    var resultado string
-    var cualfallo int 
-    cualfallo = 0
-            if numcampos == 1{
-                if campo != "" {
-                    if len(campo) > 30 {
-                        resultado = "External identifier max leng is 30"
-                        cualfallo = 1
-                    }
-
-                }else{
-                    resultado = "External Identifier is required"
-                    cualfallo = 1
-                }
-            }
-            
-            if numcampos == 2{
-            	if campo != "" {
-					if len(campo) >100 {
-	
-						resultado="Client reference is required"
-                        cualfallo = 2
-			        }
-				}else{
-					resultado="Client reference is required"
-                    cualfallo = 2
-		        }
-
-            }
-
-            if numcampos == 3{
-                if campo != "" {
-					if len(campo) >100 {
-	
-						resultado="Payment reference max lenght is 100"
-                        cualfallo = 3
-			        }
-				}else{
-					resultado="Payment reference is required"
-                    cualfallo = 3
-		        }
-
-            }
-
-            if numcampos == 4{
-                if campo != "" {
-
-				}else{
-					resultado="Token is required"
-                    cualfallo = 4
-		        }
-            }
-
-            if numcampos == 5{
-                           
-                if campo != "" {
-					if len(campo)==3 ||  len(campo)==4 {
-	
-					}else{
-						resultado="Cvv must be 3 or 4 digits"
-                        cualfallo = 5
-			        }
-				}else{
-					resultado="Cvv is required"
-                    cualfallo = 5
-		        }
-            } 
-            
-			if numcampos == 6{
-                if campo != "" {
-
-				}else{
-					resultado="Amount is required"
-                    cualfallo = 6
-		        }
-            }	
-
-    return resultado, cualfallo
-}//end func valida_campo_pay
