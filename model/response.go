@@ -7,6 +7,7 @@ type ResponseTokenFile struct {
 	StatusMessage string       `json:"status_message_file"`
 	Status       string       `json:"status_file"`
 	SucessDataEachRowToken   []ExitoDataTokenLine     `json:"sucess_data_each_row"`
+    SucessDataEachRowProcess   []ExitoDataTokenLine     `json:"sucess_data_each_row_process"`
 }
 
 type ExitoDataTokenLine struct {    
@@ -15,6 +16,7 @@ type ExitoDataTokenLine struct {
 	Status       string       `json:"status"`
 	
 }
+
 
 ///////////////////response for payment
 type ResponsePayment struct {    

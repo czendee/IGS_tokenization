@@ -205,12 +205,14 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 
 	////////////////////////////////////////////////process business rules
 	/// START
+    processLinesStatus := []modelito.ExitoDataTokenLine{}  //an array for the status of the process (tokenization)
+
     if errorGeneral=="" {   //process business Tokenization
         // use this structuire inputDataToken to call methods for the tokenization
      
          //the results of each of the tokanizations, will be returned here
 
-          linesStatus := []modelito.ExitoDataTokenLine{}
+
 
         utilito.LevelLog(Config_env_log, "1","CZ  ProcessTokenFile  STEP Get the File")
         utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File Upload Endpoint Hit")
@@ -237,7 +239,8 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
                             u.Status="ERROR540"
                             u.StatusMessage ="ERROR FIELD:"+strconv.Itoa(lineaProcess)+" - "+responseGeneral
                             lineasWithErrors =1
-                        utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer ERROR line:")
+                        utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer ERROR line:"+responseGeneral)
+                        
                            errorGeneral="ERROR555"
                       }else{
                           utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer OK line:")
@@ -253,11 +256,12 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
                 utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer NOT expected:")
             }
             // add this tokenization into the sattus for all the lines
-           linesStatus = append(linesStatus,u)
+           utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -before line:"+u.StatusMessage )
+
+           processLinesStatus = append(processLinesStatus,u)
 
  		}//end for
 
-		
 
 
 	}//end if - process business Tokenization
@@ -277,11 +281,11 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
     	//send error response if any
     	//prepare an error JSON Response, if any
 		utilito.LevelLog(Config_env_log, "3","CZ ProcessTokenFile  STEP Get the ERROR response JSON ready")
-		
 		// START
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
 
-        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
+//        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
+        fieldDataBytesJson,err := getJsonResponseProcessFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	

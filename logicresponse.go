@@ -29,7 +29,6 @@ func getJsonResponseV2( cardsFound []modelito.Card)([]byte, error) {
 			w := modelito.CardData{time.Now(), "G#$$%ytoywteouwytr","1234","VISA","2501","781234","1"}
 			mainStruct.Cards = append(mainStruct.Cards, w)
 		}
-
 */
 	}
 
@@ -93,11 +92,31 @@ func getJsonResponseErrorValidateFile(fileStatusMsg, fileStatusNumber string, li
 
 
      	for _, d := range linesStatus {
-     		             
+     		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
 			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status}   //request.go
 			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
  		}
 
+
+	return json.MarshalIndent(mainStruct, "", "  ")
+}
+
+func getJsonResponseProcessFile(fileStatusMsg, fileStatusNumber string, tokenLinesStatus []modelito.ExitoDataTokenLine, payLinesStatus []modelito.ExitoDataTokenLine  )([]byte, error) {
+	
+    mainStruct :=modelito.ResponseTokenFile{StatusMessage: fileStatusMsg ,Status:fileStatusNumber}
+
+
+     	for _, d := range tokenLinesStatus {
+     		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status}   //request.go
+			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
+ 		}
+
+     	for _, d := range payLinesStatus {
+     		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status}   //request.go
+			mainStruct.SucessDataEachRowProcess = append(mainStruct.SucessDataEachRowProcess, w)
+ 		}
 
 	return json.MarshalIndent(mainStruct, "", "  ")
 }

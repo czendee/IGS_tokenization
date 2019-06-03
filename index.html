@@ -123,7 +123,7 @@
                    <span>Respuesta Tokenizacion: </span>
               </div> 
               <div>
-                    <textarea class="textarea" rows="5" cols="100" ng-model="respuesta"></textarea >
+                    <textarea class="textarea" rows="5" cols="100" ng-model="respuestaTokenization"></textarea >
    
               </div> 
 
@@ -187,6 +187,9 @@
                                    var statusMssg =response.data.status_message_file;
                                    var statusNbr =response.data.status_file;
                                    var statusDataEachRow =response.data.sucess_data_each_row;
+                                   var statusDataEachRowProcess =response.data.sucess_data_each_row_process;
+
+                                   
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.status = statusNbr + " "+ statusMssg;
@@ -197,18 +200,30 @@
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
+
+                                        });    
+                                        statusDataEachRowProcess.forEach(function(entry) {
+                                            console.log(entry);
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuestaTokenization = $scope.respuestaTokenization +"  "+ tempLine;
+                                        });                                                                              
 
                                    }else{
                                         $scope.status = statusNbr + " "+ statusMssg;
                                         
-
                                         statusDataEachRow.forEach(function(entry) {
                                             console.log(entry);
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
                                         });                                        
+
+                                        statusDataEachRowProcess.forEach(function(entry) {
+                                            console.log(entry);
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuestaTokenization = $scope.respuestaTokenization +"  "+ tempLine;
+
+                                        });                                                                              
 
 
                                         $scope.files = [];                                        
