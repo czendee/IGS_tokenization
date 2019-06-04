@@ -110,6 +110,10 @@
    
               </div> 
               <div>
+                  <button class="btn btn-primary" ng-click="download()">Descargar validacion</button>
+
+              </div>
+              <div>
                    <span>Status Validacion: </span>
                     
               </div> 
@@ -123,6 +127,10 @@
               <div>
                     <textarea class="textarea" rows="5" cols="100" ng-model="respuestaPayment"></textarea >
    
+              </div>
+              <div>
+                  <button class="btn btn-primary" ng-click="downloadPagos()">Descargar Pagos</button>
+                  
               </div> 
 
               <div>
@@ -224,7 +232,7 @@
                                   // $scope.files = [];
                                });
                         }
-                }
+                } //end save
                 $scope.validate = function(){
                         var fd = new FormData();
                         angular.forEach($scope.files, function(file,key){
@@ -280,8 +288,121 @@
                                   // $scope.files = [];
                                });
                         }
-                }
-            });
+                } //end validate
+
+                $scope.download = function(){
+                        var fd = new FormData();
+                       
+                        //now add other data to fd
+                        fd.append('contenidofile',$scope.respuesta);
+                        
+                        //$scope.respuesta = " "
+                        $scope.status =  " "
+                       var request = $http ({
+                           method: 'POST',
+                           url : '/v1/downloadfile',
+                            data : fd,
+                           transformRequest: angular.identity,
+                           headers : {
+                               'Content-Type' : undefined
+                           }
+                        });
+                        
+                        if($scope.respuesta.length >0){
+                               request.then(
+                                 function(response){
+                                   console.log(JSON.stringify(response.data) );
+                                   var statusMssg =response.data.status_message_file;
+                                   var statusNbr =response.data.status_file;
+                                   var statusDataEachRow =response.data.sucess_data_each_row;
+                                   if(statusMssg.indexOf("ERROR")>= 0 ){
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+                                   }else{
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+                                        $scope.files = [];                                        
+                                   }
+                                 },
+                               )
+                               .catch(function (data) {
+                                   // Handle error here
+                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                  // $scope.files = [];
+                               });
+                        }
+                }// end download
+
+                $scope.downloadPagos = function(){
+                        var fd = new FormData();
+                        
+                        //now add other data to fd
+                        fd.append('contenidofile',$scope.respuestaPayment);
+                        
+                        //$scope.respuesta = " "
+                        $scope.status =  " "
+                       var request = $http ({
+                           method: 'POST',
+                           url : '/v1/downloadfile',
+                            data : fd,
+                           transformRequest: angular.identity,
+                           headers : {
+                               'Content-Type' : undefined
+                           }
+                        });
+                        if($scope.respuestaPayment.length >0){
+                               request.then(
+                                 function(response){
+                                   console.log(JSON.stringify(response.data) );
+                                   var statusMssg =response.data.status_message_file;
+                                   var statusNbr =response.data.status_file;
+                                   var statusDataEachRow =response.data.sucess_data_each_row;
+                                   if(statusMssg.indexOf("ERROR")>= 0 ){
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+                                   }else{
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+                                        $scope.files = [];                                        
+                                   }
+                                 },
+                               )
+                               .catch(function (data) {
+                                   // Handle error here
+                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                  // $scope.files = [];
+                               });
+                        }
+                } // end downloadPagos 
+
+            }); //end general de funciones
+
+
+
 //for drag and drop files
             module.directive('fileDropzone',function(){
                   return{

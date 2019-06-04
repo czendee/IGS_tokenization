@@ -39,7 +39,7 @@ import (
 
 
 
-   func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
+func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
    	 var requestData modelito.RequestPayment
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
@@ -62,9 +62,30 @@ import (
    //END
    	 
    	 return requestData,errorGeneral
-   }
+} //end obtainParmsProcessPayment
 
-   func obtainParmsGeneratetokenized(r *http.Request, errorGeneral string) (modelito.RequestTokenized,string) {
+func obtainParmsProcessDownload(r *http.Request, errorGeneral string) (string, string){
+   	 var requestData string
+	////////////////////////////////////////////////obtain parms in JSON
+   //START    
+    utilito.LevelLog(Config_env_log, "3", "cz  handleProcesspayment")
+ 		 utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago")
+    		    
+    	err := r.ParseForm()
+		if err != nil {
+	    	//prepare response with error 100
+	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
+	    	errorGeneral="ERROR:180 -"	+err.Error()
+		}
+		v := r.Form
+		requestData = v.Get("contenidofile")
+
+   //END
+   	 
+   	 return requestData,errorGeneral
+} //end obtainParmsProcessDownload
+
+func obtainParmsGeneratetokenized(r *http.Request, errorGeneral string) (modelito.RequestTokenized,string) {
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
      var requestData modelito.RequestTokenized

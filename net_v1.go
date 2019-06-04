@@ -4,6 +4,7 @@ import (
 	"net/http"
     "strconv"
     "strings"
+    "time"
 //    "regexp"
 //	"fmt"
 	"log"
@@ -65,6 +66,8 @@ func init() {
 	r.Handle("/v1/fetchtokenizedcards", netHandle(handleDBPostGettokenizedcards, nil)).Methods("POST")   //in this net_v1.go
 	r.Handle("/v1/processpayment", netHandle(v4handleDBPostProcesspayment, nil)).Methods("POST")           //in this net_v1.go    	   
 	r.Handle("/v1/generatetokenized", netHandle(handleDBPostGeneratetokenized, nil)).Methods("POST")     //in this net_v1.go
+
+    r.Handle("/v1/downloadfile", netHandle(ForceDownload, nil)).Methods("POST")     //in this net_v1.go
 
 
 }
@@ -1415,22 +1418,26 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
 func ForceDownload(w http.ResponseWriter, r *http.Request) {
           file := "banwireResponse.txt"
          //downloadBytes, err := ioutil.ReadFile(file)
+         log.Print("Paso 1")
    var errorGeneral string
-          htmlStrDownloadJson, err:= obtainParmsProcessPayment(r , errorGeneral)
+          htmlStrDownloadJson, err:= obtainParmsProcessDownload(r , errorGeneral) //logisrequest.go
           ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
           // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
            //y el indexpay.html 
+       log.Print("Paso 2")
+        if(err!=""){
 
-         if err != nil {
-                 log level (err)
-         }
+	    }//end if
+         //if err != nil {
+               //  utilito.LevelLog(Config_env_log, "3",err.tost)
+         //}
         downloadBytes:= []byte(htmlStrDownloadJson)
-
+log.Print("Paso3")
          // set the default MIME type to send
          mime := http.DetectContentType(downloadBytes)
 
          fileSize := len(string(downloadBytes))
-
+log.Print("Paso 6")
          // Generate the server headers
          w.Header().Set("Content-Type", mime)
          w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
@@ -1443,9 +1450,8 @@ func ForceDownload(w http.ResponseWriter, r *http.Request) {
          //if _, err := b.WriteTo(w); err != nil {
          //              fmt.Fprintf(w, "%s", err)
          //      }
-
+log.Print("Paso 7")
          // force it down the client's.....
          http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
-
+log.Print("paso final")
  }
-
