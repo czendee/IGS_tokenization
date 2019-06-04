@@ -44,7 +44,6 @@
       width:  250px;
        margin-top :30px;
 }
-
 .headerBanwire {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 20px;
@@ -57,7 +56,6 @@
   letter-spacing: normal;
   word-spacing: normal;
   word-wrap: normal;
-
   line-break: auto;
      text-align: left;
 }
@@ -188,26 +186,20 @@
                                    var statusNbr =response.data.status_file;
                                    var statusDataEachRow =response.data.sucess_data_each_row;
                                    var statusDataEachRowProcess =response.data.sucess_data_each_row_process;
-
-
-
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.status = statusNbr + " "+ statusMssg;
                                         
-
                                         statusDataEachRow.forEach(function(entry) {
                                             console.log(entry);
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-
                                         });                                        
                                         statusDataEachRowProcess.forEach(function(entry) {
                                             console.log(entry);
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuestaPayment = $scope.respuestaPayment +"  "+ tempLine;
                                         }); 
-
                                     }else{     
                                         $scope.status = statusNbr + " "+ statusMssg;
                                     
@@ -217,18 +209,14 @@
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
                                         }); 
-
                                         statusDataEachRowProcess.forEach(function(entry) {
                                             console.log(entry);
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuestaPayment = $scope.respuestaPayment +"  "+ tempLine;
-
                                         });                                       
-
                                         $scope.files = [];                                        
                                    }
                                  },
-
                                )
                                .catch(function (data) {
                                    // Handle error here
@@ -236,7 +224,6 @@
                                   // $scope.files = [];
                                });
                         }
-
                 }
                 $scope.validate = function(){
                         var fd = new FormData();
@@ -265,33 +252,27 @@
                                    var statusMssg =response.data.status_message_file;
                                    var statusNbr =response.data.status_file;
                                    var statusDataEachRow =response.data.sucess_data_each_row;
-
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.status = statusNbr + " "+ statusMssg;
                                         
-
                                         statusDataEachRow.forEach(function(entry) {
                                             console.log(entry);
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
                                         });                                        
-
                                    }else{
                                         $scope.status = statusNbr + " "+ statusMssg;
                                         
-
                                         statusDataEachRow.forEach(function(entry) {
                                             console.log(entry);
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
                                         });                                        
-
                                         $scope.files = [];                                        
                                    }
                                  },
-
                                )
                                .catch(function (data) {
                                    // Handle error here
@@ -299,12 +280,9 @@
                                   // $scope.files = [];
                                });
                         }
-
                 }
-
             });
 //for drag and drop files
-
             module.directive('fileDropzone',function(){
                   return{
                       restrict: 'A',
@@ -325,14 +303,12 @@
                                   }
                                   e.dataTransfer.effectAllowed = 'copy';
                                   element.attr('class','file-drop-zone-over');
-
                              });
                              element.bind('drop',function(e){
                                   element.attr('class','file-drop-zone');
                                   if(e !=null){
                                       e.preventDefault();
                                   }
-
                                    var fileObjectsArray =[];
                                    angular.forEach(e.dataTransfer.files, function(file){
                                        //for the sake of previewing the files on the page before uploading          

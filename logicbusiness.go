@@ -483,7 +483,7 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                          eachLineaDataToken :=   modelito.RequestTokenized{}
                         eachLineaDataPayment :=   modelito.RequestPayment{}
                         if typeFile =="token" {
-                            eachLineaDataToken,respuestaRes,cualfallo =validateAndObtainCampos_token (line, lineas)
+                            eachLineaDataToken,respuestaRes,cualfallo =validateAndObtainCampos_token (line, lineas)  //logicrequest.go
                         }
 
                         if typeFile =="payment" {
