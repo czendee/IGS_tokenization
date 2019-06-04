@@ -123,7 +123,7 @@
                    <span>Respuesta Pagos: </span>
               </div> 
               <div>
-                    <textarea class="textarea" rows="5" cols="100" ng-model="respuestapayment"></textarea >
+                    <textarea class="textarea" rows="5" cols="100" ng-model="respuestaPayment"></textarea >
    
               </div> 
 
@@ -171,7 +171,6 @@
                         fd.append('description',$scope.description);
                         $scope.respuesta = " "
                         $scope.status =  " "
-
                        var request = $http ({
                            method: 'POST',
                            url : '/v1/processpaymentfile',
@@ -188,6 +187,9 @@
                                    var statusMssg =response.data.status_message_file;
                                    var statusNbr =response.data.status_file;
                                    var statusDataEachRow =response.data.sucess_data_each_row;
+                                   var statusDataEachRowProcess =response.data.sucess_data_each_row_process;
+
+
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.status = statusNbr + " "+ statusMssg;
@@ -198,19 +200,30 @@
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+
                                         });                                        
+                                        statusDataEachRowProcess.forEach(function(entry) {
+                                            console.log(entry);
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuestaPayment = $scope.respuestaPayment +"  "+ tempLine;
+                                        }); 
 
-                                   }else{
+                                    }else{     
                                         $scope.status = statusNbr + " "+ statusMssg;
-                                        
-
+                                    
                                         statusDataEachRow.forEach(function(entry) {
                                             console.log(entry);
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
+                                        }); 
 
+                                        statusDataEachRowProcess.forEach(function(entry) {
+                                            console.log(entry);
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuestaPayment = $scope.respuestaPayment +"  "+ tempLine;
+
+                                        });                                       
 
                                         $scope.files = [];                                        
                                    }
@@ -233,9 +246,9 @@
                         });
                         //now add other data to fd
                         fd.append('description',$scope.description);
+                        
                         $scope.respuesta = " "
                         $scope.status =  " "
-
                        var request = $http ({
                            method: 'POST',
                            url : '/v1/validatepaymentfiles',

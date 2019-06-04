@@ -396,7 +396,7 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
     } 
 					
-}//en function validate
+}//end handlePostVaidateFiles
 
 //  handlePostProcessTokenFile
 
@@ -406,8 +406,6 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 	}()
     var errorGeneral string
     var errorGeneralNbr string
-
-
 
     
 //   	var requestData modelito.RequestTokenizedCards
@@ -429,51 +427,28 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
     errorGeneral,errorGeneralNbr ,linesStatus,inputDataToken,inputDataPayment =  validateFiles("payment", r)  //logicbusiness.go
 
     
-    
     if errorGeneral!="" {
         log.Print("CZ    Prepare Response with 200. Validation File failed-Payments:"+errorGeneral)
     	errorGeneral="ERROR:200 -Validation File failed-Payments"	+errorGeneral
     	errorGeneralNbr="100"
     }
 
-	////////////////////////////////////////////////process business rules
-	/// START
-    if errorGeneral=="" {
-        // use this structuire inputDataToken to call methods for the payments 
-        log.Print("CZ  ProcessTokenFile  STEP Get the File")
-        log.Print(" ProcessTokenFile File Upload Endpoint Hit")
+    if errorGeneral!="" {
+        //send error response if any
+        //prepare an error JSON Response, if any
+        log.Print("CZ STEP Get the ERROR response JSON ready")
+        //START
+        //old getJsonResponseError(errorGeneral, errorGeneralNbr)
 
-	}
+        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus) //logicresponse.go
+        ////////// write the response (ERROR)
+        w.Header().Set("Content-Type","application/json")
+        w.Write(fieldDataBytesJson)
+        if(err!=nil){
 
+        }
 
-	/// END
-
-    if errorGeneral!=""{
-    	//send error response if any
-    	//prepare an error JSON Response, if any
-		log.Print("CZ ProcessTokenFile  STEP Get the ERROR response JSON ready")
-		
-		// START
-		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
-
-        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
-		//////////    write the response (ERROR)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}
-	
-    }else{
-
-/*        var  cardTokenized modelito.Card
-        fieldDataBytesJson,err := getJsonResponseValidateFileV2(cardTokenized)
-        w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}//end if
-*/
+	}else{
         errorGeneral ="SUCCESS"
         errorGeneralNbr ="OK"
         fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
@@ -483,11 +458,11 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 		if(err!=nil){
 			
 		}
+        
+    }
 
-    } 
 
-}
-
+} //end handlePostProcessPaymentFile
 
 func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 	defer func() {
