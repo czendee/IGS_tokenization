@@ -72,6 +72,9 @@ func init() {
     //r.Handle("/v1/downloadfilePago", netHandle(ForceDownloadPago, nil)).Methods("POST")     //in this net_v1.go
     r.Handle("/v1/downloadfilePago", netHandle(ForceDownloadPago, nil)).Methods("GET")     //in this net_v1.go
 
+    r.Handle("/v1/downloadfileValida", netHandle(ForceDownloadValida, nil)).Methods("GET")     //in this net_v1.go
+    r.Handle("/v1/downloadfileTokeniza", netHandle(ForceDownloadTokeniza, nil)).Methods("GET")     //in this net_v1.go
+
 }
 
 
@@ -1513,3 +1516,103 @@ func ForceDownloadPago(w http.ResponseWriter, r *http.Request) {
    //      http.ServeFile(w, r, "css/app.min.css")
     log.Print("Fin ForceDownloadPago")
 } //end ForceDownloadPago
+
+//Función ForceDownloadValida para index
+func ForceDownloadValida(w http.ResponseWriter, r *http.Request) {
+          file := "banwireResponseValidacion.txt"
+         //downloadBytes, err := ioutil.ReadFile(file)
+         log.Print("Empieza funcion ForceDownloadValida")
+   var errorGeneral string
+          htmlStrDownloadJson, err:= obtainParmsProcessDownloadValida(r , errorGeneral) //logisrequest.go
+          ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
+          // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
+           //y el indexpay.html 
+       
+       log.Print("Termina función obtainParmsProcessDownloadValida")
+        
+        if(err!=""){
+
+	    }//end if
+         //if err != nil {
+               //  utilito.LevelLog(Config_env_log, "3",err.tost)
+         //}
+        downloadBytes:= []byte(htmlStrDownloadJson)
+        
+         // set the default MIME type to send
+         //mime := http.DetectContentType(downloadBytes)
+
+         //fileSize := len(string(downloadBytes))
+         // Generate the server headers
+
+		log.Print("Paso Generador de cabezeras")
+        w.Header().Set("Content-Type", "text/plain;charset: uft-8")
+        w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
+		w.Write(downloadBytes)	
+
+                
+     //    w.Header().Set("Expires", "0")
+     //    w.Header().Set("Content-Transfer-Encoding", "binary")
+     //    w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+     //    w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+
+         //b := bytes.NewBuffer(downloadBytes)
+         //if _, err := b.WriteTo(w); err != nil {
+         //              fmt.Fprintf(w, "%s", err)
+         //      }
+
+         // force it down the client's.....
+    //     http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+
+   //      http.ServeFile(w, r, "css/app.min.css")
+    log.Print("Fin ForceDownloadValida")
+} //end ForceDownloadValida
+
+//Función ForceDownloadTokeniza para index
+func ForceDownloadTokeniza(w http.ResponseWriter, r *http.Request) {
+          file := "banwireResponseTokenizacion.txt"
+         //downloadBytes, err := ioutil.ReadFile(file)
+         log.Print("Empieza funcion ForceDownloadTokeniza")
+   var errorGeneral string
+          htmlStrDownloadJson, err:= obtainParmsProcessDownloadTokeniza(r , errorGeneral) //logisrequest.go
+          ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
+          // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
+           //y el indexpay.html 
+       
+       log.Print("Termina función obtainParmsProcessDownloadTokeniza")
+        
+        if(err!=""){
+
+	    }//end if
+         //if err != nil {
+               //  utilito.LevelLog(Config_env_log, "3",err.tost)
+         //}
+        downloadBytes:= []byte(htmlStrDownloadJson)
+        
+         // set the default MIME type to send
+         //mime := http.DetectContentType(downloadBytes)
+
+         //fileSize := len(string(downloadBytes))
+         // Generate the server headers
+
+		log.Print("Paso Generador de cabezeras")
+        w.Header().Set("Content-Type", "text/plain;charset: uft-8")
+        w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
+		w.Write(downloadBytes)	
+
+                
+     //    w.Header().Set("Expires", "0")
+     //    w.Header().Set("Content-Transfer-Encoding", "binary")
+     //    w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+     //    w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+
+         //b := bytes.NewBuffer(downloadBytes)
+         //if _, err := b.WriteTo(w); err != nil {
+         //              fmt.Fprintf(w, "%s", err)
+         //      }
+
+         // force it down the client's.....
+    //     http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+
+   //      http.ServeFile(w, r, "css/app.min.css")
+    log.Print("Fin ForceDownloadTokeniza")
+} //end ForceDownloadTokeniza

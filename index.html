@@ -110,7 +110,11 @@
               <div>
                     <textarea class="textarea" rows="5" cols="100" ng-model="respuesta"></textarea >
    
-              </div> 
+              </div>
+              <div>
+                   <button class="btn btn-primary" ng-click="downloadValida()">Descarga Validacion</button> 
+   
+              </div>  
               <div>
                    <span>Status Validacion: </span>
                     
@@ -124,6 +128,10 @@
               </div> 
               <div>
                     <textarea class="textarea" rows="5" cols="100" ng-model="respuestaTokenization"></textarea >
+   
+              </div>
+              <div>
+                   <button class="btn btn-primary" ng-click="downloadTokeniza()">Descarga Tokenizacion</button> 
    
               </div> 
 
@@ -225,7 +233,6 @@
 
                                         });                                                                              
 
-
                                         $scope.files = [];                                        
                                    }
                                  },
@@ -238,7 +245,8 @@
                                });
                         }
 
-                }
+                } //end Save
+
                 $scope.validate = function(){
                         var fd = new FormData();
                         angular.forEach($scope.files, function(file,key){
@@ -301,7 +309,27 @@
                                });
                         }
 
-                }
+                } //end validate
+
+                $scope.downloadValida = function(){
+
+
+                        var a="/v1/downloadfileValida";
+                        var filetextarea = $scope.respuesta;
+                        window.open(a+'?contenidofileValida='+filetextarea, '_blank');
+
+                       
+                }// end downloadValida
+
+                $scope.downloadTokeniza = function(){
+
+
+                        var a="/v1/downloadfileTokeniza";
+                        var filetextarea = $scope.respuestaTokenization;
+                        window.open(a+'?contenidofileTokeniza='+filetextarea, '_blank');
+
+                       
+                }// end downloadTokeniza
 
             });
 //for drag and drop files

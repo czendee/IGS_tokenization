@@ -102,7 +102,7 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
     utilito.LevelLog(Config_env_log, "3", "cz  handleProcesspayment")
- 		 utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago")
+ 		 utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test respuestaPagos")
     		    
     	err := r.ParseForm()
 		if err != nil {
@@ -112,6 +112,131 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
 		}
 		v := r.Form
 		requestData = v.Get("contenidofilePagos")
+        
+        //buf := bytes.NewBuffer(nil)
+        //io.Copy(buf, requestData)
+
+        var lineaDatos string
+        micadenita := requestData
+
+        utilito.LevelLog(Config_env_log, "3", "Respuesta pagos")
+        utilito.LevelLog(Config_env_log, "3", micadenita)
+
+       parte := strings.Split(strings.TrimSuffix(micadenita, "["), "[")
+        mensajes := strings.Split(strings.TrimSuffix(parte[0], ","), ",")
+            utilito.LevelLog(Config_env_log, "3", "mensajes status")
+            utilito.LevelLog(Config_env_log, "3", mensajes[0])
+            limpiar :=  strings.Replace(mensajes[0], "\"", "", -1)
+            limpiar2 :=  strings.Replace(limpiar, " ", "", -1)
+            campoStatus := strings.Split(limpiar2, ":")
+            status_message := campoStatus[1]
+            if status_message == "Success"{
+                //utilito.LevelLog(Config_env_log, "3", status_message)
+                limpiar =  strings.Replace(mensajes[2], "\"", "", -1)
+                limpiar2 =  strings.Replace(limpiar, " ", "", -1)
+                payments := strings.Split(limpiar2, ":")
+                log.Print("Payments "+ payments[1])
+                cuenta_i := 0
+                for _, line := range strings.Split(strings.Trim(parte[1], "{}"), "},"){
+                    utilito.LevelLog(Config_env_log, "3", "For linea")
+                    //utilito.LevelLog(Config_env_log, "3", line)
+                    cuenta_i = cuenta_i + 1
+                    log.Print("no vuelta",cuenta_i)
+                    for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
+                            
+                        //utilito.LevelLog(Config_env_log, "3", "campo")
+                        //utilito.LevelLog(Config_env_log, "3", campo)
+                        limpia2 := strings.Replace(campo, " ", "", -1)
+                        limpia3 := strings.Replace(limpia2, "}", "", -1)
+                        limpia4 := strings.Replace(limpia3, "]", "", -1)
+                        //log.Print("datolimpio", limpia4)
+                        dato := strings.Split(limpia4, ":")
+                        lineaDatos = lineaDatos + dato[1] +","
+                    }// end for campo
+
+                    log.Print("fuera de for campo")
+                    //cuenta_i = 0
+                    utilito.LevelLog(Config_env_log, "3", lineaDatos)
+                    lineaDatos = lineaDatos +"\n"
+                }// end for linea
+                compara, err := strconv.Atoi(payments[1])
+                if err == nil {
+
+                }
+                if compara != cuenta_i {
+                    log.Print("ERROR 2048 payments don´t match processed payments")
+                    lineaDatos = "ERROR 2048 payments don´t match processed payments"
+                }else{
+                    log.Print("Archivo Success")
+                }
+                log.Print("fuera de for linea")
+            }else{
+                log.Print("ERROR 2024 missing parameter")
+                lineaDatos = "ERROR 2024 missing parameter"
+            } //end else-if status_message
+            log.Print("fin if status_message")
+
+        //buscar si en la cadena de caracteres esta status_message y ver si es Success
+        //buscar si en la cadena de caracteres cards_tokenized, y ponerle el valor que traiga
+        //buscar si esta la cadena de caracteres card data, y buscar los datos entre los corchetes cuadrados y ponerlo en una cadena resto
+        //para cada elemento que termine en corche y coma   
+            //procesarlo  y dejar el resto en resto  
+        //buscar en la cadena resto si hay un corchete y una coma y separas esa parte en otra variable
+        //se repite la acción anterior hasta solo entrar un corchete solo que indica el final de los datos
+        //cuando solo encuentra un corchete solo se procesa la información
+        //el ciclo termina cuando hay un solo corchete
+       
+   //END
+   	 
+   	 return lineaDatos,errorGeneral
+} //end obtainParmsProcessDownloadPagos
+
+func obtainParmsProcessDownloadValida(r *http.Request, errorGeneral string) (string, string){
+   	 var requestData string
+	////////////////////////////////////////////////obtain parms in JSON
+   //START    
+    utilito.LevelLog(Config_env_log, "3", "cz  handleProcesspayment")
+ 		 utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test respuestaValidacion")
+    		    
+    	err := r.ParseForm()
+		if err != nil {
+	    	//prepare response with error 100
+	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
+	    	errorGeneral="ERROR:180 -"	+err.Error()
+		}
+		v := r.Form
+		requestData = v.Get("contenidofileValida")
+
+        //buscar si en la cadena de caracteres esta status_message y ver si es Success
+        //buscar si en la cadena de caracteres cards_tokenized, y ponerle el valor que traiga
+        //buscar si esta la cadena de caracteres card data, y buscar los datos entre los corchetes cuadrados y ponerlo en una cadena resto
+        //para cada elemento que termine en corche y coma   
+            //procesarlo  y dejar el resto en resto  
+        //buscar en la cadena resto si hay un corchete y una coma y separas esa parte en otra variable
+        //se repite la acción anterior hasta solo entrar un corchete solo que indica el final de los datos
+        //cuando solo encuentra un corchete solo se procesa la información
+        //el ciclo termina cuando hay un solo corchete
+       
+   //END
+   	 
+   	 return requestData,errorGeneral
+} //end obtainParmsProcessDownloadValida
+
+func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (string, string){
+   	 var requestData string
+	////////////////////////////////////////////////obtain parms in JSON
+   //START    
+    utilito.LevelLog(Config_env_log, "3", "cz  handleProcesspayment")
+ 		 utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test respuestaTokenizacion")
+    		    
+    	err := r.ParseForm()
+		if err != nil {
+	    	//prepare response with error 100
+	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
+	    	errorGeneral="ERROR:180 -"	+err.Error()
+		}
+		v := r.Form
+		requestData = v.Get("contenidofileTokeniza")
         
         //buf := bytes.NewBuffer(nil)
         //io.Copy(buf, requestData)
@@ -164,30 +289,22 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
 
                 }
                 if compara != cuenta_i {
-                    log.Print("ERROR 2048 cards_tokenized don´t match processed cards")
-                    lineaDatos = "ERROR 2048 cards_tokenized don´t match processed cards"
+                    log.Print("ERROR 1048 cards_tokenized don´t match processed cards")
+                    lineaDatos = "ERROR 1048 cards_tokenized don´t match processed cards"
                 }else{
                     log.Print("Archivo Success")
                 }
                 log.Print("fuera de for linea")
-            }// end if
+            }else{
+                log.Print("ERROR 1024 missing parameter")
+                lineaDatos = "ERROR 1024 missing parameter"
+            } //end else-if status_message
             log.Print("fin if status_message")
-
-        //buscar si en la cadena de caracteres esta status_message y ver si es Success
-        //buscar si en la cadena de caracteres cards_tokenized, y ponerle el valor que traiga
-        //buscar si esta la cadena de caracteres card data, y buscar los datos entre los corchetes cuadrados y ponerlo en una cadena resto
-        //para cada elemento que termine en corche y coma   
-            //procesarlo  y dejar el resto en resto  
-        //buscar en la cadena resto si hay un corchete y una coma y separas esa parte en otra variable
-        //se repite la acción anterior hasta solo entrar un corchete solo que indica el final de los datos
-        //cuando solo encuentra un corchete solo se procesa la información
-        //el ciclo termina cuando hay un solo corchete
        
    //END
    	 
    	 return lineaDatos,errorGeneral
-} //end obtainParmsProcessDownloadPagos
-
+} //end obtainParmsProcessDownloadTokeniza
 func obtainParmsGeneratetokenized(r *http.Request, errorGeneral string) (modelito.RequestTokenized,string) {
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
