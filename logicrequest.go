@@ -157,7 +157,7 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
                     log.Print("fuera de for campo")
                     //cuenta_i = 0
                     utilito.LevelLog(Config_env_log, "3", lineaDatos)
-                    lineaDatos = lineaDatos +"\n"
+                    lineaDatos = lineaDatos +"\r\n"
                 }// end for linea
                 compara, err := strconv.Atoi(payments[1])
                 if err == nil {
@@ -282,7 +282,7 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
                     log.Print("fuera de for campo")
                     //cuenta_i = 0
                     utilito.LevelLog(Config_env_log, "3", lineaDatos)
-                    lineaDatos = lineaDatos +"\n"
+                    lineaDatos = lineaDatos +"\r\n"
                 }// end for linea
                 compara, err := strconv.Atoi(cardsTokenized[1])
                 if err == nil {

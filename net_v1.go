@@ -75,6 +75,7 @@ func init() {
     r.Handle("/v1/downloadfileValida", netHandle(ForceDownloadValida, nil)).Methods("GET")     //in this net_v1.go
     r.Handle("/v1/downloadfileTokeniza", netHandle(ForceDownloadTokeniza, nil)).Methods("GET")     //in this net_v1.go
 
+
 }
 
 
@@ -188,7 +189,25 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 	}()
     var errorGeneral string
     var errorGeneralNbr string
-    
+
+   //this is used to store the file procession status and data
+    var u modelito.Filetrans
+    u.Transtype ="process tokenizer"
+    /*u.Transtype =
+    u.Filename =
+
+    u.Trans_status =
+    u.Trans_statusmssg =
+    u.Trans_processstatus =
+    u.TransCreated_at =
+    u.Trans_user =
+    u.Trans_data_received =
+    u.Trans_val_response =
+    u.Trans_process_responser =
+    u.Trans_process_qty =
+    */
+     tokensCreados := 0
+
 //   	var requestData modelito.RequestTokenizedCards
     errorGeneral=""
 
@@ -232,7 +251,7 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
         var howmany int
         howmany = len(inputDataPayment)
         howmany = howmany+1
-
+     
         for _, d := range inputDataToken {
      		lineaProcess =lineaProcess +1
              var responseGeneral string
@@ -256,7 +275,7 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
                         u.Line=strconv.Itoa(lineaProcess)
                         u.Status="OK"
                         u.StatusMessage =responseGeneral
-
+                        tokensCreados =    tokensCreados +1
                       }
             }//edn if
             if responseGeneral==""{
@@ -329,7 +348,20 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 		}
 
     } 
+    //call the function to store the filetransaction info
+    //type tokenizer
 
+    u.Trans_status =errorGeneralNbr
+    u.Trans_statusmssg =errorGeneral
+    u.Trans_processstatus =errorGeneral
+    u.Trans_process_qty ="3"
+
+     resultCreateFiletransRecord :=logicProcessCreateFileTrans(u, errorGeneral) 
+     if resultCreateFiletransRecord!=""{
+              //error inserting the record for file trans
+     }else{
+         //success inserting the record for file trans
+     }
 }
 
 
@@ -339,7 +371,26 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 	}()
     var errorGeneral string
     var errorGeneralNbr string
-    
+
+
+   //this is used to store the file procession status and data
+    var u modelito.Filetrans
+    u.Transtype ="validate token"
+    /*u.Transtype =
+    u.Filename =
+
+    u.Trans_status =
+    u.Trans_statusmssg =
+    u.Trans_processstatus =
+    u.TransCreated_at =
+    u.Trans_user =
+    u.Trans_data_received =
+    u.Trans_val_response =
+    u.Trans_process_responser =
+    u.Trans_process_qty =
+    */
+
+
 //   	var requestData modelito.RequestTokenizedCards
 
 
@@ -411,7 +462,23 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 		}
 
     } 
-					
+
+    //call the function to store the filetransaction info
+    //type tokenizer
+
+    u.Trans_status =errorGeneralNbr
+    u.Trans_statusmssg =errorGeneral
+    u.Trans_processstatus =errorGeneral
+    u.Trans_process_qty ="0"
+
+     resultCreateFiletransRecord :=logicProcessCreateFileTrans(u, errorGeneral) 
+     if resultCreateFiletransRecord!=""{
+              //error inserting the record for file trans
+     }else{
+         //success inserting the record for file trans
+     }
+
+
 }//end handlePostVaidateFiles
 
 //  handlePostProcessTokenFile
@@ -423,7 +490,24 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
     var errorGeneral string
     var errorGeneralNbr string
 
-    
+   //this is used to store the file procession status and data
+    var u modelito.Filetrans
+    u.Transtype ="process payment"
+    /*u.Transtype =
+    u.Filename =
+
+    u.Trans_status =
+    u.Trans_statusmssg =
+    u.Trans_processstatus =
+    u.TransCreated_at =
+    u.Trans_user =
+    u.Trans_data_received =
+    u.Trans_val_response =
+    u.Trans_process_responser =
+    u.Trans_process_qty =
+    */
+
+
 //   	var requestData modelito.RequestTokenizedCards
 
 
@@ -574,6 +658,21 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 
     } 
 
+    //call the function to store the filetransaction info
+    //type tokenizer
+
+    u.Trans_status =errorGeneralNbr
+    u.Trans_statusmssg =errorGeneral
+    u.Trans_processstatus =errorGeneral
+    u.Trans_process_qty ="0"
+
+     resultCreateFiletransRecord :=logicProcessCreateFileTrans(u, errorGeneral) 
+     if resultCreateFiletransRecord!=""{
+              //error inserting the record for file trans
+     }else{
+         //success inserting the record for file trans
+     }
+
 
 } //end handlePostProcessPaymentFile
 
@@ -585,6 +684,22 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
     var errorGeneralNbr string
 
 
+   //this is used to store the file procession status and data
+    var u modelito.Filetrans
+    u.Transtype ="validate payment"
+    /*u.Transtype =
+    u.Filename =
+
+    u.Trans_status =
+    u.Trans_statusmssg =
+    u.Trans_processstatus =
+    u.TransCreated_at =
+    u.Trans_user =
+    u.Trans_data_received =
+    u.Trans_val_response =
+    u.Trans_process_responser =
+    u.Trans_process_qty =
+    */
 
     
 //   	var requestData modelito.RequestTokenizedCards
@@ -654,7 +769,22 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 		}
 
     } 
-					
+
+    //call the function to store the filetransaction info
+    //type tokenizer
+
+    u.Trans_status =errorGeneralNbr
+    u.Trans_statusmssg =errorGeneral
+    u.Trans_processstatus =errorGeneral
+    u.Trans_process_qty ="0"
+
+     resultCreateFiletransRecord :=logicProcessCreateFileTrans(u, errorGeneral) 
+     if resultCreateFiletransRecord!=""{
+              //error inserting the record for file trans
+     }else{
+         //success inserting the record for file trans
+     }
+
 }//en function handlePostVaidatePaymentFiles
 
 
@@ -1416,6 +1546,7 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
 	    }//end if
 
     }
+    
 
 }//end function handlePostConsultaHistorialPagos
 

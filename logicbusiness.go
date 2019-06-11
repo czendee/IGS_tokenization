@@ -465,7 +465,7 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
 
                 micadenita := buf.String()
 
-                utilito.LevelLog(Config_env_log, "3", micadenita)
+                utilito.LevelLog(Config_env_log, "4", micadenita)
 
                 utilito.LevelLog(Config_env_log, "3", "MGR Paso linea por linea index")
 

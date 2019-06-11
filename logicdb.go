@@ -475,3 +475,58 @@ resultMssg=""
    //END
    	  return  resultMssg, errorGeneral
    }
+
+
+   ///create a record for file transaction
+
+      func logicProcessCreateFileTrans(miFiletrans modelito.Filetrans, errorGeneral string) (string) {
+	////////////////////////////////////////////////process db steps
+   //START  
+                      
+		    //  START 
+			    var errdb error
+			    var db *sql.DB
+			    // Create connection string
+				connString := fmt.Sprintf("host=%s dbname=%s user=%s password=%s port=%d sslmode=disable",
+                Config_DB_server,Config_DB_name, Config_DB_user, Config_DB_pass, Config_DB_port)		
+		
+
+			 // Create connection pool
+				db, errdb = sql.Open("postgres", connString)
+				if errdb != nil {
+					utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
+				}
+				// Close the database connection pool after program executes
+				 defer db.Close()
+				if errdb == nil {
+					utilito.LevelLog(Config_env_log, "3", "Connected!\n")
+			
+				
+					errPing:= db.Ping()
+					if errPing != nil {
+					  utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
+					  errorGeneral =errPing.Error()
+					}else{
+				         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
+                        //the increase was done, now try record the payment for rule (3max payments for tcd a day)
+                        utilito.LevelLog(Config_env_log, "3", "About record CreateFiletrans info in DB, the customer exists, ID interno es "+miFiletrans.ID)
+                        errInsertPay:=miFiletrans.CreateFiletrans(db )
+                        utilito.LevelLog(Config_env_log, "3", "regresa func  CreateFiletrans ok!\n")
+                        if errInsertPay != nil {
+                            utilito.LevelLog(Config_env_log, "3", "Error: Recording the CreateFiletrans info in the DB:"+ errInsertPay.Error())
+                            errorGeneral =errInsertPay.Error()
+                        }else{
+                            //
+                            errorGeneral="SUCCESS filetrans"
+                            
+                        }
+			
+				    }
+			
+			
+				}
+		    
+		//  END updateCardScoreDB
+   
+   	  return  errorGeneral
+   }
