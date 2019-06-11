@@ -4,7 +4,7 @@ import (
 	"net/http"
     "strconv"
     "strings"
-    "time"
+    //"time"
 //    "regexp"
 //	"fmt"
 	"log"
@@ -68,7 +68,9 @@ func init() {
 	r.Handle("/v1/generatetokenized", netHandle(handleDBPostGeneratetokenized, nil)).Methods("POST")     //in this net_v1.go
 
     r.Handle("/v1/downloadfile", netHandle(ForceDownload, nil)).Methods("POST")     //in this net_v1.go
-
+    r.Handle("/v1/downloadfile", netHandle(ForceDownload, nil)).Methods("GET")     //in this net_v1.go
+    //r.Handle("/v1/downloadfilePago", netHandle(ForceDownloadPago, nil)).Methods("POST")     //in this net_v1.go
+    r.Handle("/v1/downloadfilePago", netHandle(ForceDownloadPago, nil)).Methods("GET")     //in this net_v1.go
 
 }
 
@@ -1434,17 +1436,22 @@ func ForceDownload(w http.ResponseWriter, r *http.Request) {
         downloadBytes:= []byte(htmlStrDownloadJson)
 log.Print("Paso3")
          // set the default MIME type to send
-         mime := http.DetectContentType(downloadBytes)
+         //mime := http.DetectContentType(downloadBytes)
 
-         fileSize := len(string(downloadBytes))
+         //fileSize := len(string(downloadBytes))
 log.Print("Paso 6")
          // Generate the server headers
-         w.Header().Set("Content-Type", mime)
+
+		
+          w.Header().Set("Content-Type", "text/plain;charset: uft-8")
          w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
-         w.Header().Set("Expires", "0")
-         w.Header().Set("Content-Transfer-Encoding", "binary")
-         w.Header().Set("Content-Length", strconv.Itoa(fileSize))
-         w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+		w.Write(downloadBytes)	
+
+                
+     //    w.Header().Set("Expires", "0")
+     //    w.Header().Set("Content-Transfer-Encoding", "binary")
+     //    w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+     //    w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
 
          //b := bytes.NewBuffer(downloadBytes)
          //if _, err := b.WriteTo(w); err != nil {
@@ -1452,6 +1459,57 @@ log.Print("Paso 6")
          //      }
 log.Print("Paso 7")
          // force it down the client's.....
-         http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+    //     http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+
+   //      http.ServeFile(w, r, "css/app.min.css")
 log.Print("paso final")
- }
+ } //end ForceDownload
+
+func ForceDownloadPago(w http.ResponseWriter, r *http.Request) {
+          file := "banwireResponsePagos.txt"
+         //downloadBytes, err := ioutil.ReadFile(file)
+         log.Print("Empieza funcion ForceDownloadPago")
+   var errorGeneral string
+          htmlStrDownloadJson, err:= obtainParmsProcessDownloadPagos(r , errorGeneral) //logisrequest.go
+          ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
+          // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
+           //y el indexpay.html 
+       
+       log.Print("Función obtainParmsProcessDownloadPagos")
+        
+        if(err!=""){
+
+	    }//end if
+         //if err != nil {
+               //  utilito.LevelLog(Config_env_log, "3",err.tost)
+         //}
+        downloadBytes:= []byte(htmlStrDownloadJson)
+        
+         // set the default MIME type to send
+         //mime := http.DetectContentType(downloadBytes)
+
+         //fileSize := len(string(downloadBytes))
+         // Generate the server headers
+
+		log.Print("Paso Generador de cabezeras")
+        w.Header().Set("Content-Type", "text/plain;charset: uft-8")
+        w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
+		w.Write(downloadBytes)	
+
+                
+     //    w.Header().Set("Expires", "0")
+     //    w.Header().Set("Content-Transfer-Encoding", "binary")
+     //    w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+     //    w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+
+         //b := bytes.NewBuffer(downloadBytes)
+         //if _, err := b.WriteTo(w); err != nil {
+         //              fmt.Fprintf(w, "%s", err)
+         //      }
+
+         // force it down the client's.....
+    //     http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+
+   //      http.ServeFile(w, r, "css/app.min.css")
+    log.Print("Fin ForceDownloadPago")
+} //end ForceDownloadPago

@@ -110,7 +110,7 @@
    
               </div> 
               <div>
-                  <button class="btn btn-primary" ng-click="download()">Descargar validacion</button>
+                  <button class="btn btn-primary" ng-click="openWindowCarga();">Descargar validacion</button>
 
               </div>
               <div>
@@ -152,6 +152,7 @@
 
 
 <script type="text/javascript">
+
      (function(){
            'use strict';
             var module = angular.module('module',[]);
@@ -290,113 +291,25 @@
                         }
                 } //end validate
 
-                $scope.download = function(){
-                        var fd = new FormData();
+                $scope.openWindowCarga = function(){
+
+
+
+                        var a="/v1/downloadfile";
+                        var filetextarea = $scope.respuesta;
+                        window.open(a+'?contenidofile='+filetextarea, '_blank');
+
+
                        
-                        //now add other data to fd
-                        fd.append('contenidofile',$scope.respuesta);
-                        
-                        //$scope.respuesta = " "
-                        $scope.status =  " "
-                       var request = $http ({
-                           method: 'POST',
-                           url : '/v1/downloadfile',
-                            data : fd,
-                           transformRequest: angular.identity,
-                           headers : {
-                               'Content-Type' : undefined
-                           }
-                        });
-                        
-                        if($scope.respuesta.length >0){
-                               request.then(
-                                 function(response){
-                                   console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message_file;
-                                   var statusNbr =response.data.status_file;
-                                   var statusDataEachRow =response.data.sucess_data_each_row;
-                                   if(statusMssg.indexOf("ERROR")>= 0 ){
-                                        $scope.status = statusNbr + " "+ statusMssg;
-                                        
-                                        statusDataEachRow.forEach(function(entry) {
-                                            console.log(entry);
-//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
-                                            var tempLine =JSON.stringify(entry);
-                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
-                                   }else{
-                                        $scope.status = statusNbr + " "+ statusMssg;
-                                        
-                                        statusDataEachRow.forEach(function(entry) {
-                                            console.log(entry);
-//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
-                                            var tempLine =JSON.stringify(entry);
-                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
-                                        $scope.files = [];                                        
-                                   }
-                                 },
-                               )
-                               .catch(function (data) {
-                                   // Handle error here
-                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
-                                  // $scope.files = [];
-                               });
-                        }
                 }// end download
 
                 $scope.downloadPagos = function(){
-                        var fd = new FormData();
                         
-                        //now add other data to fd
-                        fd.append('contenidofile',$scope.respuestaPayment);
+                        var a="/v1/downloadfilePago";
+                        var filetextarea = $scope.respuestaPayment;
+                        window.open(a+'?contenidofilePagos='+filetextarea, '_blank');
+
                         
-                        //$scope.respuesta = " "
-                        $scope.status =  " "
-                       var request = $http ({
-                           method: 'POST',
-                           url : '/v1/downloadfile',
-                            data : fd,
-                           transformRequest: angular.identity,
-                           headers : {
-                               'Content-Type' : undefined
-                           }
-                        });
-                        if($scope.respuestaPayment.length >0){
-                               request.then(
-                                 function(response){
-                                   console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message_file;
-                                   var statusNbr =response.data.status_file;
-                                   var statusDataEachRow =response.data.sucess_data_each_row;
-                                   if(statusMssg.indexOf("ERROR")>= 0 ){
-                                        $scope.status = statusNbr + " "+ statusMssg;
-                                        
-                                        statusDataEachRow.forEach(function(entry) {
-                                            console.log(entry);
-//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
-                                            var tempLine =JSON.stringify(entry);
-                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
-                                   }else{
-                                        $scope.status = statusNbr + " "+ statusMssg;
-                                        
-                                        statusDataEachRow.forEach(function(entry) {
-                                            console.log(entry);
-//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
-                                            var tempLine =JSON.stringify(entry);
-                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
-                                        $scope.files = [];                                        
-                                   }
-                                 },
-                               )
-                               .catch(function (data) {
-                                   // Handle error here
-                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
-                                  // $scope.files = [];
-                               });
-                        }
                 } // end downloadPagos 
 
             }); //end general de funciones
