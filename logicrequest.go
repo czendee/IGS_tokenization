@@ -137,9 +137,11 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
                 payments := strings.Split(limpiar2, ":")
                 log.Print("Payments "+ payments[1])
                 cuenta_i := 0
-                for _, line := range strings.Split(strings.Trim(parte[1], "{}"), "},"){
+                limpiar =  strings.Replace(parte[1], "\n", "", -1)
+                limpiar2 =  strings.Replace(limpiar, " ", "", -1)
+                for _, line := range strings.Split(limpiar2, "},"){
                     utilito.LevelLog(Config_env_log, "3", "For linea")
-                    //utilito.LevelLog(Config_env_log, "3", line)
+                    utilito.LevelLog(Config_env_log, "3", line)
                     cuenta_i = cuenta_i + 1
                     log.Print("no vuelta",cuenta_i)
                     for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
@@ -149,7 +151,7 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
                         limpia2 := strings.Replace(campo, " ", "", -1)
                         limpia3 := strings.Replace(limpia2, "}", "", -1)
                         limpia4 := strings.Replace(limpia3, "]", "", -1)
-                        //log.Print("datolimpio", limpia4)
+                        log.Print("datolimpio4", limpia4)
                         dato := strings.Split(limpia4, ":")
                         lineaDatos = lineaDatos + dato[1] +","
                     }// end for campo
@@ -159,7 +161,8 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
                     utilito.LevelLog(Config_env_log, "3", lineaDatos)
                     lineaDatos = lineaDatos +"\r\n"
                 }// end for linea
-                compara, err := strconv.Atoi(payments[1])
+                
+                /*compara, err := strconv.Atoi(payments[1])
                 if err == nil {
 
                 }
@@ -168,8 +171,15 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
                     lineaDatos = "ERROR 2048 payments don´t match processed payments"
                 }else{
                     log.Print("Archivo Success")
-                }
+                }*/
+                
                 log.Print("fuera de for linea")
+                log.Print("Registros procesados: ",cuenta_i)
+                log.Print("Registros correctos: "+payments[1])
+                compara, err := strconv.Atoi(payments[1])
+                if err == nil {
+                    log.Print("Registros con error: ",cuenta_i-compara)
+                }//end err
             }else{
                 log.Print("ERROR 2024 missing parameter")
                 lineaDatos = "ERROR 2024 missing parameter"
@@ -207,16 +217,6 @@ func obtainParmsProcessDownloadValida(r *http.Request, errorGeneral string) (str
 		v := r.Form
 		requestData = v.Get("contenidofileValida")
 
-        //buscar si en la cadena de caracteres esta status_message y ver si es Success
-        //buscar si en la cadena de caracteres cards_tokenized, y ponerle el valor que traiga
-        //buscar si esta la cadena de caracteres card data, y buscar los datos entre los corchetes cuadrados y ponerlo en una cadena resto
-        //para cada elemento que termine en corche y coma   
-            //procesarlo  y dejar el resto en resto  
-        //buscar en la cadena resto si hay un corchete y una coma y separas esa parte en otra variable
-        //se repite la acción anterior hasta solo entrar un corchete solo que indica el final de los datos
-        //cuando solo encuentra un corchete solo se procesa la información
-        //el ciclo termina cuando hay un solo corchete
-       
    //END
    	 
    	 return requestData,errorGeneral
@@ -262,7 +262,9 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
                 cardsTokenized := strings.Split(limpiar2, ":")
                 log.Print("Cards_tokenized "+ cardsTokenized[1])
                 cuenta_i := 0
-                for _, line := range strings.Split(strings.Trim(parte[1], "{}"), "},"){
+                limpiar =  strings.Replace(parte[1], "\n", "", -1)
+                limpiar2 =  strings.Replace(limpiar, " ", "", -1)
+                for _, line := range strings.Split(limpiar2, "},"){
                     utilito.LevelLog(Config_env_log, "3", "For linea")
                     //utilito.LevelLog(Config_env_log, "3", line)
                     cuenta_i = cuenta_i + 1
@@ -284,7 +286,8 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
                     utilito.LevelLog(Config_env_log, "3", lineaDatos)
                     lineaDatos = lineaDatos +"\r\n"
                 }// end for linea
-                compara, err := strconv.Atoi(cardsTokenized[1])
+                
+                /*compara, err := strconv.Atoi(cardsTokenized[1])
                 if err == nil {
 
                 }
@@ -293,8 +296,14 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
                     lineaDatos = "ERROR 1048 cards_tokenized don´t match processed cards"
                 }else{
                     log.Print("Archivo Success")
-                }
+                }*/
                 log.Print("fuera de for linea")
+                log.Print("Registros procesados: ",cuenta_i)
+                log.Print("Registros correctos: "+cardsTokenized[1])
+                compara, err := strconv.Atoi(cardsTokenized[1])
+                if err == nil {
+                    log.Print("Registros con error: ",cuenta_i-compara)
+                }//end err
             }else{
                 log.Print("ERROR 1024 missing parameter")
                 lineaDatos = "ERROR 1024 missing parameter"
@@ -785,7 +794,9 @@ func validateAndObtainCampos_token (line string, lineas int)(modelito.RequestTok
 
               var campoValue string
 
-              campoValue = strings.Replace(campo, "\"", "", -1) // only works with a single character
+              limpia := strings.Replace(campo, ":", "", -1) // para eliminar cualquier caracter de ":"
+              campoValue = strings.Replace(limpia, "\"", "", -1) // only works with a single character
+              log.Print("Prueba: "+campoValue)
               var largo string
               largo = strconv.Itoa ( len(campoValue))
               utilito.LevelLog(Config_env_log, "1", "largo del campo es:"+largo+":valor del campo es:"+campoValue)
