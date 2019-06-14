@@ -23,11 +23,11 @@ func (u *Card) getCard(db *sql.DB) error {
     return db.QueryRow(statement).Scan(&u.Token, &u.Last)
 }
 func (u *Card) GetCardByToken(db *sql.DB) error {
-    statement := fmt.Sprintf("SELECT token,last_digits,bin, brand, type_card  reference FROM banwirecard WHERE token='%s'", u.Token)
+    statement := fmt.Sprintf("SELECT token,last_digits,bin, brand, type_card  reference FROM banwirefilecard WHERE token='%s'", u.Token)
     return db.QueryRow(statement).Scan(&u.Token, &u.Last,&u.Bin,&u.Brand,&u.Type)
 }
 func (u *Card) GetCardByTokenAndCust(db *sql.DB,customer_id string) error {
-    statement := fmt.Sprintf("SELECT token,last_digits,bin, brand, type_card  reference FROM banwirecard WHERE token='%s' and id_customer='%s' ", u.Token,customer_id)
+    statement := fmt.Sprintf("SELECT token,last_digits,bin, brand, type_card  reference FROM banwirefilecard WHERE token='%s' and id_customer='%s' ", u.Token,customer_id)
     return db.QueryRow(statement).Scan(&u.Token, &u.Last,&u.Bin,&u.Brand,&u.Type)
 }
 /*
@@ -43,28 +43,28 @@ func GetCardByToken(db *sql.DB) (Customer, error) {
 
 func (u *Card) UpdateCard(db *sql.DB) error {
 //    statement := fmt.Sprintf("UPDATE card SET score='%s', last_update_at= current_timestamp WHERE token='%s'", u.Score,  u.Token)
-    statement := fmt.Sprintf("UPDATE banwirecard SET score=score +1, last_update_at= current_timestamp WHERE token='%s'",  u.Token)
+    statement := fmt.Sprintf("UPDATE banwirefilecard SET score=score +1, last_update_at= current_timestamp WHERE token='%s'",  u.Token)
     _, err := db.Exec(statement)
     return err
 }
 
 func (u *Card) IncreaseScoreCardAndCust(db *sql.DB,customer_id string) error {
 //    statement := fmt.Sprintf("UPDATE card SET score='%s', last_update_at= current_timestamp WHERE token='%s'", u.Score,  u.Token)
-    statement := fmt.Sprintf("UPDATE banwirecard SET score=score +1, last_update_at= current_timestamp WHERE token='%s' and id_customer='%s' ", u.Token,customer_id)
+    statement := fmt.Sprintf("UPDATE banwirefilecard SET score=score +1, last_update_at= current_timestamp WHERE token='%s' and id_customer='%s' ", u.Token,customer_id)
     _, err := db.Exec(statement)
     return err
 }
 
 func (u *Card) IncreaseScoreCard(db *sql.DB) error {
 //    statement := fmt.Sprintf("UPDATE card SET score='%s', last_update_at= current_timestamp WHERE token='%s'", u.Score,  u.Token)
-    statement := fmt.Sprintf("UPDATE banwirecard SET score=score +1, last_update_at= current_timestamp WHERE token='%s'",  u.Token)
+    statement := fmt.Sprintf("UPDATE banwirefilecard SET score=score +1, last_update_at= current_timestamp WHERE token='%s'",  u.Token)
     _, err := db.Exec(statement)
     return err
 }
 
 //Jan 27,2018: used in new rule to Remove card if 1st payment fails
 func (u *Card) DeleteCard(db *sql.DB) error {
-    statement := fmt.Sprintf("DELETE from banwirecard WHERE token='%s'",  u.Token)
+    statement := fmt.Sprintf("DELETE from banwirefilecard WHERE token='%s'",  u.Token)
     _, err := db.Exec(statement)
     return err
 //    return errors.New("Not implemented")        
@@ -77,7 +77,7 @@ func (u *Card) CreateCard(db *sql.DB) error {
      if(errorGeneral==""){
      	log.Print("fecha valid"+dateDDMMYY)
 
-	    statement := fmt.Sprintf("INSERT INTO banwirecard( token, last_digits, bin, valid_thru, score, is_banned, id_customer,brand, created_at, last_update_at, type_card) VALUES('%s','%s','%s',to_timestamp('%s 00:00:01', 'DD/MM/YYYY hh24:mi:ss'), %s,false, %s, '%s',current_timestamp,current_timestamp,'%s')",  u.Token, u.Last, u.Bin,dateDDMMYY, u.Score,u.Customer, u.Brand,u.Type)
+	    statement := fmt.Sprintf("INSERT INTO banwirefilecard( token, last_digits, bin, valid_thru, score, is_banned, id_customer,brand, created_at, last_update_at, type_card) VALUES('%s','%s','%s',to_timestamp('%s 00:00:01', 'DD/MM/YYYY hh24:mi:ss'), %s,false, %s, '%s',current_timestamp,current_timestamp,'%s')",  u.Token, u.Last, u.Bin,dateDDMMYY, u.Score,u.Customer, u.Brand,u.Type)
 	    _, err := db.Exec(statement)
      	log.Print("exec ejecutado")
 	    if err != nil {
@@ -97,7 +97,7 @@ func (u *Card) CreateCard(db *sql.DB) error {
 func GetCardsByCustomer(db *sql.DB, customer_reference string) ([]Card, error) {
 	log.Print("GetCardsByCustomer 01!\n")
 //	statement := fmt.Sprintf("SELECT id_card, token, bin,last_digits,valid_thru,brand,type_card, score FROM card WHERE id_customer= %s  order by score DESC", id_customer)
-	statement := fmt.Sprintf("SELECT id_card, token, bin,last_digits,valid_thru,brand,type_card, score  FROM banwirecard  c, banwirecustomer  a WHERE c.id_customer= a.id_customer and a.reference= '%s'  order by score DESC;", customer_reference)
+	statement := fmt.Sprintf("SELECT id_card, token, bin,last_digits,valid_thru,brand,type_card, score  FROM banwirefilecard  c, banwirefilecustomer  a WHERE c.id_customer= a.id_customer and a.reference= '%s'  order by score DESC;", customer_reference)
  	log.Print("GetCardsByCustomerb 02!\n")
     rows, err := db.Query(statement)
     log.Print("GetCardsByCustomer 02.1!\n")
@@ -123,7 +123,7 @@ func GetCardsByCustomer(db *sql.DB, customer_reference string) ([]Card, error) {
 }
 
 func getCards(db *sql.DB, start, count int) ([]Card, error) {
- statement := fmt.Sprintf("SELECT id_card, token, bin FROM banwirecard LIMIT %d OFFSET %d", count, start)
+ statement := fmt.Sprintf("SELECT id_card, token, bin FROM banwirefilecard LIMIT %d OFFSET %d", count, start)
     rows, err := db.Query(statement)
     if err != nil {
         return nil, err

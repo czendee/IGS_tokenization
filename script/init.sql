@@ -3,7 +3,7 @@ CREATE USER banwire;
 CREATE DATABASE gs_ivr_tokenization OWNER banwire;
 
 
-CREATE TABLE banwirecard(
+CREATE TABLE banwirefilecard(
 id_card bigserial,
 token    varchar(100),   --constrain unique
 last_digits   varchar(4),        
@@ -20,14 +20,14 @@ type_card varchar(15)
 );
 
 
-CREATE TABLE banwirecustomer(
+CREATE TABLE banwirefilecustomer(
 id_customer bigserial,
 reference    varchar(100),   --constrain unique
 created_at         timestamp,
 last_update_at timestamp 
 );
 
-CREATE TABLE banwirepayment(
+CREATE TABLE banwirefilepayment(
 id_payment bigserial,
 token    varchar(100),   --constrain unique
 created_at         timestamp,
