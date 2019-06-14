@@ -4,7 +4,7 @@ import (
 	"net/http"
     "strconv"
     "strings"
-    //"time"
+    "time"
 //    "regexp"
 //	"fmt"
 	"log"
@@ -64,8 +64,8 @@ func init() {
 
 //TO DO not needed in this program
 	r.Handle("/v1/fetchtokenizedcards", netHandle(handleDBPostGettokenizedcards, nil)).Methods("POST")   //in this net_v1.go
-	r.Handle("/v1/processpayment", netHandle(v4handleDBPostProcesspayment, nil)).Methods("POST")           //in this net_v1.go    	   
-	r.Handle("/v1/generatetokenized", netHandle(handleDBPostGeneratetokenized, nil)).Methods("POST")     //in this net_v1.go
+	//r.Handle("/v1/processpayment", netHandle(v4handleDBPostProcesspayment, nil)).Methods("POST")           //in this net_v1.go    	   
+	//r.Handle("/v1/generatetokenized", netHandle(handleDBPostGeneratetokenized, nil)).Methods("POST")     //in this net_v1.go
 
     r.Handle("/v1/downloadfile", netHandle(ForceDownload, nil)).Methods("POST")     //in this net_v1.go
     r.Handle("/v1/downloadfile", netHandle(ForceDownload, nil)).Methods("GET")     //in this net_v1.go
@@ -189,6 +189,7 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 	}()
     var errorGeneral string
     var errorGeneralNbr string
+    var resultadoTokenJson modelito.Card
 
    //this is used to store the file procession status and data
     var u modelito.Filetrans
@@ -211,7 +212,7 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 //   	var requestData modelito.RequestTokenizedCards
     errorGeneral=""
 
-    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+    linesStatus := []modelito.ExitoDataValidaLine{}   //structure to stire the errors in each of the liens of the file
     inputDataToken:= []modelito.RequestTokenized{} //this is for processing not for just validating
     inputDataPayment:= []modelito.RequestPayment{} //this is for processing not for just validating
 
@@ -251,12 +252,15 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
         var howmany int
         howmany = len(inputDataPayment)
         howmany = howmany+1
+
+        log.Print("info lienaProcess: ",lineaProcess)
      
         for _, d := range inputDataToken {
-     		lineaProcess =lineaProcess +1
+            lineaProcess =lineaProcess +1
+             log.Print("info lienaProcess: ",lineaProcess)
              var responseGeneral string
 
-            responseGeneral,errorGeneralNbr= ProcessGeneratetokenized(w , d) //logicbusiness.go
+            responseGeneral,errorGeneralNbr,resultadoTokenJson= ProcessGeneratetokenized(w , d) //logicbusiness.go
 
              var u modelito.ExitoDataTokenLine
 
@@ -264,7 +268,16 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
                       if strings.Contains(responseGeneral, "ERROR") {
                             u.Line=strconv.Itoa(lineaProcess)
                             u.Status="ERROR540"
-                            u.StatusMessage ="ERROR FIELD:"+strconv.Itoa(lineaProcess)+" - "+responseGeneral
+                            u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(lineaProcess)+" - "+responseGeneral
+                            now := time.Now()
+                            u.Date = now
+	                        u.Token = "0"
+                            u.LastDigits = "0"
+	                        u.Marca = "0"
+	                        u.Vigencia = "0"
+	                        u.Bin = "0"
+	                        u.Score = "0"
+	                        u.Type = "0"
                             lineasWithErrors =1
                         utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer ERROR line:"+responseGeneral)
                         
@@ -275,6 +288,15 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
                         u.Line=strconv.Itoa(lineaProcess)
                         u.Status="OK"
                         u.StatusMessage =responseGeneral
+                        now := time.Now()
+                        u.Date = now
+	                    u.Token = resultadoTokenJson.Token
+                        u.LastDigits = resultadoTokenJson.Last
+	                    u.Marca = resultadoTokenJson.Brand
+	                    u.Vigencia = resultadoTokenJson.Valid
+	                    u.Bin = resultadoTokenJson.Bin
+	                    u.Score = resultadoTokenJson.Score
+	                    u.Type = resultadoTokenJson.Type
                         tokensCreados =    tokensCreados +1
                       }
             }//edn if
@@ -312,7 +334,7 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
 
 //        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
-        fieldDataBytesJson,err := getJsonResponseProcessFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
+        fieldDataBytesJson,err := getJsonResponseTokenFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
@@ -396,7 +418,7 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
     errorGeneral=""
 
-    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+    linesStatus := []modelito.ExitoDataValidaLine{}   //structure to stire the errors in each of the liens of the file
     notToBeUsedDataToken:= []modelito.RequestTokenized{} //this is for processing not for just validating
     notToBeUsedDataPayment:= []modelito.RequestPayment{} //this is for processing not for just validating
 
@@ -489,6 +511,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 	}()
     var errorGeneral string
     var errorGeneralNbr string
+    var resultadoPaymentJson modelito.ExitoData
 
    //this is used to store the file procession status and data
     var u modelito.Filetrans
@@ -513,7 +536,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 
     errorGeneral=""
 
-    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+    linesStatus := []modelito.ExitoDataValidaLine{}   //structure to stire the errors in each of the liens of the file
     inputDataToken:= []modelito.RequestTokenized{} //this is for processing not for just validating
     inputDataPayment:= []modelito.RequestPayment{} //this is for processing not for just validating
 
@@ -541,7 +564,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 
 	////////////////////////////////////////////////process business rules
 	/// START
-    processLinesStatus := []modelito.ExitoDataTokenLine{}  //an array for the status of the process (tokenization)
+    processLinesStatus := []modelito.ExitoDataPayLine{}  //an array for the status of the process (tokenization)
 
     if errorGeneral=="" {   //process business Tokenization
         // use this structuire inputDataToken to call methods for the tokenization
@@ -563,17 +586,27 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 
         for _, d := range inputDataPayment {
      		lineaProcess =lineaProcess +1
+             
              var responseGeneral string
                                //d is supposed to be of type   requestData modelito.RequestPayment
-            responseGeneral,errorGeneralNbr= v4ProcessProcessPayment(w , d) //logicbusiness.go
+            responseGeneral,errorGeneralNbr,resultadoPaymentJson= v4ProcessProcessPayment(w , d) //logicbusiness.go
 
-             var u modelito.ExitoDataTokenLine
+            log.Print("info responseGeneral: "+responseGeneral)
+             var u modelito.ExitoDataPayLine
 
             if responseGeneral !=""{
                       if strings.Contains(responseGeneral, "ERROR") {
                             u.Line=strconv.Itoa(lineaProcess)
+                            u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(lineaProcess)+" - "+responseGeneral
                             u.Status="ERROR640"
-                            u.StatusMessage ="ERROR FIELD:"+strconv.Itoa(lineaProcess)+" - "+responseGeneral
+                            u.Token = "0"
+                            u.PaymentReference = "0"
+                            u.Authcode = "0"
+                            u.Idtransaction = "0"
+                            u.Marca = "0"
+                            u.Bin = "0"
+                            u.LastDigits = "0"
+                            u.Type = "0"
                             lineasWithErrors =1
                         utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File -Process  ERROR line:"+responseGeneral)
                         
@@ -582,9 +615,16 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
                           utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File -Process  OK line:")
                          //sucess for this line/tokenizer
                         u.Line=strconv.Itoa(lineaProcess)
-                        u.Status="OK"
                         u.StatusMessage =responseGeneral
-
+                        u.Status="OK"
+                        u.Token = resultadoPaymentJson.Token
+                        u.PaymentReference = resultadoPaymentJson.PaymentReference
+                        u.Authcode = resultadoPaymentJson.Authcode
+                        u.Idtransaction = resultadoPaymentJson.Idtransaction
+                        u.Marca = resultadoPaymentJson.Marca
+                        u.Bin = resultadoPaymentJson.Bin
+                        u.LastDigits = resultadoPaymentJson.LastDigits
+                        u.Type = resultadoPaymentJson.Type
                       }
             }//edn if
             if responseGeneral==""{
@@ -621,7 +661,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
 
 //        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
-        fieldDataBytesJson,err := getJsonResponseProcessFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
+        fieldDataBytesJson,err := getJsonResponsePaymentFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
@@ -707,7 +747,7 @@ func handlePostVaidatePaymentFiles(w http.ResponseWriter, r *http.Request) {
 
     errorGeneral=""
 
-    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+    linesStatus := []modelito.ExitoDataValidaLine{}   //structure to stire the errors in each of the liens of the file
 
     notToBeUsedDataToken:= []modelito.RequestTokenized{} //this is for processing not for just validating
     notToBeUsedDataPayment:= []modelito.RequestPayment{} //this is for processing not for just validating
@@ -834,94 +874,10 @@ func handleDBPostGettokenizedcards(w http.ResponseWriter, r *http.Request) {
 
 
 
-// handleGeneratetokenized for receive and handle the request from client
-func handleDBPostGeneratetokenized(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		db.Connection.Close(nil)
-	}()
-     var requestData modelito.RequestTokenized
-     var errorGeneral string
-     var errorGeneralNbr string
-     
-    errorGeneral=""
-
-
-    requestData,errorGeneral =obtainPostParmsGeneratetokenized(r,errorGeneral)   //logicrequest_post.go
-
-
-
-	////////////////////////////////////////////////validate parms
-	/// START
-    
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= ProcessGeneratetokenized(w , requestData)
-	}
-
-    if errorGeneral!=""{
-    	//send error response if any
-    	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
-		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
-		//////////    write the response (ERROR)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}
-	
-    } 
-					
-}
-
 
 
 ///////////////////////////////v4
 ///////////////////////////////v4
-
-
-
-// v4handleDBProcesspayment  receive and handle the request from client, access DB
-func v4handleDBPostProcesspayment(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		db.Connection.Close(nil)
-	}()
-    var errorGeneral string
-    var errorGeneralNbr string
-    var requestData modelito.RequestPayment
-    
-    errorGeneral=""
-requestData,errorGeneral =obtainPostParmsProcessPayment(r,errorGeneral)  //logicrequest_post.go
-
-	////////////////////////////////////////////////validate parms
-	/// START
-	////////////////////////////////////////////////validate parms
-	/// START
-    
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= v4ProcessProcessPayment(w , requestData)    //logicbusiness.go 
-	}
- 
-    if errorGeneral!=""{
-    	//send error response if any
-    	//prepare an error JSON Response, if any
-		log.Print("CZ   STEP Get the ERROR response JSON ready")
-		
-			/// START
-		fieldDataBytesJson,err := getJsonResponseError(errorGeneral, errorGeneralNbr)
-		//////////    write the response (ERROR)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}
-	
-    } 
-					
-}
 
    // handlePostConsultaTokens  receive and handle the request from client, access DB, and web
 func handlePostConsultaTokens(w http.ResponseWriter, r *http.Request) {
@@ -1015,7 +971,7 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
 
 
     errorGeneral=""
-    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+    linesStatus := []modelito.ExitoDataValidaLine{}   //structure to stire the errors in each of the liens of the file
 
 	//    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
@@ -1091,7 +1047,7 @@ func handlePostConsultahistorialClientes(w http.ResponseWriter, r *http.Request)
                 lineasWithErrors := 0
 
                 for _, line := range strings.Split(strings.TrimSuffix(str, "\n"), "\n") {//inicio for
-                    var u modelito.ExitoDataTokenLine
+                    var u modelito.ExitoDataValidaLine
                     if lineas >= 1{ //if -data
                         log.Printf("MGR Linea %d de datos", lineas)
 
@@ -1198,7 +1154,7 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
 
 
     errorGeneral=""
-    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+    linesStatus := []modelito.ExitoDataValidaLine{}   //structure to stire the errors in each of the liens of the file
 
 	//    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
@@ -1274,7 +1230,7 @@ func handlePostConsultaHistorialToken(w http.ResponseWriter, r *http.Request) {
                 lineasWithErrors := 0
 
                 for _, line := range strings.Split(strings.TrimSuffix(str, "\n"), "\n") {//inicio for
-                    var u modelito.ExitoDataTokenLine
+                    var u modelito.ExitoDataValidaLine
                     if lineas >= 1{ //if -data
                         log.Printf("MGR Linea %d de datos", lineas)
 
@@ -1381,7 +1337,7 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
 
 
     errorGeneral=""
-    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+    linesStatus := []modelito.ExitoDataValidaLine{}   //structure to stire the errors in each of the liens of the file
 
 	//    requestData, errorGeneral=obtainPostParmsGettokenizedcards(r,errorGeneral) //logicrequest_post.go
     if errorGeneral!="" {
@@ -1457,7 +1413,7 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
                 lineasWithErrors := 0
 
                 for _, line := range strings.Split(strings.TrimSuffix(str, "\n"), "\n") {//inicio for
-                    var u modelito.ExitoDataTokenLine
+                    var u modelito.ExitoDataValidaLine
                     if lineas >= 1{ //if -data
                         log.Printf("MGR Linea %d de datos", lineas)
 
@@ -1552,80 +1508,35 @@ func handlePostConsultaHistorialPagos(w http.ResponseWriter, r *http.Request) {
 
 
 func ForceDownload(w http.ResponseWriter, r *http.Request) {
-          file := "banwireResponse.txt"
-         //downloadBytes, err := ioutil.ReadFile(file)
-         log.Print("Paso 1")
-   var errorGeneral string
-          htmlStrDownloadJson, err:= obtainParmsProcessDownload(r , errorGeneral) //logisrequest.go
-          ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
-          // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
-           //y el indexpay.html 
-       log.Print("Paso 2")
-        if(err!=""){
+    file := "banwireResponse.txt"
+    //downloadBytes, err := ioutil.ReadFile(file)
+    
+    log.Print("Entra a función obtainParmsProcessDownload")
+    var errorGeneral string
+    
+    htmlStrDownloadJson, err:= obtainParmsProcessDownload(r , errorGeneral) //logisrequest.go
+    //hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
+    // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
+    //y el indexpay.html 
+    
+    if(err!=""){
 
-	    }//end if
-         //if err != nil {
-               //  utilito.LevelLog(Config_env_log, "3",err.tost)
-         //}
-        downloadBytes:= []byte(htmlStrDownloadJson)
-log.Print("Paso3")
-         // set the default MIME type to send
-         //mime := http.DetectContentType(downloadBytes)
+	}//end if
+    log.Print("Regreso de función obtainParmsProcessDownload")
+        
+    //if err != nil {
+    //  utilito.LevelLog(Config_env_log, "3",err.tost)
+    //}
+    downloadBytes:= []byte(htmlStrDownloadJson)
 
-         //fileSize := len(string(downloadBytes))
-log.Print("Paso 6")
-         // Generate the server headers
+    // set the default MIME type to send
+    //mime := http.DetectContentType(downloadBytes)
 
+    //fileSize := len(string(downloadBytes))
+    // Generate the server headers
+
+    log.Print("Generador de cabezeras")
 		
-          w.Header().Set("Content-Type", "text/plain;charset: uft-8")
-         w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
-		w.Write(downloadBytes)	
-
-                
-     //    w.Header().Set("Expires", "0")
-     //    w.Header().Set("Content-Transfer-Encoding", "binary")
-     //    w.Header().Set("Content-Length", strconv.Itoa(fileSize))
-     //    w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
-
-         //b := bytes.NewBuffer(downloadBytes)
-         //if _, err := b.WriteTo(w); err != nil {
-         //              fmt.Fprintf(w, "%s", err)
-         //      }
-log.Print("Paso 7")
-         // force it down the client's.....
-    //     http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
-
-   //      http.ServeFile(w, r, "css/app.min.css")
-log.Print("paso final")
- } //end ForceDownload
-
-func ForceDownloadPago(w http.ResponseWriter, r *http.Request) {
-          file := "banwireResponsePagos.txt"
-         //downloadBytes, err := ioutil.ReadFile(file)
-         log.Print("Empieza funcion ForceDownloadPago")
-   var errorGeneral string
-          htmlStrDownloadJson, err:= obtainParmsProcessDownloadPagos(r , errorGeneral) //logisrequest.go
-          ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
-          // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
-           //y el indexpay.html 
-       
-       log.Print("Función obtainParmsProcessDownloadPagos")
-        
-        if(err!=""){
-
-	    }//end if
-         //if err != nil {
-               //  utilito.LevelLog(Config_env_log, "3",err.tost)
-         //}
-        downloadBytes:= []byte(htmlStrDownloadJson)
-        
-         // set the default MIME type to send
-         //mime := http.DetectContentType(downloadBytes)
-
-         //fileSize := len(string(downloadBytes))
-         // Generate the server headers
-
-		log.Print("Paso Generador de cabezeras")
         w.Header().Set("Content-Type", "text/plain;charset: uft-8")
         w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
 		w.Write(downloadBytes)	
@@ -1641,33 +1552,89 @@ func ForceDownloadPago(w http.ResponseWriter, r *http.Request) {
          //              fmt.Fprintf(w, "%s", err)
          //      }
 
-         // force it down the client's.....
-    //     http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+        //force it down the client's.....
+        //http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
 
-   //      http.ServeFile(w, r, "css/app.min.css")
+        //http.ServeFile(w, r, "css/app.min.css")
+    log.Print("Fin ForceDownload")
+ } //end ForceDownload
+
+func ForceDownloadPago(w http.ResponseWriter, r *http.Request) {
+    file := "banwireResponsePagos.txt"
+    //downloadBytes, err := ioutil.ReadFile(file)
+    
+    log.Print("Entra funcion obtainParmsProcessDownloadPagos")
+    var errorGeneral string
+    htmlStrDownloadJson, err:= obtainParmsProcessDownloadPagos(r , errorGeneral) //logisrequest.go
+    ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
+    // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
+    //y el indexpay.html 
+
+    if(err!=""){
+
+	}//end if
+
+    log.Print("Función obtainParmsProcessDownloadPagos")
+        
+    
+        //if err != nil {
+        //  utilito.LevelLog(Config_env_log, "3",err.tost)
+        //}
+    downloadBytes:= []byte(htmlStrDownloadJson)
+        
+    // set the default MIME type to send
+    //mime := http.DetectContentType(downloadBytes)
+
+    //fileSize := len(string(downloadBytes))
+    // Generate the server headers
+
+	log.Print("Paso Generador de cabezeras")
+        w.Header().Set("Content-Type", "text/plain;charset: uft-8")
+        w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
+		w.Write(downloadBytes)	
+
+                
+     //    w.Header().Set("Expires", "0")
+     //    w.Header().Set("Content-Transfer-Encoding", "binary")
+     //    w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+     //    w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+
+         //b := bytes.NewBuffer(downloadBytes)
+         //if _, err := b.WriteTo(w); err != nil {
+         //              fmt.Fprintf(w, "%s", err)
+         //      }
+
+    //force it down the client's.....
+    //http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+
+    //http.ServeFile(w, r, "css/app.min.css")
     log.Print("Fin ForceDownloadPago")
+
 } //end ForceDownloadPago
 
 //Función ForceDownloadValida para index
 func ForceDownloadValida(w http.ResponseWriter, r *http.Request) {
-          file := "banwireResponseValidacion.txt"
-         //downloadBytes, err := ioutil.ReadFile(file)
-         log.Print("Empieza funcion ForceDownloadValida")
-   var errorGeneral string
-          htmlStrDownloadJson, err:= obtainParmsProcessDownloadValida(r , errorGeneral) //logisrequest.go
-          ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
-          // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
-           //y el indexpay.html 
-       
-       log.Print("Termina función obtainParmsProcessDownloadValida")
-        
-        if(err!=""){
+    file := "banwireResponseValidacion.txt"
+    //downloadBytes, err := ioutil.ReadFile(file)
+    log.Print("Empieza funcion obtainParmsProcessDownloadValida")
+    
+    var errorGeneral string
+    htmlStrDownloadJson, err:= obtainParmsProcessDownloadValida(r , errorGeneral) //logisrequest.go
+    ///hacer una func similar a esta func obtainParmsProcessPayment(r *http.Request, errorGeneral string) (modelito.RequestPayment,string){
+    // que reciba lo misoomo, y solo busque dos parametros: cualArchivo y lo que viaja en respuestaGeneral que mando el index.html
+    //y el indexpay.html 
 
-	    }//end if
-         //if err != nil {
-               //  utilito.LevelLog(Config_env_log, "3",err.tost)
-         //}
-        downloadBytes:= []byte(htmlStrDownloadJson)
+    if(err!=""){
+
+	}//end if
+
+    log.Print("Termina función obtainParmsProcessDownloadValida")
+        
+    
+        //if err != nil {
+        //  utilito.LevelLog(Config_env_log, "3",err.tost)
+        //}
+    downloadBytes:= []byte(htmlStrDownloadJson)
         
          // set the default MIME type to send
          //mime := http.DetectContentType(downloadBytes)
@@ -1675,7 +1642,7 @@ func ForceDownloadValida(w http.ResponseWriter, r *http.Request) {
          //fileSize := len(string(downloadBytes))
          // Generate the server headers
 
-		log.Print("Paso Generador de cabezeras")
+	log.Print("Paso Generador de cabezeras")
         w.Header().Set("Content-Type", "text/plain;charset: uft-8")
         w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
 		w.Write(downloadBytes)	
@@ -1691,11 +1658,11 @@ func ForceDownloadValida(w http.ResponseWriter, r *http.Request) {
          //              fmt.Fprintf(w, "%s", err)
          //      }
 
-         // force it down the client's.....
-    //     http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
+         //force it down the client's.....
+         //http.ServeContent(w, r, file, time.Now(), bytes.NewReader(downloadBytes))
 
-   //      http.ServeFile(w, r, "css/app.min.css")
-    log.Print("Fin ForceDownloadValida")
+   //http.ServeFile(w, r, "css/app.min.css")
+   log.Print("Fin ForceDownloadValida")
 } //end ForceDownloadValida
 
 //Función ForceDownloadTokeniza para index

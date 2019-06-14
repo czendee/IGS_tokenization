@@ -1,13 +1,26 @@
 package model
 
+import (
+	"time"
+
+	)
 
 
 ///////////////////response for validate token
 type ResponseTokenFile struct {    
 	StatusMessage string       `json:"status_message_file"`
 	Status       string       `json:"status_file"`
-	SucessDataEachRowToken   []ExitoDataTokenLine     `json:"sucess_data_each_row"`
-    SucessDataEachRowProcess   []ExitoDataTokenLine     `json:"sucess_data_each_row_process"`
+    CardsToken string       `json:"cards_token"`
+	SucessDataEachRowToken   []ExitoDataTokenLine     `json:"data_row"`
+    SucessValidacion   []ExitoDataValidaLine     `json:"data_val_row"`
+}
+
+type ResponsePayFile struct {    
+	StatusMessage string       `json:"status_message_file"`
+	Status       string       `json:"status_file"`
+    Payments string       `json:"payments"`
+    SucessDataEachRowPay   []ExitoDataPayLine     `json:"data_row"`
+    SucessValidacion   []ExitoDataValidaLine     `json:"data_val_row"`
 }
 
 type ExitoDataTokenLine struct {    
@@ -15,8 +28,38 @@ type ExitoDataTokenLine struct {
 	StatusMessage string       `json:"status_message"`
 	Status       string       `json:"status"`
 	
+    Date time.Time `json:"card_date"`
+	Token  string   `json:"card_token"`
+    LastDigits  string   `json:"card_last"`
+	Marca  string   `json:"card_brand"`
+	Vigencia  string   `json:"card_exp"`
+	Bin  string   `json:"card_bin"`
+	Score  string   `json:"card_score"`
+	Type  string   `json:"type_card"`
+    
 }
 
+type ExitoDataPayLine struct {    
+    Line          string       `json:"line"`
+	StatusMessage string       `json:"status_message"`
+	Status       string       `json:"status"`
+	
+    Token  string   `json:"card_token"`
+    PaymentReference  string   `json:"paymentreference"`
+	Authcode  string   `json:"authcode"`
+	Idtransaction  string   `json:"idtransaction"`
+	Marca  string   `json:"card_brand"`
+	Bin  string   `json:"card_bin"`
+    LastDigits  string   `json:"card_last"`
+	Type  string   `json:"type_card"`
+}
+
+type ExitoDataValidaLine struct {    
+    Line          string       `json:"line"`
+	StatusMessage string       `json:"status_message"`
+	Status       string       `json:"status"`
+	
+}
 
 ///////////////////response for payment
 type ResponsePayment struct {    

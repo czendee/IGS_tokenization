@@ -47,7 +47,7 @@ func ProcessGettokenizedcards(w http.ResponseWriter,  requestData modelito.Reque
     if errorGeneral!="" && errorGeneralNbr=="" {
     	//prepare response with error 300
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 300. Missing parameter:"+errorGeneral)
-    	errorGeneral="ERROR:300 -Missing parameter"	+errorGeneral
+    	errorGeneral="ERROR_300 -Missing parameter"	+errorGeneral
     	errorGeneralNbr="300"
     }
 
@@ -63,7 +63,7 @@ func ProcessGettokenizedcards(w http.ResponseWriter,  requestData modelito.Reque
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 310
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 310. Error obtaining cards:"+errorGeneral)
-    	errorGeneral="ERROR:310 -  Error obtaining cards -"	+errorGeneral
+    	errorGeneral="ERROR_310 -  Error obtaining cards -"	+errorGeneral
 	    errorGeneralNbr="310"
     }
 
@@ -99,7 +99,7 @@ func ProcessGettokenizedcards(w http.ResponseWriter,  requestData modelito.Reque
     	utilito.LevelLog(Config_env_log, "3", "CZ   prepare the JSON response for ERROR")
 
 	    //  START 
-	    errorGeneral="ERROR:330 -Error preparing the response"	+errorGeneral
+	    errorGeneral="ERROR_330 -Error preparing the response"	+errorGeneral
 	    errorGeneralNbr="330"
 	    //  END
     }
@@ -110,7 +110,7 @@ func ProcessGettokenizedcards(w http.ResponseWriter,  requestData modelito.Reque
 
 
 // Generatetokenized for receive and handle the request from client
-func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.RequestTokenized) (string,string) {
+func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.RequestTokenized) (string,string,modelito.Card) {
 	defer func() {
 		db.Connection.Close(nil)
 	}()
@@ -122,6 +122,9 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
      var resultCardTokenized modelito.Card
      
      var obtainedDataWebservice modelito.ExitoDataTokenized
+
+     var resultadoTokenSingle modelito.Card
+     //var resultadoToken modelito.ExitoData
      
     errorGeneral=""
 
@@ -140,7 +143,7 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
     if errorGeneral!="" && errorGeneralNbr=="" {
     	//prepare response with error 800
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 200. Missing parameter:"+errorGeneral)
-    	errorGeneral="ERROR :200 -Missing parameter "	+errorGeneral
+    	errorGeneral="ERROR_200 -Missing parameter "	+errorGeneral
 		errorGeneralNbr="200"
     }
 
@@ -160,7 +163,7 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 210
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 210. Error processing payment:"+errorGeneral)
-    	errorGeneral="ERROR:210 -Error processing payment:"	+errorGeneral
+    	errorGeneral="ERROR_210 -Error processing payment:"	+errorGeneral
 		errorGeneralNbr="210"
     }
 
@@ -179,7 +182,7 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 220
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 220. Error generating token:"+errorGeneral)
-    	errorGeneral="ERROR:220 -Error generating token:"	+errorGeneral
+    	errorGeneral="ERROR_220 -Error generating token:"	+errorGeneral
 		errorGeneralNbr="220"
     }
 
@@ -188,7 +191,7 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Post the response JSON ready")
 		
 			/// START
-		fieldDataBytesJsonTokenize,err := getJsonResponseTokenizeV2(resultCardTokenized)
+		fieldDataBytesJsonTokenize,err := getJsonResponseTokenizeV2(resultCardTokenized) // logicresponse.go
 			
 		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago  3")	
 
@@ -206,19 +209,20 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
             errorGeneral =string(fieldDataBytesJsonTokenize);
         }
 				
-		/// END
+		// END
+        resultadoTokenSingle = resultCardTokenized
 	}	
 
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 230
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 230. Error generating Response Tokenized:"+errorGeneral)
-    	errorGeneral="ERROR:230 -Error generating Response Tokenized:"	+errorGeneral
+    	errorGeneral="ERROR_230 -Error generating Response Tokenized:"	+errorGeneral
 		errorGeneralNbr="230"
     }
     
 	 utilito.LevelLog(Config_env_log, "3", "CZ  ends func tokenized")
 	 
-	return errorGeneral, errorGeneralNbr
+	return errorGeneral, errorGeneralNbr, resultadoTokenSingle
 }
 
 
@@ -234,13 +238,14 @@ func GetCardType(number string) string {
 /////////////////////////v4
 
 // v4Processpayment  receive and handle the request from client, access DB
-func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.RequestPayment) (string,string){
+func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.RequestPayment) (string,string,modelito.ExitoData){
 	defer func() {
 		db.Connection.Close(nil)
 	}()
     var result string
     var errorGeneral string
     var	errorGeneralNbr string
+    var resultadoPaymentSingle modelito.ExitoData
 
     var resultadoPayment modelito.ExitoData
     errorGeneral=""
@@ -266,7 +271,7 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
     if errorGeneral!="" {
     	//prepare response with error 100
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 100. Missing parameter:"+errorGeneral)
-    	errorGeneral="ERROR:100 - Missing parameter"	+errorGeneral
+    	errorGeneral="ERROR_100 - Missing parameter"	+errorGeneral
 		errorGeneralNbr="100"
     }
 //////////////////////////////////////////DB verify if less payments for the same card
@@ -308,7 +313,7 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 	    if errorGeneral!="" && errorGeneralNbr==""{
 	    	//prepare response with error 110
 	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 110. Error processing payment:"+errorGeneral)
-	    	errorGeneral="ERROR:110 - Error processing payment"	+errorGeneral
+	    	errorGeneral="ERROR_110 - Error processing payment"	+errorGeneral
 			errorGeneralNbr="110"
 
 	    }
@@ -362,7 +367,7 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 	    if errorGeneral!="" && errorGeneralNbr==""{
 	    	//prepare response with error 120
 	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 120. Error recording results in DB:"+errorGeneral)
-	    	errorGeneral="ERROR: 120 - Error recording results in DB"	+errorGeneral
+	    	errorGeneral="ERROR_ 120 - Error recording results in DB"	+errorGeneral
 			errorGeneralNbr="120"
 	    }
 
@@ -385,31 +390,32 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
                     errorGeneral= err.Error()
                 }
 		    //  END
+            resultadoPaymentSingle = resultadoPayment
         }
 
 	    if errorGeneral!="" && errorGeneralNbr=="" {//continue next step
 	    	utilito.LevelLog(Config_env_log, "3", "CZ   prepare the JSON response for ERROR")
 
 		    //  START 
-		    errorGeneral="ERROR:130 -Error preparing the response"	+errorGeneral
+		    errorGeneral="ERROR_130 -Error preparing the response"	+errorGeneral
 			errorGeneralNbr="130"
 		    //  END
         }
  utilito.LevelLog(Config_env_log, "3", "CZ  END   handler Listening DB  realizarpago  2")
-     return errorGeneral, errorGeneralNbr
+     return errorGeneral, errorGeneralNbr, resultadoPaymentSingle
 }
 
 ///---------------------------------------- File validations and file processing
 
 
-func validateFiles(typeFile string, r *http.Request) ( string, string, []modelito.ExitoDataTokenLine,[]modelito.RequestTokenized,[]modelito.RequestPayment) {
+func validateFiles(typeFile string, r *http.Request) ( string, string, []modelito.ExitoDataValidaLine,[]modelito.RequestTokenized,[]modelito.RequestPayment) {
     var errorGeneral string
     var errorGeneralNbr string
 
 
     errorGeneral=""
 
-    linesStatus := []modelito.ExitoDataTokenLine{}   //structure to stire the errors in each of the liens of the file
+    linesStatus := []modelito.ExitoDataValidaLine{}   //structure to stire the errors in each of the liens of the file
 
     linesDataTokens := []modelito.RequestTokenized{}   //structure to store the data for all the tokens (all the liens of the file   )     
     linesDataPayments := []modelito.RequestPayment{}   //structure to store the data for all the payment (all the liens of the file   )     
@@ -428,7 +434,7 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
             
             utilito.LevelLog(Config_env_log, "3", "CZ Error Retrieving the File")
             utilito.LevelLog(Config_env_log, "3",  err.Error())
-            errorGeneral="ERROR:110 -Error retriving files ,parameters"	+errorGeneral
+            errorGeneral="ERROR_110 -Error retriving files ,parameters"	+errorGeneral
             errorGeneralNbr="110"
 
         } 
@@ -454,7 +460,7 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                 defer file.Close()
                 if err != nil {
                     utilito.LevelLog(Config_env_log, "3",  err.Error())
-                    errorGeneral="ERROR:120 -Error file passed not open ,parameters"	+errorGeneral
+                    errorGeneral="ERROR_120 -Error file passed not open ,parameters"	+errorGeneral
                     errorGeneralNbr="120"
 
                 }
@@ -473,7 +479,7 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
 
                 lineasWithErrors := 0
                 for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
-                    var u modelito.ExitoDataTokenLine
+                    var u modelito.ExitoDataValidaLine
                     if lineas >= 1{
                         utilito.LevelLog(Config_env_log, "3", "MGR linea de datos")
 
@@ -500,7 +506,7 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                          }else { //error, al menos un error en la linea
                             u.Line=strconv.Itoa(lineas)
                             u.Status="ERROR540"
-                            u.StatusMessage ="ERROR FIELD:"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
                             lineasWithErrors =1
                             //the dataToken is set to "" when errors
                          }

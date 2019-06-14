@@ -193,18 +193,22 @@
                                    console.log(JSON.stringify(response.data) );
                                    var statusMssg =response.data.status_message_file;
                                    var statusNbr =response.data.status_file;
-                                   var statusDataEachRow =response.data.sucess_data_each_row;
-                                   var statusDataEachRowProcess =response.data.sucess_data_each_row_process;
+                                   var payments =response.data.payments;
+                                   var statusDataEachRow =response.data.data_row;
+                                   var statusValidacion =response.data.data_val_row;
+
+                                   $scope.respuestaPayment = " "
+
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.status = statusNbr + " "+ statusMssg;
                                         
-                                        statusDataEachRow.forEach(function(entry) {
+                                        statusValidacion.forEach(function(entry) {
                                             console.log(entry);
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
                                         });                                        
-                                        statusDataEachRowProcess.forEach(function(entry) {
+                                        statusDataEachRow.forEach(function(entry) {
                                             console.log(entry);
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuestaPayment = $scope.respuestaPayment +"  "+ tempLine;
@@ -212,13 +216,13 @@
                                     }else{     
                                         $scope.status = statusNbr + " "+ statusMssg;
                                     
-                                        statusDataEachRow.forEach(function(entry) {
+                                        statusValidacion.forEach(function(entry) {
                                             console.log(entry);
 //                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuesta = $scope.respuesta +"  "+ tempLine;
                                         }); 
-                                        statusDataEachRowProcess.forEach(function(entry) {
+                                        statusDataEachRow.forEach(function(entry) {
                                             console.log(entry);
                                             var tempLine =JSON.stringify(entry);
                                             $scope.respuestaPayment = $scope.respuestaPayment +"  "+ tempLine;
@@ -260,7 +264,9 @@
                                    console.log(JSON.stringify(response.data) );
                                    var statusMssg =response.data.status_message_file;
                                    var statusNbr =response.data.status_file;
-                                   var statusDataEachRow =response.data.sucess_data_each_row;
+                                   var payments =response.data.payments;
+                                   var statusDataEachRow =response.data.data_val_row;
+
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.status = statusNbr + " "+ statusMssg;
                                         

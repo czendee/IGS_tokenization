@@ -82,19 +82,33 @@ func obtainParmsProcessDownload(r *http.Request, errorGeneral string) (string, s
 		v := r.Form
 		requestData = v.Get("contenidofile")
 
-        //buscar si en la cadena de caracteres esta status_message y ver si es Success
-        //buscar si en la cadena de caracteres cards_tokenized, y ponerle el valor que traiga
-        //buscar si esta la cadena de caracteres card data, y buscar los datos entre los corchetes cuadrados y ponerlo en una cadena resto
-        //para cada elemento que termine en corche y coma   
-            //procesarlo  y dejar el resto en resto  
-        //buscar en la cadena resto si hay un corchete y una coma y separas esa parte en otra variable
-        //se repite la acción anterior hasta solo entrar un corchete solo que indica el final de los datos
-        //cuando solo encuentra un corchete solo se procesa la información
-        //el ciclo termina cuando hay un solo corchete
+        var lineaDatos string
+        micadenita := requestData
+
+        utilito.LevelLog(Config_env_log, "3", "Respuesta validacion")
+        utilito.LevelLog(Config_env_log, "3", micadenita)
+
+        cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
+
+        for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+            utilito.LevelLog(Config_env_log, "3", "linea")
+            
+            linealimpia :=  strings.Replace(linea, " ", "", -1)
+            utilito.LevelLog(Config_env_log, "3", linealimpia)
+
+            for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
+                utilito.LevelLog(Config_env_log, "3", "Campo")
+                utilito.LevelLog(Config_env_log, "3", campo)
+                lineaDatos = lineaDatos + campo +","
+            } // end for campo
+
+            lineaDatos = lineaDatos +"\r\n"
+            utilito.LevelLog(Config_env_log, "3", lineaDatos)
+        } //end for linea
        
    //END
    	 
-   	 return requestData,errorGeneral
+   	 return lineaDatos,errorGeneral
 } //end obtainParmsProcessDownload
 
 func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (string, string){
@@ -113,16 +127,32 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
 		v := r.Form
 		requestData = v.Get("contenidofilePagos")
         
-        //buf := bytes.NewBuffer(nil)
-        //io.Copy(buf, requestData)
-
         var lineaDatos string
         micadenita := requestData
 
         utilito.LevelLog(Config_env_log, "3", "Respuesta pagos")
         utilito.LevelLog(Config_env_log, "3", micadenita)
 
-       parte := strings.Split(strings.TrimSuffix(micadenita, "["), "[")
+        cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
+
+        for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+            utilito.LevelLog(Config_env_log, "3", "linea")
+            
+            linealimpia :=  strings.Replace(linea, " ", "", -1)
+            utilito.LevelLog(Config_env_log, "3", linealimpia)
+
+            for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
+                utilito.LevelLog(Config_env_log, "3", "Campo")
+                utilito.LevelLog(Config_env_log, "3", campo)
+                dato := strings.Split(campo, ":")
+                lineaDatos = lineaDatos + dato[1] +","
+            } // end for campo
+
+            lineaDatos = lineaDatos +"\r\n"
+            utilito.LevelLog(Config_env_log, "3", lineaDatos)
+        } //end for linea
+
+       /*parte := strings.Split(strings.TrimSuffix(micadenita, "["), "[")
         mensajes := strings.Split(strings.TrimSuffix(parte[0], ","), ",")
             utilito.LevelLog(Config_env_log, "3", "mensajes status")
             utilito.LevelLog(Config_env_log, "3", mensajes[0])
@@ -162,16 +192,16 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
                     lineaDatos = lineaDatos +"\r\n"
                 }// end for linea
                 
-                /*compara, err := strconv.Atoi(payments[1])
-                if err == nil {
+                //compara, err := strconv.Atoi(payments[1])
+                //if err == nil {
 
-                }
-                if compara != cuenta_i {
-                    log.Print("ERROR 2048 payments don´t match processed payments")
-                    lineaDatos = "ERROR 2048 payments don´t match processed payments"
-                }else{
-                    log.Print("Archivo Success")
-                }*/
+                //}
+                //if compara != cuenta_i {
+                //    log.Print("ERROR 2048 payments don´t match processed payments")
+                //    lineaDatos = "ERROR 2048 payments don´t match processed payments"
+                //}else{
+                //    log.Print("Archivo Success")
+                //}
                 
                 log.Print("fuera de for linea")
                 log.Print("Registros procesados: ",cuenta_i)
@@ -184,7 +214,7 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
                 log.Print("ERROR 2024 missing parameter")
                 lineaDatos = "ERROR 2024 missing parameter"
             } //end else-if status_message
-            log.Print("fin if status_message")
+            log.Print("fin if status_message")*/
 
         //buscar si en la cadena de caracteres esta status_message y ver si es Success
         //buscar si en la cadena de caracteres cards_tokenized, y ponerle el valor que traiga
@@ -199,6 +229,7 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
    //END
    	 
    	 return lineaDatos,errorGeneral
+        
 } //end obtainParmsProcessDownloadPagos
 
 func obtainParmsProcessDownloadValida(r *http.Request, errorGeneral string) (string, string){
@@ -214,12 +245,38 @@ func obtainParmsProcessDownloadValida(r *http.Request, errorGeneral string) (str
 	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
 	    	errorGeneral="ERROR:180 -"	+err.Error()
 		}
+
 		v := r.Form
 		requestData = v.Get("contenidofileValida")
 
+        var lineaDatos string
+        micadenita := requestData
+
+        utilito.LevelLog(Config_env_log, "3", "Respuesta validacion")
+        utilito.LevelLog(Config_env_log, "3", micadenita)
+
+        cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
+
+        for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+            utilito.LevelLog(Config_env_log, "3", "linea")
+            
+            linealimpia :=  strings.Replace(linea, " ", "", -1)
+            utilito.LevelLog(Config_env_log, "3", linealimpia)
+
+            for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
+                utilito.LevelLog(Config_env_log, "3", "Campo")
+                utilito.LevelLog(Config_env_log, "3", campo)
+                lineaDatos = lineaDatos + campo +","
+            } // end for campo
+
+            lineaDatos = lineaDatos +"\r\n"
+            utilito.LevelLog(Config_env_log, "3", lineaDatos)
+        } //end for linea
+
    //END
    	 
-   	 return requestData,errorGeneral
+   	 return lineaDatos,errorGeneral
+
 } //end obtainParmsProcessDownloadValida
 
 func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (string, string){
@@ -235,19 +292,36 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
 	    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
 	    	errorGeneral="ERROR:180 -"	+err.Error()
 		}
-		v := r.Form
+		
+        v := r.Form
 		requestData = v.Get("contenidofileTokeniza")
         
-        //buf := bytes.NewBuffer(nil)
-        //io.Copy(buf, requestData)
-
         var lineaDatos string
         micadenita := requestData
 
         utilito.LevelLog(Config_env_log, "3", "Respuesta pagos")
         utilito.LevelLog(Config_env_log, "3", micadenita)
 
-       parte := strings.Split(strings.TrimSuffix(micadenita, "["), "[")
+        cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
+
+        for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+            utilito.LevelLog(Config_env_log, "3", "linea")
+            
+            linealimpia :=  strings.Replace(linea, " ", "", -1)
+            utilito.LevelLog(Config_env_log, "3", linealimpia)
+
+            for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
+                utilito.LevelLog(Config_env_log, "3", "Campo")
+                utilito.LevelLog(Config_env_log, "3", campo)
+                dato := strings.Split(campo, ":")
+                lineaDatos = lineaDatos + dato[1] +","
+            } // end for campo
+
+            lineaDatos = lineaDatos +"\r\n"
+            utilito.LevelLog(Config_env_log, "3", lineaDatos)
+        } //end for linea
+
+       /*parte := strings.Split(strings.TrimSuffix(micadenita, "["), "[")
         mensajes := strings.Split(strings.TrimSuffix(parte[0], ","), ",")
             utilito.LevelLog(Config_env_log, "3", "mensajes status")
             utilito.LevelLog(Config_env_log, "3", mensajes[0])
@@ -287,16 +361,16 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
                     lineaDatos = lineaDatos +"\r\n"
                 }// end for linea
                 
-                /*compara, err := strconv.Atoi(cardsTokenized[1])
-                if err == nil {
+                //compara, err := strconv.Atoi(cardsTokenized[1])
+                //if err == nil {
 
-                }
-                if compara != cuenta_i {
-                    log.Print("ERROR 1048 cards_tokenized don´t match processed cards")
-                    lineaDatos = "ERROR 1048 cards_tokenized don´t match processed cards"
-                }else{
-                    log.Print("Archivo Success")
-                }*/
+                //}
+                //if compara != cuenta_i {
+                //    log.Print("ERROR 1048 cards_tokenized don´t match processed cards")
+                //    lineaDatos = "ERROR 1048 cards_tokenized don´t match processed cards"
+                //}else{
+                //    log.Print("Archivo Success")
+                //}
                 log.Print("fuera de for linea")
                 log.Print("Registros procesados: ",cuenta_i)
                 log.Print("Registros correctos: "+cardsTokenized[1])
@@ -308,7 +382,7 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
                 log.Print("ERROR 1024 missing parameter")
                 lineaDatos = "ERROR 1024 missing parameter"
             } //end else-if status_message
-            log.Print("fin if status_message")
+            log.Print("fin if status_message")*/
        
    //END
    	 

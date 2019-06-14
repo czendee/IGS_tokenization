@@ -84,7 +84,7 @@ func getJsonResponseError(errorMsg, errorNumber string )([]byte, error) {
 	return json.MarshalIndent(mainStruct, "", "  ")
 }
 
-func getJsonResponseErrorValidateFile(fileStatusMsg, fileStatusNumber string, linesStatus []modelito.ExitoDataTokenLine  )([]byte, error) {
+func getJsonResponseErrorValidateFile(fileStatusMsg, fileStatusNumber string, linesStatus []modelito.ExitoDataValidaLine  )([]byte, error) {
 	
     mainStruct :=modelito.ResponseTokenFile{StatusMessage: fileStatusMsg ,Status:fileStatusNumber}
 
@@ -93,7 +93,28 @@ func getJsonResponseErrorValidateFile(fileStatusMsg, fileStatusNumber string, li
 
      	for _, d := range linesStatus {
      		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
-			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status}   //request.go
+			w := modelito.ExitoDataValidaLine{d.Line, d.StatusMessage,d.Status}   //request.go
+			mainStruct.SucessValidacion = append(mainStruct.SucessValidacion, w)
+ 		}
+
+
+	return json.MarshalIndent(mainStruct, "", "  ")
+}
+
+func getJsonResponseTokenFile(fileStatusMsg, fileStatusNumber string, validaLinesStatus []modelito.ExitoDataValidaLine, tokenLinesStatus []modelito.ExitoDataTokenLine  )([]byte, error) {
+	
+    mainStruct :=modelito.ResponseTokenFile{StatusMessage: fileStatusMsg ,Status:fileStatusNumber, CardsToken:"4"}
+
+
+     	for _, d := range validaLinesStatus {
+     		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+			w := modelito.ExitoDataValidaLine{d.Line, d.StatusMessage,d.Status}   //request.go
+			mainStruct.SucessValidacion = append(mainStruct.SucessValidacion, w)
+ 		}
+
+        for _, d := range tokenLinesStatus {
+     		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status, d.Date, d.Token, d.LastDigits, d.Marca, d.Vigencia, d.Bin, d.Score, d.Type}   //request.go
 			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
  		}
 
@@ -101,22 +122,23 @@ func getJsonResponseErrorValidateFile(fileStatusMsg, fileStatusNumber string, li
 	return json.MarshalIndent(mainStruct, "", "  ")
 }
 
-func getJsonResponseProcessFile(fileStatusMsg, fileStatusNumber string, tokenLinesStatus []modelito.ExitoDataTokenLine, payLinesStatus []modelito.ExitoDataTokenLine  )([]byte, error) {
+func getJsonResponsePaymentFile(fileStatusMsg, fileStatusNumber string, validaLinesStatus []modelito.ExitoDataValidaLine, paymentLinesStatus []modelito.ExitoDataPayLine  )([]byte, error) {
 	
-    mainStruct :=modelito.ResponseTokenFile{StatusMessage: fileStatusMsg ,Status:fileStatusNumber}
+    mainStruct :=modelito.ResponsePayFile{StatusMessage: fileStatusMsg ,Status:fileStatusNumber, Payments:"4"}
 
 
-     	for _, d := range tokenLinesStatus {
+     	for _, d := range validaLinesStatus {
      		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
-			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status}   //request.go
-			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
+			w := modelito.ExitoDataValidaLine{d.Line, d.StatusMessage,d.Status}   //request.go
+			mainStruct.SucessValidacion = append(mainStruct.SucessValidacion, w)
  		}
 
-     	for _, d := range payLinesStatus {
+        for _, d := range paymentLinesStatus {
      		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
-			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status}   //request.go
-			mainStruct.SucessDataEachRowProcess = append(mainStruct.SucessDataEachRowProcess, w)
+			w := modelito.ExitoDataPayLine{d.Line, d.StatusMessage,d.Status,d.Token,d.PaymentReference,d.Authcode,d.Idtransaction,d.Marca,d.Bin,d.LastDigits,d.Type}   //request.go
+			mainStruct.SucessDataEachRowPay = append(mainStruct.SucessDataEachRowPay, w)
  		}
+         
 
 	return json.MarshalIndent(mainStruct, "", "  ")
 }
