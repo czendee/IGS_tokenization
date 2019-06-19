@@ -299,7 +299,23 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 	                    u.Type = resultadoTokenJson.Type
                         tokensCreados =    tokensCreados +1
                       }
-            }//edn if
+            }else{
+                utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer OK line:")
+                //sucess for this line/tokenizer
+                u.Line=strconv.Itoa(lineaProcess)
+                u.Status="OK"
+                u.StatusMessage ="OK"
+                now := time.Now()
+                u.Date = now
+                u.Token = resultadoTokenJson.Token
+                u.LastDigits = resultadoTokenJson.Last
+                u.Marca = resultadoTokenJson.Brand
+                u.Vigencia = resultadoTokenJson.Valid
+                u.Bin = resultadoTokenJson.Bin
+                u.Score = resultadoTokenJson.Score
+                u.Type = resultadoTokenJson.Type
+                tokensCreados =    tokensCreados +1
+            }
             if responseGeneral==""{
                 //this is not expected, as the result will be returned 
                 utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer NOT expected:")
@@ -333,7 +349,6 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 		// START
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
 
-//        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
         fieldDataBytesJson,err := getJsonResponseTokenFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
@@ -344,14 +359,6 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 	
     }else{
         utilito.LevelLog(Config_env_log, "3","CZ ProcessTokenFile  STEP SUCESS, prepare response JSON ready")
-/*        var  cardTokenized modelito.Card
-        fieldDataBytesJson,err := getJsonResponseValidateFileV2(cardTokenized)
-        w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}//end if
-*/
 
        if   lineasWithErrors ==0 { //all the lines were tokenized
             errorGeneral ="SUCCESS"
@@ -361,7 +368,8 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
        }
 
         errorGeneralNbr ="OK"
-        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
+        fieldDataBytesJson,err := getJsonResponseTokenFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
+
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
@@ -615,7 +623,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
                           utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File -Process  OK line:")
                          //sucess for this line/tokenizer
                         u.Line=strconv.Itoa(lineaProcess)
-                        u.StatusMessage =responseGeneral
+                        u.StatusMessage ="OK"
                         u.Status="OK"
                         u.Token = resultadoPaymentJson.Token
                         u.PaymentReference = resultadoPaymentJson.PaymentReference
@@ -626,7 +634,21 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
                         u.LastDigits = resultadoPaymentJson.LastDigits
                         u.Type = resultadoPaymentJson.Type
                       }
-            }//edn if
+            }else{
+                    utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File -Process  OK line:")
+                    //sucess for this line/tokenizer
+                u.Line=strconv.Itoa(lineaProcess)
+                u.StatusMessage ="OK"
+                u.Status="OK"
+                u.Token = resultadoPaymentJson.Token
+                u.PaymentReference = resultadoPaymentJson.PaymentReference
+                u.Authcode = resultadoPaymentJson.Authcode
+                u.Idtransaction = resultadoPaymentJson.Idtransaction
+                u.Marca = resultadoPaymentJson.Marca
+                u.Bin = resultadoPaymentJson.Bin
+                u.LastDigits = resultadoPaymentJson.LastDigits
+                u.Type = resultadoPaymentJson.Type
+            }
             if responseGeneral==""{
                 //this is not expected, as the result will be returned 
                 utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File -Process - NOT expected:")
@@ -660,7 +682,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 		// START
 		 //old  getJsonResponseError(errorGeneral, errorGeneralNbr)
 
-//        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
+
         fieldDataBytesJson,err := getJsonResponsePaymentFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
@@ -671,14 +693,6 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
 	
     }else{
         utilito.LevelLog(Config_env_log, "3","CZ ProcessPaymentFile  STEP SUCESS, prepare response JSON ready")
-/*        var  cardTokenized modelito.Card
-        fieldDataBytesJson,err := getJsonResponseValidateFileV2(cardTokenized)
-        w.Header().Set("Content-Type", "application/json")
-		w.Write(fieldDataBytesJson)	
-		if(err!=nil){
-			
-		}//end if
-*/
 
        if   lineasWithErrors ==0 { //all the lines were tokenized
             errorGeneral ="SUCCESS"
@@ -688,7 +702,7 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
        }
 
         errorGeneralNbr ="OK"
-        fieldDataBytesJson,err := getJsonResponseErrorValidateFile(errorGeneral, errorGeneralNbr, linesStatus  )  //logicresponse.go 
+        fieldDataBytesJson,err := getJsonResponsePaymentFile(errorGeneral, errorGeneralNbr, linesStatus,processLinesStatus  )  //logicresponse.go 
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	

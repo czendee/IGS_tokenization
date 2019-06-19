@@ -191,16 +191,10 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Post the response JSON ready")
 		
 			/// START
-		fieldDataBytesJsonTokenize,err := getJsonResponseTokenizeV2(resultCardTokenized) // logicresponse.go
+/*            		fieldDataBytesJsonTokenize,err := getJsonResponseTokenizeV2(resultCardTokenized) // logicresponse.go
 			
 		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test realizarpago  3")	
 
-/* do not send response in this point, of the logic, 
-   return the[]bytes intoa string
-
-	    w.Header().Set("Content-Type", "application/json")
-	    w.Write(fieldDataBytesJsonTokenize)
-*/        
 		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleGeneratetokenized  4"+"<html><body>"+ result+"</body></html>")
         if err!=nil{
         	utilito.LevelLog(Config_env_log, "3", "Eror en generando response")
@@ -208,7 +202,7 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
         }else{
             errorGeneral =string(fieldDataBytesJsonTokenize);
         }
-				
+*/				
 		// END
         resultadoTokenSingle = resultCardTokenized
 	}	
@@ -381,7 +375,7 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
 
 		    //  START 
 
-		    fieldDataBytesJsonPayment,err := getJsonResponsePaymentV2(resultadoPayment)					
+/*		    fieldDataBytesJsonPayment,err := getJsonResponsePaymentV2(resultadoPayment)					
 		        w.Header().Set("Content-Type", "application/json")
 		        w.Write(fieldDataBytesJsonPayment)
 				utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleProcesspayment  4"+"<html><body>"+ result+"</body></html>")
@@ -389,6 +383,8 @@ func v4ProcessProcessPayment(w http.ResponseWriter, requestData modelito.Request
                 	utilito.LevelLog(Config_env_log, "3", "Eror en generando response")
                     errorGeneral= err.Error()
                 }
+
+*/                
 		    //  END
             resultadoPaymentSingle = resultadoPayment
         }

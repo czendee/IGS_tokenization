@@ -308,6 +308,7 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
             utilito.LevelLog(Config_env_log, "3", "linea")
             
             linealimpia :=  strings.Replace(linea, " ", "", -1)
+            
             utilito.LevelLog(Config_env_log, "3", linealimpia)
 
             for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
@@ -321,68 +322,6 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
             utilito.LevelLog(Config_env_log, "3", lineaDatos)
         } //end for linea
 
-       /*parte := strings.Split(strings.TrimSuffix(micadenita, "["), "[")
-        mensajes := strings.Split(strings.TrimSuffix(parte[0], ","), ",")
-            utilito.LevelLog(Config_env_log, "3", "mensajes status")
-            utilito.LevelLog(Config_env_log, "3", mensajes[0])
-            limpiar :=  strings.Replace(mensajes[0], "\"", "", -1)
-            limpiar2 :=  strings.Replace(limpiar, " ", "", -1)
-            campoStatus := strings.Split(limpiar2, ":")
-            status_message := campoStatus[1]
-            if status_message == "Success"{
-                //utilito.LevelLog(Config_env_log, "3", status_message)
-                limpiar =  strings.Replace(mensajes[2], "\"", "", -1)
-                limpiar2 =  strings.Replace(limpiar, " ", "", -1)
-                cardsTokenized := strings.Split(limpiar2, ":")
-                log.Print("Cards_tokenized "+ cardsTokenized[1])
-                cuenta_i := 0
-                limpiar =  strings.Replace(parte[1], "\n", "", -1)
-                limpiar2 =  strings.Replace(limpiar, " ", "", -1)
-                for _, line := range strings.Split(limpiar2, "},"){
-                    utilito.LevelLog(Config_env_log, "3", "For linea")
-                    //utilito.LevelLog(Config_env_log, "3", line)
-                    cuenta_i = cuenta_i + 1
-                    log.Print("no vuelta",cuenta_i)
-                    for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
-                            
-                        //utilito.LevelLog(Config_env_log, "3", "campo")
-                        //utilito.LevelLog(Config_env_log, "3", campo)
-                        limpia2 := strings.Replace(campo, " ", "", -1)
-                        limpia3 := strings.Replace(limpia2, "}", "", -1)
-                        limpia4 := strings.Replace(limpia3, "]", "", -1)
-                        //log.Print("datolimpio", limpia4)
-                        dato := strings.Split(limpia4, ":")
-                        lineaDatos = lineaDatos + dato[1] +","
-                    }// end for campo
-
-                    log.Print("fuera de for campo")
-                    //cuenta_i = 0
-                    utilito.LevelLog(Config_env_log, "3", lineaDatos)
-                    lineaDatos = lineaDatos +"\r\n"
-                }// end for linea
-                
-                //compara, err := strconv.Atoi(cardsTokenized[1])
-                //if err == nil {
-
-                //}
-                //if compara != cuenta_i {
-                //    log.Print("ERROR 1048 cards_tokenized don´t match processed cards")
-                //    lineaDatos = "ERROR 1048 cards_tokenized don´t match processed cards"
-                //}else{
-                //    log.Print("Archivo Success")
-                //}
-                log.Print("fuera de for linea")
-                log.Print("Registros procesados: ",cuenta_i)
-                log.Print("Registros correctos: "+cardsTokenized[1])
-                compara, err := strconv.Atoi(cardsTokenized[1])
-                if err == nil {
-                    log.Print("Registros con error: ",cuenta_i-compara)
-                }//end err
-            }else{
-                log.Print("ERROR 1024 missing parameter")
-                lineaDatos = "ERROR 1024 missing parameter"
-            } //end else-if status_message
-            log.Print("fin if status_message")*/
        
    //END
    	 
@@ -889,20 +828,21 @@ func validateAndObtainCampos_token (line string, lineas int)(modelito.RequestTok
                   break
               }else{
                   //set the value 
-
-                  if numcampos==1 {
-                        requestData.Clientreference = campoValue
+                  if numcampos==1 {//IGS data id external identifier
                   }
                   if numcampos==2 {
-                      requestData.Paymentreference = campoValue
+                        requestData.Clientreference = campoValue
                   }
                   if numcampos==3 {
-                      requestData.Card = campoValue
+                      requestData.Paymentreference = campoValue
                   }
                   if numcampos==4 {
+                      requestData.Card = campoValue
+                  }
+                  if numcampos==5 {
                       requestData.Exp = campoValue
                   }
-                  if numcampos==5 {//cvv not required
+                  if numcampos==6 {//cvv not required
                       requestData.Cvv = campoValue
                   }                       
 
@@ -958,20 +898,21 @@ func validateAndObtainCampos_payment (line string, lineas int)(modelito.RequestP
                   break
               }else{
                   //set the value 
-
                   if numcampos==1 {
-                        requestData.Clientreference = campoValue
                   }
                   if numcampos==2 {
-                      requestData.Paymentreference = campoValue
+                        requestData.Clientreference = campoValue
                   }
                   if numcampos==3 {
-                      requestData.Token = campoValue
+                      requestData.Paymentreference = campoValue
                   }
                   if numcampos==4 {
-                      requestData.Cvv = campoValue
+                      requestData.Token = campoValue
                   }
                   if numcampos==5 {
+                      requestData.Cvv = campoValue
+                  }
+                  if numcampos==6 {
                       requestData.Amount = campoValue
                   }                       
 

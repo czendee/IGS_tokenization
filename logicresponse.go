@@ -2,6 +2,7 @@ package main
 
 import (
 	//"log"
+    "strings"
     utilito "banwire/services/file_tokenizer/util"
 	modelito "banwire/services/file_tokenizer/model"
 	 _ "github.com/lib/pq"   //use go get github.com/lib/pq
@@ -114,6 +115,7 @@ func getJsonResponseTokenFile(fileStatusMsg, fileStatusNumber string, validaLine
 
         for _, d := range tokenLinesStatus {
      		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+             d.StatusMessage =  strings.Replace(d.StatusMessage, ":", "", -1)
 			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status, d.Date, d.Token, d.LastDigits, d.Marca, d.Vigencia, d.Bin, d.Score, d.Type}   //request.go
 			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
  		}
@@ -135,6 +137,7 @@ func getJsonResponsePaymentFile(fileStatusMsg, fileStatusNumber string, validaLi
 
         for _, d := range paymentLinesStatus {
      		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+             d.StatusMessage =  strings.Replace(d.StatusMessage, ":", "", -1)
 			w := modelito.ExitoDataPayLine{d.Line, d.StatusMessage,d.Status,d.Token,d.PaymentReference,d.Authcode,d.Idtransaction,d.Marca,d.Bin,d.LastDigits,d.Type}   //request.go
 			mainStruct.SucessDataEachRowPay = append(mainStruct.SucessDataEachRowPay, w)
  		}
