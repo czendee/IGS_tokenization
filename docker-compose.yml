@@ -1,0 +1,9 @@
+version: '3.3'
+
+services:
+  app:
+    image: golang:1.11-alpine
+    volumes:
+      - .:/go/src/banwire/services/file_tokenizer
+    working_dir: /go/src/banwire/services/file_tokenizer
+    command: go build -o bin_banwire_igs/igs_files-${ENV:-prod}

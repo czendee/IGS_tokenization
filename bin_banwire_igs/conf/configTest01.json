@@ -1,0 +1,41 @@
+{
+	"othersources" : [
+		{
+			"type" : "crbanwire",
+			"nodes" : [
+				{
+					"active"   : true,
+                       "passwordcrbanwire" : "pruebasbw",
+                       "urlcrbanwire" : "https://cr.banwire.com"
+				}
+			]
+		},      
+		{
+			"type" : "envserver",
+			"nodes" : [
+				{
+					"active"   : true,
+                       "envlevel" : "dev",
+                       "envurl" : "http://198.101.187.112:3000",
+                       "envport" : ":3000",
+                       "envlog" : "2"
+				}
+			]
+		},         
+		{
+			"type" : "postgresql",
+			"nodes" : [
+				{
+                   
+					"active"   : true,
+                    "host" 	   : "stampy.db.elephantsql.com",
+					"port" 	   : 5432,
+					"db" 	   : "lerepagr",
+					"user" 	   : "lerepagr",
+					"password" : "Ag8q2utgSsVy2tyR7_M9cNYbzsqSvwma"
+
+				}
+			]
+		}
+	]
+}

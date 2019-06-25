@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"banwire/dash/dashboard_front/db"
+	"banwire/services/file_tokenizer/db"
 )
 
 // Time represents the time object
