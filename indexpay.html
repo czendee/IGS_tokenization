@@ -66,6 +66,15 @@
 
               <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
                      <span > BANWIRE: Herramienta de Pagos por Archivos </span>
+                     <a href="/v1/index">
+                        <button class="btn btn-primary">Tokenizacion</button>
+                     </a>
+                     <a href="/v1/indexpay">
+                     <button class="btn btn-primary">Pagos</button>
+                     </a>
+                     <a href="/v1/indexconsulta">
+                     <button class="btn btn-primary">Consulta</button>
+                     </a>
               </div >
 
 <div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:100px;">
@@ -97,11 +106,13 @@
    
               </div> 
               <div>
-                   <button class="btn btn-primary" ng-click="validate()">Validar</button>
-                   <button class="btn btn-primary" ng-click="save()">Aplicar Pagos</button>
+                   <button class="btn btn-primary" id="boton1" ng-click="validate()">Validar</button>
+                   <button class="btn btn-primary" id="boton2" ng-click="aplica_pago()">Aplicar Pagos</button>
                     
    
-              </div> 
+              </div>
+              <div id='datos'> 
+                  </div>
               <div>
                    <span>Respuesta Validacion: </span>
               </div> 
@@ -110,7 +121,7 @@
    
               </div> 
               <div>
-                  <button class="btn btn-primary" ng-click="downloadValida();">Descargar validacion</button>
+                  <button class="btn btn-primary" id="boton3" ng-click="downloadValida();">Descargar validacion</button>
 
               </div>
               <div>
@@ -129,7 +140,7 @@
    
               </div>
               <div>
-                  <button class="btn btn-primary" ng-click="downloadPagos()">Descargar Pagos</button>
+                  <button class="btn btn-primary" id="boton4" ng-click="downloadPagos()">Descargar Pagos</button>
                   
               </div> 
 
@@ -153,8 +164,20 @@
 
 <script type="text/javascript">
 
+/*function muestra() {
+    document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
+    //datos.html='<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
+}
+function esconde() {
+    document.getElementById("datos").innerHTML = ':)';
+}*/
      (function(){
            'use strict';
+            var boton1 = document.getElementById("boton1");
+            var boton2 = document.getElementById("boton2");
+            var boton3 = document.getElementById("boton3");
+            var boton4 = document.getElementById("boton4");
+            
             var module = angular.module('module',[]);
             module.controller('myCtrl',function($scope,$http){
                 $scope.files = [];
@@ -168,7 +191,9 @@
                           $scope.files =files;
                      } );
                 }
-                $scope.save = function(){
+                
+                $scope.validate = function(){
+                        
                         var fd = new FormData();
                         angular.forEach($scope.files, function(file,key){
                              var fileObject = 'file'+key;
@@ -176,8 +201,84 @@
                         });
                         //now add other data to fd
                         fd.append('description',$scope.description);
+                        
                         $scope.respuesta = " "
+                        $scope.respuestaPayment = " "
                         $scope.status =  " "
+
+                       var request = $http ({
+                           method: 'POST',
+                           url : '/v1/validatepaymentfiles',
+                            data : fd,
+                           transformRequest: angular.identity,
+                           headers : {
+                               'Content-Type' : undefined
+                           }
+                        });
+                        if($scope.files.length >0){
+                               boton1.disabled = true;
+                               boton2.disabled = true;
+                               boton3.disabled = true;
+                               boton4.disabled = true;
+                               document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
+                               setTimeout(function(){ alert('hola'); }, 10000);
+                               request.then(
+                                 function(response){
+                                   console.log(JSON.stringify(response.data) );
+                                   boton1.disabled = false;
+                                   boton2.disabled = false;
+                                   boton3.disabled = false;
+                                   boton4.disabled = false;
+                                   document.getElementById("datos").innerHTML = ':)';
+                                   var statusMssg =response.data.status_message_file;
+                                   var statusNbr =response.data.status_file;
+                                   var payments =response.data.payments;
+                                   var statusDataEachRow =response.data.data_val_row;
+
+                                   if(statusMssg.indexOf("ERROR")>= 0 ){
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+                                   }else{
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+                                        $scope.files = [];                                        
+                                   }
+                                 },
+                               )
+                               .catch(function (data) {
+                                   // Handle error here
+                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                  // $scope.files = [];
+                               });
+                        }
+                } //end validate
+
+                $scope.aplica_pago = function(){
+                        
+                        var fd = new FormData();
+                        angular.forEach($scope.files, function(file,key){
+                             var fileObject = 'file'+key;
+                             fd.append(fileObject,file.file);
+                        });
+                        //now add other data to fd
+                        fd.append('description',$scope.description);
+                        
+                        $scope.respuesta = " "
+                        $scope.respuestaPayment = " "
+                        $scope.status =  " "
+
                        var request = $http ({
                            method: 'POST',
                            url : '/v1/processpaymentfile',
@@ -188,16 +289,28 @@
                            }
                         });
                         if($scope.files.length >0){
+                               boton1.disabled = true;
+                               boton2.disabled = true;
+                               boton3.disabled = true;
+                               boton4.disabled = true;
+                               document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
+                               setTimeout(function(){ alert('hola'); }, 10000);
                                request.then(
                                  function(response){
                                    console.log(JSON.stringify(response.data) );
+                                   boton1.disabled = false;
+                                   boton2.disabled = false;
+                                   boton3.disabled = false;
+                                   boton4.disabled = false;
+                                   document.getElementById("datos").innerHTML = ':)';
                                    var statusMssg =response.data.status_message_file;
                                    var statusNbr =response.data.status_file;
                                    var payments =response.data.payments;
                                    var statusDataEachRow =response.data.data_row;
                                    var statusValidacion =response.data.data_val_row;
 
-                                   $scope.respuestaPayment = " "
+                                   //$scope.respuesta = " "
+                                   //$scope.respuestaPayment = " "
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.status = statusNbr + " "+ statusMssg;
@@ -237,73 +350,25 @@
                                   // $scope.files = [];
                                });
                         }
-                } //end save
-                $scope.validate = function(){
-                        var fd = new FormData();
-                        angular.forEach($scope.files, function(file,key){
-                             var fileObject = 'file'+key;
-                             fd.append(fileObject,file.file);
-                        });
-                        //now add other data to fd
-                        fd.append('description',$scope.description);
-                        
-                        $scope.respuesta = " "
-                        $scope.status =  " "
-                       var request = $http ({
-                           method: 'POST',
-                           url : '/v1/validatepaymentfiles',
-                            data : fd,
-                           transformRequest: angular.identity,
-                           headers : {
-                               'Content-Type' : undefined
-                           }
-                        });
-                        if($scope.files.length >0){
-                               request.then(
-                                 function(response){
-                                   console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message_file;
-                                   var statusNbr =response.data.status_file;
-                                   var payments =response.data.payments;
-                                   var statusDataEachRow =response.data.data_val_row;
-
-                                   if(statusMssg.indexOf("ERROR")>= 0 ){
-                                        $scope.status = statusNbr + " "+ statusMssg;
-                                        
-                                        statusDataEachRow.forEach(function(entry) {
-                                            console.log(entry);
-//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
-                                            var tempLine =JSON.stringify(entry);
-                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
-                                   }else{
-                                        $scope.status = statusNbr + " "+ statusMssg;
-                                        
-                                        statusDataEachRow.forEach(function(entry) {
-                                            console.log(entry);
-//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
-                                            var tempLine =JSON.stringify(entry);
-                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
-                                        $scope.files = [];                                        
-                                   }
-                                 },
-                               )
-                               .catch(function (data) {
-                                   // Handle error here
-                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
-                                  // $scope.files = [];
-                               });
-                        }
-                } //end validate
-
+                } //end aplica_pago
+                
                 $scope.downloadValida = function(){
 
 
 
                         var a="/v1/downloadfile";
+                        boton1.disabled = true;
+                        boton2.disabled = true;
+                        boton3.disabled = true;
+                        boton4.disabled = true;
+                        
                         var filetextarea = $scope.respuesta;
                         window.open(a+'?contenidofile='+filetextarea, '_blank');
+                                boton1.disabled = false;
+                                boton2.disabled = false;
+                                boton3.disabled = false;
+                                boton4.disabled = false;
+                        
 
 
                        
@@ -312,8 +377,18 @@
                 $scope.downloadPagos = function(){
                         
                         var a="/v1/downloadfilePago";
+                        boton1.disabled = true;
+                        boton2.disabled = true;
+                        boton3.disabled = true;
+                        boton4.disabled = true;
+                        
                         var filetextarea = $scope.respuestaPayment;
                         window.open(a+'?contenidofilePagos='+filetextarea, '_blank');
+                                boton1.disabled = false;
+                                boton2.disabled = false;
+                                boton3.disabled = false;
+                                boton4.disabled = false;
+                        
 
                         
                 } // end downloadPagos 

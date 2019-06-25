@@ -68,6 +68,15 @@
 
               <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
                      <span > BANWIRE: Herramienta de Consulta Token e Historial Pagos </span>
+                     <a href="/v1/index">
+                        <button class="btn btn-primary">Tokenizacion</button>
+                     </a>
+                     <a href="/v1/indexpay">
+                     <button class="btn btn-primary">Pagos</button>
+                     </a>
+                     <a href="/v1/indexconsulta">
+                     <button class="btn btn-primary">Consulta</button>
+                     </a>
               </div >
 
 <div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:100px;">
@@ -83,7 +92,7 @@
               </div> 
               <div>
                    
-                   <button class="btn btn-primary" ng-click="consultok()">Consultar Tokens</button> 
+                   <button class="btn btn-primary" id="boton1" ng-click="consultok()">Consultar Tokens</button> 
                     
    
               </div> 
@@ -100,7 +109,7 @@
 
               <div>
                    
-                   <button class="btn btn-primary" ng-click="consulhist()">Consultar Historial Pagos del Token</button>
+                   <button class="btn btn-primary" id="boton2" ng-click="consulhist()">Consultar Historial Pagos del Token</button>
                     
    
               </div> 
@@ -132,6 +141,9 @@
 <script type="text/javascript">
      (function(){
            'use strict';
+            var boton1 = document.getElementById("boton1");
+            var boton2 = document.getElementById("boton2");
+            
             var module = angular.module('module',[]);
             module.controller('myCtrl',function($scope,$http){
                 $scope.files = [];
@@ -145,48 +157,17 @@
                           $scope.files =files;
                      } );
                 }
-                $scope.consulhist = function(){
-                        
-                        var a="/v1/consultarhistorialtokens";
-                        var filetextarea = $scope.token;
-                        window.open(a+'?contenidohitorialToken='+filetextarea, '_blank');
-                        
-                        /*var fd = new FormData();
-
-                        //now add other data to fd
-                        fd.append('token',$scope.token);
-                       var request = $http ({
-                           method: 'POST',
-                           url : '/v1/consultarhistorialtokens',
-                            data : fd,
-                           transformRequest: angular.identity,
-                           headers : {
-                               'Content-Type' : undefined
-                           }
-                        });
-                        if($scope.token.length >0){
-                               request.then(
-                                 function(response){
-                                   console.log(JSON.stringify(response.data) );
-                                   $scope.respuesta =  response.data;
-                                   $scope.files = [];       
-                                 },
-
-                               )
-                               .catch(function (data) {
-                                   // Handle error here
-                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
-                                  // $scope.files = [];
-                               });
-                        }*/
-
-                }//end consulhist
 
                 $scope.consultok = function(){
                         
                         var a="/v1/consultartokens";
+                        boton1.disabled = true;
+                        boton2.disabled = true;
+
                         var filetextarea = $scope.clientreference;
                         window.open(a+'?contenidofileconsultaTok='+filetextarea, '_blank');
+                                boton1.disabled = false;
+                                boton2.disabled = false;
 
                         /*var fd = new FormData();
                         //now add other data to fd
@@ -224,6 +205,48 @@
                         }*/
 
                 }//end consultok
+
+                $scope.consulhist = function(){
+                        
+                        var a="/v1/consultarhistorialtokens";
+                        boton1.disabled = true;
+                        boton2.disabled = true;
+
+                        var filetextarea = $scope.token;
+                        window.open(a+'?contenidohitorialToken='+filetextarea, '_blank');
+                                boton1.disabled = false;
+                                boton2.disabled = false;
+                        
+                        /*var fd = new FormData();
+
+                        //now add other data to fd
+                        fd.append('token',$scope.token);
+                       var request = $http ({
+                           method: 'POST',
+                           url : '/v1/consultarhistorialtokens',
+                            data : fd,
+                           transformRequest: angular.identity,
+                           headers : {
+                               'Content-Type' : undefined
+                           }
+                        });
+                        if($scope.token.length >0){
+                               request.then(
+                                 function(response){
+                                   console.log(JSON.stringify(response.data) );
+                                   $scope.respuesta =  response.data;
+                                   $scope.files = [];       
+                                 },
+
+                               )
+                               .catch(function (data) {
+                                   // Handle error here
+                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                  // $scope.files = [];
+                               });
+                        }*/
+
+                }//end consulhist
 
             });
 //for drag and drop files

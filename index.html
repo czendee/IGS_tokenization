@@ -68,6 +68,15 @@
 
               <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
                      <span > BANWIRE: Herramienta de Tokenizacion de Archivos </span>
+                     <a href="/v1/index">
+                        <button class="btn btn-primary">Tokenizacion</button>
+                     </a>
+                     <a href="/v1/indexpay">
+                     <button class="btn btn-primary">Pagos</button>
+                     </a>
+                     <a href="/v1/indexconsulta">
+                     <button class="btn btn-primary">Consulta</button>
+                     </a>
               </div >
 
 <div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:100px;">
@@ -99,11 +108,13 @@
    
               </div> 
               <div>
-                   <button class="btn btn-primary" ng-click="validate()">Validar</button>
-                   <button class="btn btn-primary" ng-click="save()">Tokenizar</button>
+                   <button class="btn btn-primary" id="boton1" ng-click="validate()">Validar</button>
+                   <button class="btn btn-primary" id="boton2" ng-click="tokenizar()">Tokenizar</button>
                     
    
-              </div> 
+              </div>
+              <div id='datos'> 
+                  </div>
               <div>
                    <span>Respuesta Validacion: </span>
               </div> 
@@ -112,7 +123,7 @@
    
               </div>
               <div>
-                   <button class="btn btn-primary" ng-click="downloadValida()">Descarga Validacion</button> 
+                   <button class="btn btn-primary" id="boton3" ng-click="downloadValida()">Descarga Validacion</button> 
    
               </div>  
               <div>
@@ -131,7 +142,7 @@
    
               </div>
               <div>
-                   <button class="btn btn-primary" ng-click="downloadTokeniza()">Descarga Tokenizacion</button> 
+                   <button class="btn btn-primary" id="boton4" ng-click="downloadTokeniza()">Descarga Tokenizacion</button> 
    
               </div> 
 
@@ -156,6 +167,10 @@
 <script type="text/javascript">
      (function(){
            'use strict';
+            var boton1 = document.getElementById("boton1");
+            var boton2 = document.getElementById("boton2");
+            var boton3 = document.getElementById("boton3");
+            var boton4 = document.getElementById("boton4");
             var module = angular.module('module',[]);
             module.controller('myCtrl',function($scope,$http){
                 $scope.files = [];
@@ -169,7 +184,9 @@
                           $scope.files =files;
                      } );
                 }
-                $scope.save = function(){
+
+                $scope.validate = function(){
+                        
                         var fd = new FormData();
                         angular.forEach($scope.files, function(file,key){
                              var fileObject = 'file'+key;
@@ -177,8 +194,89 @@
                         });
                         //now add other data to fd
                         fd.append('description',$scope.description);
+
                         $scope.respuesta = " "
+                        $scope.respuestaTokenization = " "
                         $scope.status =  " "
+                       var request = $http ({
+                           method: 'POST',
+                           url : '/v1/validatefiles',
+                            data : fd,
+                           transformRequest: angular.identity,
+                           headers : {
+                               'Content-Type' : undefined
+                           }
+                        });
+                        if($scope.files.length >0){
+                               boton1.disabled = true;
+                               boton2.disabled = true;
+                               boton3.disabled = true;
+                               boton4.disabled = true;
+                               document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
+                               setTimeout(function(){ alert('hola'); }, 10000);
+                               request.then(
+                                 function(response){
+                                   console.log(JSON.stringify(response.data) );
+                                   boton1.disabled = false;
+                                   boton2.disabled = false;
+                                   boton3.disabled = false;
+                                   boton4.disabled = false;
+                                   document.getElementById("datos").innerHTML = ':)';
+                                   var statusMssg =response.data.status_message_file;
+                                   var statusNbr =response.data.status_file;
+                                   var cardsToken =response.data.cards_token;
+                                   var statusDataEachRow =response.data.data_val_row;
+
+                                   if(statusMssg.indexOf("ERROR")>= 0 ){
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+
+                                   }else{
+                                        $scope.status = statusNbr + " "+ statusMssg;
+                                        
+
+                                        statusDataEachRow.forEach(function(entry) {
+                                            console.log(entry);
+//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
+                                            var tempLine =JSON.stringify(entry);
+                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
+                                        });                                        
+
+                                        $scope.files = [];                                        
+                                   }
+                                 },
+
+                               )
+                               .catch(function (data) {
+                                   // Handle error here
+                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                  // $scope.files = [];
+                               });
+                        }
+
+                } //end validate
+
+                $scope.tokenizar = function(){
+                        
+                        var fd = new FormData();
+                        angular.forEach($scope.files, function(file,key){
+                             var fileObject = 'file'+key;
+                             fd.append(fileObject,file.file);
+                        });
+                        //now add other data to fd
+                        fd.append('description',$scope.description);
+
+                        $scope.respuesta = " "
+                        $scope.respuestaTokenization = " "
+                        $scope.status =  " "
+
                        var request = $http ({
                            method: 'POST',
                            url : '/v1/processtokenfile',
@@ -189,15 +287,27 @@
                            }
                         });
                         if($scope.files.length >0){
+                               boton1.disabled = true;
+                               boton2.disabled = true;
+                               boton3.disabled = true;
+                               boton4.disabled = true;
+                               document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
+                               setTimeout(function(){ alert('hola'); }, 10000);
                                request.then(
                                  function(response){
                                    console.log(JSON.stringify(response.data) );
+                                   boton1.disabled = false;
+                                   boton2.disabled = false;
+                                   boton3.disabled = false;
+                                   boton4.disabled = false;
+                                   document.getElementById("datos").innerHTML = ':)';
                                    var statusMssg =response.data.status_message_file;
                                    var statusNbr =response.data.status_file;
                                    var cardsToken =response.data.cards_token;
                                    var statusDataEachRow =response.data.data_row;
                                    var statusValidacion =response.data.data_val_row;
                                    
+                                   $scope.respuesta = " "
                                    $scope.respuestaTokenization = " "
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
@@ -246,79 +356,24 @@
                                });
                         }
 
-                } //end Save
-
-                $scope.validate = function(){
-                        var fd = new FormData();
-                        angular.forEach($scope.files, function(file,key){
-                             var fileObject = 'file'+key;
-                             fd.append(fileObject,file.file);
-                        });
-                        //now add other data to fd
-                        fd.append('description',$scope.description);
-
-                        $scope.respuesta = " "
-                        $scope.status =  " "
-                       var request = $http ({
-                           method: 'POST',
-                           url : '/v1/validatefiles',
-                            data : fd,
-                           transformRequest: angular.identity,
-                           headers : {
-                               'Content-Type' : undefined
-                           }
-                        });
-                        if($scope.files.length >0){
-                               request.then(
-                                 function(response){
-                                   console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message_file;
-                                   var statusNbr =response.data.status_file;
-                                   var cardsToken =response.data.cards_token;
-                                   var statusDataEachRow =response.data.data_val_row;
-
-                                   if(statusMssg.indexOf("ERROR")>= 0 ){
-                                        $scope.status = statusNbr + " "+ statusMssg;
-                                        
-
-                                        statusDataEachRow.forEach(function(entry) {
-                                            console.log(entry);
-//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
-                                            var tempLine =JSON.stringify(entry);
-                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
-
-                                   }else{
-                                        $scope.status = statusNbr + " "+ statusMssg;
-                                        
-
-                                        statusDataEachRow.forEach(function(entry) {
-                                            console.log(entry);
-//                                            $scope.respuesta = $scope.respuesta +"  "+ entry;
-                                            var tempLine =JSON.stringify(entry);
-                                            $scope.respuesta = $scope.respuesta +"  "+ tempLine;
-                                        });                                        
-
-                                        $scope.files = [];                                        
-                                   }
-                                 },
-
-                               )
-                               .catch(function (data) {
-                                   // Handle error here
-                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
-                                  // $scope.files = [];
-                               });
-                        }
-
-                } //end validate
+                } //end tokenizar
 
                 $scope.downloadValida = function(){
 
 
                         var a="/v1/downloadfileValida";
+                        boton1.disabled = true;
+                        boton2.disabled = true;
+                        boton3.disabled = true;
+                        boton4.disabled = true;
+                        
                         var filetextarea = $scope.respuesta;
                         window.open(a+'?contenidofileValida='+filetextarea, '_blank');
+                                boton1.disabled = false;
+                                boton2.disabled = false;
+                                boton3.disabled = false;
+                                boton4.disabled = false;
+                        
 
                        
                 }// end downloadValida
@@ -327,8 +382,18 @@
 
 
                         var a="/v1/downloadfileTokeniza";
+                        //boton1.disabled = true;
+                        //boton2.disabled = true;
+                        //boton3.disabled = true;
+                        //boton4.disabled = true;
+                        
                         var filetextarea = $scope.respuestaTokenization;
                         window.open(a+'?contenidofileTokeniza='+filetextarea, '_blank');
+                        //        boton1.disabled = false;
+                        //        boton2.disabled = false;
+                        //        boton3.disabled = false;
+                        //        boton4.disabled = false;
+                        
 
                        
                 }// end downloadTokeniza
