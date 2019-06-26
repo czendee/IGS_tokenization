@@ -145,3 +145,50 @@ func getJsonResponsePaymentFile(fileStatusMsg, fileStatusNumber string, validaLi
 
 	return json.MarshalIndent(mainStruct, "", "  ")
 }
+
+
+func getJsonResponseConsultarToken(fileStatusMsg, fileStatusNumber string  )([]byte, error) {
+	
+    mainStruct :=modelito.ResponseTokenFile{StatusMessage: fileStatusMsg ,Status:fileStatusNumber, CardsToken:"4"}
+
+
+			w := modelito.ExitoDataTokenLine{Line:"1", StatusMessage:"OK",Status:"OK",  Token:"69876jk", LastDigits:"4500", Marca:"VISA", Vigencia:"0921",Bin:"670", Score:"0", Type:"CREDIT"}   //request.go
+			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
+			w2 := modelito.ExitoDataTokenLine{Line:"1", StatusMessage:"OK",Status:"OK",  Token:"12876jh", LastDigits:"4588", Marca:"VISA", Vigencia:"0919",Bin:"681", Score:"0", Type:"CREDIT"}   //request.go
+			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w2)
+
+/*
+        for _, d := range tokenLinesStatus {
+     		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+             d.StatusMessage =  strings.Replace(d.StatusMessage, ":", "", -1)
+			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status, d.Date, d.Token, d.LastDigits, d.Marca, d.Vigencia, d.Bin, d.Score, d.Type}   //request.go
+			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
+ 		}
+*/
+
+	return json.MarshalIndent(mainStruct, "", "  ")
+}
+
+
+func getJsonResponseConsultarPayments(fileStatusMsg, fileStatusNumber string  )([]byte, error) {
+	
+    mainStruct :=modelito.ResponsePayFile{StatusMessage: fileStatusMsg ,Status:fileStatusNumber, Payments:"4"}
+
+    w := modelito.ExitoDataPayLine{Line:"1", StatusMessage:"ok",Status:"OK",Token:"6711IJK",PaymentReference:"MARCH Pago",Authcode:"%&tgat:77",Idtransaction:"345001",Marca:"VISA",Bin:"6780",LastDigits:"356",Type:"CREDIT"}   //request.go
+    mainStruct.SucessDataEachRowPay = append(mainStruct.SucessDataEachRowPay, w)
+
+    w2 := modelito.ExitoDataPayLine{Line:"1", StatusMessage:"ok",Status:"OK",Token:"6691IJK",PaymentReference:"CAR Pago",Authcode:"fg7877",Idtransaction:"561801",Marca:"VISA",Bin:"5758",LastDigits:"445",Type:"DEBIT"}   //request.go
+    mainStruct.SucessDataEachRowPay = append(mainStruct.SucessDataEachRowPay, w2)
+
+
+/*
+        for _, d := range paymentLinesStatus {
+     		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+             d.StatusMessage =  strings.Replace(d.StatusMessage, ":", "", -1)
+			w := modelito.ExitoDataPayLine{d.Line, d.StatusMessage,d.Status,d.Token,d.PaymentReference,d.Authcode,d.Idtransaction,d.Marca,d.Bin,d.LastDigits,d.Type}   //request.go
+			mainStruct.SucessDataEachRowPay = append(mainStruct.SucessDataEachRowPay, w)
+ 		}
+  */       
+
+	return json.MarshalIndent(mainStruct, "", "  ")
+}

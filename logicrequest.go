@@ -343,12 +343,12 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
 
 func obtainParmsConsultarTokens(r *http.Request, errorGeneral string) (string, string){
     
-    log.Print("Entra a obtainParmsConsultarTokens")
+    log.Print("Entra a obtainParmsConsultarTokens GET")
     var requestData string
 	////////////////////////////////////////////////obtain parms in JSON
     //START    
-    utilito.LevelLog(Config_env_log, "3", "cz  handleConsultarTokens")
- 	utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test ConsultarTokens")
+    utilito.LevelLog(Config_env_log, "3", "cz  handleConsultarTokensGET ")
+ 	utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test ConsultarTokens GET")
     	    
     err := r.ParseForm()
 	if err != nil {
@@ -365,9 +365,10 @@ func obtainParmsConsultarTokens(r *http.Request, errorGeneral string) (string, s
     var lineaDatos string
     micadenita := requestData
 
-    utilito.LevelLog(Config_env_log, "3", "Respuesta ConsultarToken")
+    utilito.LevelLog(Config_env_log, "3", "Respuesta ConsultarToken GET:")
     utilito.LevelLog(Config_env_log, "3", micadenita)
 
+/*
     cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
 
     for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
@@ -388,9 +389,10 @@ func obtainParmsConsultarTokens(r *http.Request, errorGeneral string) (string, s
         utilito.LevelLog(Config_env_log, "3", lineaDatos)
     } //end for linea
 
-       
+  */     
     //END
-   	 
+   	 lineaDatos= "ESTO LLEGO"+micadenita
+
    	return lineaDatos,errorGeneral
 } //end obtainParmsConsultarTokens
 
@@ -420,7 +422,7 @@ func obtainParmsConsultarHistPagoTokens(r *http.Request, errorGeneral string) (s
 
     utilito.LevelLog(Config_env_log, "3", "Respuesta Consultar historial Token")
     utilito.LevelLog(Config_env_log, "3", micadenita)
-
+/*
     cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
 
     for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
@@ -441,7 +443,9 @@ func obtainParmsConsultarHistPagoTokens(r *http.Request, errorGeneral string) (s
         utilito.LevelLog(Config_env_log, "3", lineaDatos)
     } //end for linea
     
-       
+  */
+   	 lineaDatos= "ESTO LLEGO"+micadenita
+     
     //END
    	 
    	return lineaDatos,errorGeneral
@@ -1069,3 +1073,58 @@ func validateAndObtainCampos_payment (line string, lineas int)(modelito.RequestP
 
 ///END
 //// File_tokenizer   solution needs these to validate the input of the lines received.
+
+
+func obtainParmsConsultarTokensPOST(r *http.Request, errorGeneral string) (string, string){
+    
+    log.Print("Entra a obtainParmsConsultarTokens :)")
+    var requestData string
+	////////////////////////////////////////////////obtain parms in JSON
+    //START    
+    utilito.LevelLog(Config_env_log, "3", "cz  handleConsultarTokens")
+ 	utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test ConsultarTokens")
+    	    
+    err := r.ParseForm()
+	if err != nil {
+	    //prepare response with error 100
+	    utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
+	    errorGeneral="ERROR:180 -"	+err.Error()
+	}
+		
+    v := r.Form
+    
+	requestData = v.Get("contenidofileconsultaTok")
+    
+
+    var lineaDatos string
+    micadenita := requestData
+
+    utilito.LevelLog(Config_env_log, "3", "Respuesta ConsultarToken")
+    utilito.LevelLog(Config_env_log, "3", micadenita)
+
+    cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
+
+    for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+        utilito.LevelLog(Config_env_log, "3", "linea")
+            
+        linealimpia :=  strings.Replace(linea, " ", "", -1)
+            
+        utilito.LevelLog(Config_env_log, "3", linealimpia)
+
+        for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
+            utilito.LevelLog(Config_env_log, "3", "Campo")
+            utilito.LevelLog(Config_env_log, "3", campo)
+            dato := strings.Split(campo, ":")
+            lineaDatos = lineaDatos + dato[1] +","
+        } // end for campo
+
+        lineaDatos = lineaDatos +"\r\n"
+        utilito.LevelLog(Config_env_log, "3", lineaDatos)
+    } //end for linea
+
+       
+    //END
+   	 
+   	return lineaDatos,errorGeneral
+} //end obtainParmsConsultarTokens
+

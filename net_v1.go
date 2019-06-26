@@ -64,7 +64,7 @@ func init() {
     r.Handle("/v1/downloadfilePago", netHandle(ForceDownloadPago, nil)).Methods("GET")     //in this net_v1.go
 
     //Handle's para indexconsulta
-    //r.Handle("/v1/consultartokens", netHandle(handlePostConsultaTokens, nil)).Methods("POST")   //in this net_v1.go
+    r.Handle("/v1/consultartokens", netHandle(handlePostConsultaTokens, nil)).Methods("POST")   //in this net_v1.go
     r.Handle("/v1/consultartokens", netHandle(handleGetConsultaTokens, nil)).Methods("GET")   //in this net_v1.go
     //r.Handle("/v1/consultarhistorialtokens", netHandle(handlePostConsultaHistorial, nil)).Methods("POST")   //in this net_v1.go
     r.Handle("/v1/consultarhistorialtokens", netHandle(handleGetConsultaHistorial, nil)).Methods("GET")   //in this net_v1.go
@@ -877,38 +877,34 @@ func handleDBPostGettokenizedcards(w http.ResponseWriter, r *http.Request) {
 
 // handleGetConsultaTokens  receive and handle the request from client, access DB, and web
 func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
-	
-    log.Print("Entra a handleGetConsultaTokens funcion boton \"Consultar token\" indexconsulta")
-    file := "ConsultarToken.txt"
-    
-    var errorGeneral string
-    
-    htmlStrDownloadJson, err:= obtainParmsConsultarTokens(r , errorGeneral) //logisrequest.go
-    
-    if(err!=""){
-
-	}//end if
-    log.Print("Regreso de función obtainParmsConsultarTokens")
-    
-    downloadBytes:= []byte(htmlStrDownloadJson)
-
-    // Generate the server headers
-
-    log.Print("Generador de cabezeras")
-		
-        w.Header().Set("Content-Type", "text/plain;charset: uft-8")
-        w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
-		w.Write(downloadBytes)	
-
-    log.Print("Fin obtainParmsConsultarTokens")
-
-    /*log.Print("Entra a handlePostConsultaTokens funcion boton \"Consultar token\" indexconsulta")
     defer func() {
 		db.Connection.Close(nil)
 	}()
     
     var errorGeneral string
     var errorGeneralNbr string
+	
+    log.Print("Entra a handleGetConsultaTokens funcion boton \"Consultar token\" indexconsulta")
+    //file := "ConsultarToken.txt"
+    
+    
+    paramsReceived, err:= obtainParmsConsultarTokens(r , errorGeneral) //logisrequest.go
+    
+    if(err!=""){
+
+	}//end if
+    log.Print("Regreso de función obtainParmsConsultarTokens")
+    
+    // downloadBytes:= []byte(paramsReceived)
+
+    // Generate the server headers
+
+    log.Print("Generador de cabezeras")
+
+
+    log.Print("Fin obtainParmsConsultarTokens")
+
+    /*log.Print("Entra a handlePostConsultaTokens funcion boton \"Consultar token\" indexconsulta")
 
    	var requestData modelito.RequestTokenizedCards
 
@@ -926,7 +922,7 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
 		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
 	}
 	/// END
-
+*/
     if errorGeneral != ""{
     	//send error response if any
     	//prepare an error JSON Response, if any
@@ -938,38 +934,59 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
 		
+        		
         if(err!=nil){
 			
 	    }
 	
-    }//end if errorGeneral!="" */
-					
+    }else{
+    	//send error response if any
+    	//prepare an error JSON Response, if any
+		log.Print("CZ   STEP Get the OK response JSON ready")
+		errorGeneralNbr ="500"
+			/// START
+		fieldDataBytesJson,err := getJsonResponseConsultarToken(paramsReceived, errorGeneralNbr)
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		
+        		
+        if(err!=nil){
+			
+	    }
+
+    }
+
+
+
 }//end handleGetConsultaTokens
+
+
+
+///////////////////////////////v4
+
 
 // handleGetConsultaHistorial  receive and handle the request from client, access DB, and web
 func handleGetConsultaHistorial(w http.ResponseWriter, r *http.Request) {
     
     log.Print("Entra a handleGetConsultaHistorial funcion boton \"Consultar historial pagos del token\" indexconsulta")
-	file := "ConsultarHistorialToken.txt"
     
     var errorGeneral string
+    var errorGeneralNbr string
     
-    htmlStrDownloadJson, err:= obtainParmsConsultarHistPagoTokens(r , errorGeneral) //logisrequest.go
+    
+    paramsReceived, err:= obtainParmsConsultarHistPagoTokens(r , errorGeneral) //logisrequest.go
     
     if(err!=""){
 
 	}//end if
     log.Print("Regreso de función obtainParmsConsultarHistPagoTokens")
     
-    downloadBytes:= []byte(htmlStrDownloadJson)
+//    downloadBytes:= []byte(paramsReceived)
 
     // Generate the server headers
 
     log.Print("Generador de cabezeras")
-		
-        w.Header().Set("Content-Type", "text/plain;charset: uft-8")
-        w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
-		w.Write(downloadBytes)	
 
     log.Print("Fin obtainParmsConsultarHistPagoTokens")
 
@@ -996,8 +1013,8 @@ func handleGetConsultaHistorial(w http.ResponseWriter, r *http.Request) {
 		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
 	}
 	/// END
-    
-    if errorGeneral!=""{
+*/    
+    if errorGeneral != ""{
     	//send error response if any
     	//prepare an error JSON Response, if any
 		log.Print("CZ   STEP Get the ERROR response JSON ready")
@@ -1008,11 +1025,28 @@ func handleGetConsultaHistorial(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
 		
+        		
         if(err!=nil){
 			
-		}
+	    }
 	
-    } */
+    }else{
+    	//send error response if any
+    	//prepare an error JSON Response, if any
+		log.Print("CZ   STEP Get the OK response JSON ready")
+		errorGeneralNbr ="500"
+			/// START
+		fieldDataBytesJson,err := getJsonResponseConsultarPayments(paramsReceived, errorGeneralNbr)
+		//////////    write the response (ERROR)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(fieldDataBytesJson)	
+		
+        		
+        if(err!=nil){
+			
+	    }
+
+    }
 					
 }//end handleGetConsultaHistorial
 
@@ -1777,3 +1811,35 @@ func ForceDownloadTokeniza(w http.ResponseWriter, r *http.Request) {
     //      http.ServeFile(w, r, "css/app.min.css")
     log.Print("Fin ForceDownloadTokeniza")
 } //end ForceDownloadTokeniza
+
+
+
+// handlePostConsultaTokens  receive and handle the request from client, access DB, and web
+func handlePostConsultaTokens(w http.ResponseWriter, r *http.Request) {
+	
+    log.Print("Entra a handlePostConsultaTokens funcion boton \"Consultar token\" indexconsulta")
+    file := "ConsultarToken.txt"
+    
+    var errorGeneral string
+    
+    htmlStrDownloadJson, err:= obtainParmsConsultarTokensPOST(r , errorGeneral) //logisrequest.go
+    
+    if(err!=""){
+
+	}//end if
+    log.Print("Regreso de función obtainParmsConsultarTokens")
+    
+    downloadBytes:= []byte(htmlStrDownloadJson)
+
+    // Generate the server headers
+
+    log.Print("Generador de cabezeras")
+		
+        w.Header().Set("Content-Type", "text/plain;charset: uft-8")
+        w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
+		w.Write(downloadBytes)	
+
+    log.Print("Fin obtainParmsConsultarTokens")
+
+    				
+}//end handleGetConsultaTokens

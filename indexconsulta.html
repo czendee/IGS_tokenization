@@ -67,23 +67,23 @@
 <!-- Drag and drop -->
 
               <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
-                     <span > BANWIRE: Herramienta de Consulta Token e Historial Pagos </span>
+                     <span > BANWIRE: Herramienta de Tokenizacion y Pagos por Archivos </span>
                      <a href="/v1/index">
-                        <button class="btn btn-primary">Tokenizacion</button>
+                        <button class="btn btn-primary" id="botonTtitle">Tokenizacion</button>
                      </a>
                      <a href="/v1/indexpay">
-                     <button class="btn btn-primary">Pagos</button>
+                     <button class="btn btn-primary" id="botonPtitle">Pagos</button>
                      </a>
                      <a href="/v1/indexconsulta">
-                     <button class="btn btn-primary">Consulta</button>
+                     <button class="btn btn-primary" id="botonCtitle">Consulta</button>
                      </a>
               </div >
+
 
 <div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:100px;">
               <div>
                    <span >Client Reference: </span>
                     
-   
               </div> 
               <div >
                   <textarea class="textarea" ng-model="clientreference"></textarea >
@@ -113,6 +113,10 @@
                     
    
               </div> 
+
+                  <div id='datosresultados'> 
+                  </div>
+
               <div>
                    <span>Respuesta: </span>
               </div> 
@@ -120,6 +124,7 @@
                     <textarea class="textarea" ng-model="respuesta"></textarea >
    
               </div> 
+<!--              
               <div>
                    <span>Cantidad de Pagos: </span>
               </div> 
@@ -135,6 +140,7 @@
               <div>
                      <textarea class="textarea" ng-model="status"></textarea >
               </div> 
+-->              
 </div>
 
 
@@ -144,6 +150,10 @@
             var boton1 = document.getElementById("boton1");
             var boton2 = document.getElementById("boton2");
             
+            //grayout the button of the current screen
+            var botonTitle = document.getElementById("botonCtitle");
+            botonTitle.disabled = true;
+
             var module = angular.module('module',[]);
             module.controller('myCtrl',function($scope,$http){
                 $scope.files = [];
@@ -165,18 +175,19 @@
                         boton2.disabled = true;
 
                         var filetextarea = $scope.clientreference;
+                        /*
                         window.open(a+'?contenidofileconsultaTok='+filetextarea, '_blank');
                                 boton1.disabled = false;
                                 boton2.disabled = false;
-
-                        /*var fd = new FormData();
+                       */
+                        var fd = new FormData();
                         //now add other data to fd
                         fd.append('clientreference',$scope.clientreference);
                        var request = $http ({
-                           method: 'POST',
-                           url : '/v1/consultartokens',
-                            data : fd,
-                           transformRequest: angular.identity,
+                           method: 'GET',
+                           url : '/v1/consultartokens?contenidofileconsultaTok='+$scope.clientreference,
+//                            data : fd,
+//                           transformRequest: angular.identity,
                            headers : {
                                'Content-Type' : undefined
                            }
@@ -184,8 +195,12 @@
                         if($scope.clientreference.length >0){
                                request.then(
                                  function(response){
+                                  boton1.disabled = false;
+                                  boton2.disabled = false;
                                    console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message;
+                                   var statusMssg =response.data.status_message_file;
+
+                                   var resultados =response.data.data_row;
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.respuesta = statusMssg;
@@ -194,6 +209,40 @@
                                         $scope.respuesta = statusMssg;
                                         
                                    }
+                                   var tableResultados ="NADA";
+                                   var tableResultadosEnd =" ";
+                                   if(resultados.length>0){
+                                       tableResultados ="<table border='1'> ";
+                                       tableResultadosEnd ="</table> ";
+                                   }
+                                   for(var i = 0; i < resultados.length; i++) {
+                                        var obj = resultados[i];
+
+                                        console.log(obj.line);
+                                        console.log(obj.status_message);
+                                        console.log(obj.card_token);
+                                        console.log(obj.card_last);
+                                        console.log(obj.card_brand);
+                                        console.log(obj.card_exp);
+                                        console.log(obj.card_bin);
+                                        console.log(obj.card_score);
+                                        console.log(obj.type_card);
+                                        tableResultados =tableResultados+"<tr> ";
+                                        tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_token+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_last+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_brand+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_exp+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_bin+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_score+"</td> ";
+                                        tableResultados =tableResultados+"</tr> ";
+ 
+
+                                    }
+                                    if(tableResultados !="NADA"){
+                                        document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
+                                    }
+                                   
                                  },
 
                                )
@@ -202,7 +251,7 @@
                                    $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
                                   // $scope.files = [];
                                });
-                        }*/
+                        }
 
                 }//end consultok
 
@@ -213,19 +262,20 @@
                         boton2.disabled = true;
 
                         var filetextarea = $scope.token;
+                        /*
                         window.open(a+'?contenidohitorialToken='+filetextarea, '_blank');
                                 boton1.disabled = false;
                                 boton2.disabled = false;
-                        
-                        /*var fd = new FormData();
+                        */
+                        var fd = new FormData();
 
                         //now add other data to fd
                         fd.append('token',$scope.token);
                        var request = $http ({
-                           method: 'POST',
-                           url : '/v1/consultarhistorialtokens',
-                            data : fd,
-                           transformRequest: angular.identity,
+                           method: 'GET',
+                           url : '/v1/consultarhistorialtokens?contenidohitorialTokenk='+$scope.clientreference,
+//                            data : fd,
+//                           transformRequest: angular.identity,
                            headers : {
                                'Content-Type' : undefined
                            }
@@ -233,9 +283,57 @@
                         if($scope.token.length >0){
                                request.then(
                                  function(response){
+                                  boton1.disabled = false;
+                                  boton2.disabled = false;
+
                                    console.log(JSON.stringify(response.data) );
-                                   $scope.respuesta =  response.data;
-                                   $scope.files = [];       
+                                   //$scope.respuesta =  response.data;
+                                   //$scope.files = [];       
+                                   var statusMssg =response.data.status_message_file;
+
+                                   var resultados =response.data.data_row;
+
+                                   if(statusMssg.indexOf("ERROR")>= 0 ){
+                                        $scope.respuesta = statusMssg;
+
+                                   }else{
+                                        $scope.respuesta = statusMssg;
+                                        
+                                   }
+                                   var tableResultados ="NADA";
+                                   var tableResultadosEnd =" ";
+                                   if(resultados.length>0){
+                                       tableResultados ="<table border='1'> ";
+                                       tableResultadosEnd ="</table> ";
+                                   }
+                                   for(var i = 0; i < resultados.length; i++) {
+                                        var obj = resultados[i];
+
+                                        console.log(obj.line);
+                                        console.log(obj.status_message);
+                                        console.log(obj.card_token);
+                                        console.log(obj.paymentreference);
+                                        console.log(obj.authcode);
+                                        console.log(obj.idtransaction);
+                                        console.log(obj.card_brand);
+                                        console.log(obj.card_bin);
+                                        console.log(obj.type_card);
+                                        tableResultados =tableResultados+"<tr> ";
+                                        tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_token+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.paymentreference+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.authcode+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.idtransaction+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_bin+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_score+"</td> ";
+                                        tableResultados =tableResultados+"</tr> ";
+ 
+
+                                    }
+                                    if(tableResultados !="NADA"){
+                                        document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
+                                    }
+
                                  },
 
                                )
@@ -244,7 +342,7 @@
                                    $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
                                   // $scope.files = [];
                                });
-                        }*/
+                        }
 
                 }//end consulhist
 

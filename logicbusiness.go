@@ -441,6 +441,7 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
             //get the *fileheaders
             files := formdata.File["file0"] // grab the files, this files was set in the html 
 
+//            midescripcioncita := r.FormValue("description")
             utilito.LevelLog(Config_env_log, "3", "CZ before loop files")
 
             for i, _ := range files { // loop through the files one by one

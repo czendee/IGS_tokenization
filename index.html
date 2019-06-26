@@ -67,15 +67,15 @@
 <!-- Drag and drop -->
 
               <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
-                     <span > BANWIRE: Herramienta de Tokenizacion de Archivos </span>
+                     <span > BANWIRE: Herramienta de Tokenizacion y Pagos por Archivos </span>
                      <a href="/v1/index">
-                        <button class="btn btn-primary">Tokenizacion</button>
+                        <button class="btn btn-primary" id="botonTtitle">Tokenizacion</button>
                      </a>
                      <a href="/v1/indexpay">
-                     <button class="btn btn-primary">Pagos</button>
+                     <button class="btn btn-primary" id="botonPtitle">Pagos</button>
                      </a>
                      <a href="/v1/indexconsulta">
-                     <button class="btn btn-primary">Consulta</button>
+                     <button class="btn btn-primary" id="botonCtitle">Consulta</button>
                      </a>
               </div >
 
@@ -171,6 +171,13 @@
             var boton2 = document.getElementById("boton2");
             var boton3 = document.getElementById("boton3");
             var boton4 = document.getElementById("boton4");
+
+
+            //grayout the button of the current screen
+            var botonTitle = document.getElementById("botonTtitle");
+            botonTitle.disabled = true;
+
+
             var module = angular.module('module',[]);
             module.controller('myCtrl',function($scope,$http){
                 $scope.files = [];
