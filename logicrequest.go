@@ -145,21 +145,36 @@ func obtainParmsProcessDownloadPagos(r *http.Request, errorGeneral string) (stri
     cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
 
     for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+        
         utilito.LevelLog(Config_env_log, "3", "linea")
-            
-        linealimpia :=  strings.Replace(linea, " ", "", -1)
+
+        linealimpia := strings.Replace(linea, " ", "", -1)
         utilito.LevelLog(Config_env_log, "3", linealimpia)
 
         for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
-            utilito.LevelLog(Config_env_log, "3", "Campo")
+            utilito.LevelLog(Config_env_log, "3", "Campo:")
             utilito.LevelLog(Config_env_log, "3", campo)
-            dato := strings.Split(campo, ":")
-            lineaDatos = lineaDatos + dato[1] +","
-        } // end for campo
 
+            cuenta := 0
+            for _, dato := range strings.Split(campo, "\":"){
+                //log.Print("dato ",dato)
+                cuenta = cuenta + 1
+                //log.Print("cuenta_",cuenta)
+                if cuenta == 2{
+                    datolimpio := strings.Replace(dato, ":", "_", -1)
+                    log.Print("Datolimpio: ", datolimpio)
+                    lineaDatos = lineaDatos + datolimpio
+                }//end if cuenta
+     
+            }// end for dato
+            lineaDatos = lineaDatos + ","
+            
+        }//end for campo
+
+        log.Print("lineaDatos: ",lineaDatos)
+        
         lineaDatos = lineaDatos +"\r\n"
-        utilito.LevelLog(Config_env_log, "3", lineaDatos)
-    } //end for linea
+    }//end for linea
 
     //parte := strings.Split(strings.TrimSuffix(micadenita, "["), "[")
     //mensajes := strings.Split(strings.TrimSuffix(parte[0], ","), ",")
@@ -318,22 +333,36 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
     cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
 
     for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+        
         utilito.LevelLog(Config_env_log, "3", "linea")
-            
-        linealimpia :=  strings.Replace(linea, " ", "", -1)
-            
+
+        linealimpia := strings.Replace(linea, " ", "", -1)
         utilito.LevelLog(Config_env_log, "3", linealimpia)
 
         for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
-            utilito.LevelLog(Config_env_log, "3", "Campo")
+            utilito.LevelLog(Config_env_log, "3", "Campo:")
             utilito.LevelLog(Config_env_log, "3", campo)
-            dato := strings.Split(campo, ":")
-            lineaDatos = lineaDatos + dato[1] +","
-        } // end for campo
 
+            cuenta := 0
+            for _, dato := range strings.Split(campo, "\":"){
+                //log.Print("dato ",dato)
+                cuenta = cuenta + 1
+                //log.Print("cuenta_",cuenta)
+                if cuenta == 2{
+                    datolimpio := strings.Replace(dato, ":", "_", -1)
+                    log.Print("Datolimpio: ", datolimpio)
+                    lineaDatos = lineaDatos + datolimpio
+                }//end if cuenta
+     
+            }// end for dato
+            lineaDatos = lineaDatos + ","
+            
+        }//end for campo
+
+        log.Print("lineaDatos: ",lineaDatos)
+        
         lineaDatos = lineaDatos +"\r\n"
-        utilito.LevelLog(Config_env_log, "3", lineaDatos)
-    } //end for linea
+    }//end for linea
 
        
     //END
