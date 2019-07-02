@@ -420,7 +420,7 @@ func obtainParmsConsultarTokens(r *http.Request, errorGeneral string) (string, s
 
   */     
     //END
-   	 lineaDatos= "ESTO LLEGO"+micadenita
+   	 lineaDatos= "ESTO LLEGO: "+micadenita
 
    	return lineaDatos,errorGeneral
 } //end obtainParmsConsultarTokens
@@ -443,7 +443,7 @@ func obtainParmsConsultarHistPagoTokens(r *http.Request, errorGeneral string) (s
 		
     v := r.Form
     
-	requestData = v.Get("contenidohitorialToken")
+	requestData = v.Get("contenidohitorialTokenk")
     
         
     var lineaDatos string
@@ -473,7 +473,7 @@ func obtainParmsConsultarHistPagoTokens(r *http.Request, errorGeneral string) (s
     } //end for linea
     
   */
-   	 lineaDatos= "ESTO LLEGO"+micadenita
+   	 lineaDatos= "ESTO LLEGO: "+micadenita
      
     //END
    	 
@@ -1155,5 +1155,111 @@ func obtainParmsConsultarTokensPOST(r *http.Request, errorGeneral string) (strin
     //END
    	 
    	return lineaDatos,errorGeneral
-} //end obtainParmsConsultarTokens
+} //end obtainParmsConsultarTokensPOST
 
+func obtainParmsConsultarHistorialClientes(r *http.Request, errorGeneral string) (string, string){
+    
+    log.Print("Entra a obtainParmsConsultarHistorialClientes GET")
+    var requestData string
+	////////////////////////////////////////////////obtain parms in JSON
+    //START    
+    utilito.LevelLog(Config_env_log, "3", "cz  handleConsultarHistorialClientesGET ")
+ 	utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test ConsultarHistorialClientes GET")
+    	    
+    err := r.ParseForm()
+	if err != nil {
+	    //prepare response with error 100
+	    utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
+	    errorGeneral="ERROR:180 -"	+err.Error()
+	}
+		
+    v := r.Form
+    
+	requestData = v.Get("contenidofileconsultaHistorialC")
+    
+
+    var lineaDatos string
+    micadenita := requestData
+
+    utilito.LevelLog(Config_env_log, "3", "Respuesta ConsultarHistorialClientes GET:")
+    utilito.LevelLog(Config_env_log, "3", micadenita)
+
+/*
+    cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
+
+    for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+        utilito.LevelLog(Config_env_log, "3", "linea")
+            
+        linealimpia :=  strings.Replace(linea, " ", "", -1)
+            
+        utilito.LevelLog(Config_env_log, "3", linealimpia)
+
+        for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
+            utilito.LevelLog(Config_env_log, "3", "Campo")
+            utilito.LevelLog(Config_env_log, "3", campo)
+            dato := strings.Split(campo, ":")
+            lineaDatos = lineaDatos + dato[1] +","
+        } // end for campo
+
+        lineaDatos = lineaDatos +"\r\n"
+        utilito.LevelLog(Config_env_log, "3", lineaDatos)
+    } //end for linea
+
+  */     
+    //END
+   	 lineaDatos= "ESTO LLEGO: "+micadenita
+
+   	return lineaDatos,errorGeneral
+} //end obtainParmsConsultarHistorialClientes
+func obtainParmsConsultarHistorialCPOST(r *http.Request, errorGeneral string) (string, string){
+    
+    log.Print("Entra a obtainParmsConsultarHistorialCPOST :)")
+    var requestData string
+	////////////////////////////////////////////////obtain parms in JSON
+    //START    
+    utilito.LevelLog(Config_env_log, "3", "cz  handleConsultarHistorilaC")
+ 	utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test HistorialClientes")
+    	    
+    err := r.ParseForm()
+	if err != nil {
+	    //prepare response with error 100
+	    utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 180. Missing parameter:"+errorGeneral)
+	    errorGeneral="ERROR:180 -"	+err.Error()
+	}
+		
+    v := r.Form
+    
+	requestData = v.Get("contenidofileconsultaHistorialC")
+    
+
+    var lineaDatos string
+    micadenita := requestData
+
+    utilito.LevelLog(Config_env_log, "3", "Respuesta ConsultarHistorialC")
+    utilito.LevelLog(Config_env_log, "3", micadenita)
+
+    cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
+
+    for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
+        utilito.LevelLog(Config_env_log, "3", "linea")
+            
+        linealimpia :=  strings.Replace(linea, " ", "", -1)
+            
+        utilito.LevelLog(Config_env_log, "3", linealimpia)
+
+        for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
+            utilito.LevelLog(Config_env_log, "3", "Campo")
+            utilito.LevelLog(Config_env_log, "3", campo)
+            dato := strings.Split(campo, ":")
+            lineaDatos = lineaDatos + dato[1] +","
+        } // end for campo
+
+        lineaDatos = lineaDatos +"\r\n"
+        utilito.LevelLog(Config_env_log, "3", lineaDatos)
+    } //end for linea
+
+       
+    //END
+   	 
+   	return lineaDatos,errorGeneral
+} //end obtainParmsConsultarHistorialCPOST

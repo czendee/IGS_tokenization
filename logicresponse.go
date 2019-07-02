@@ -167,7 +167,7 @@ func getJsonResponseConsultarToken(fileStatusMsg, fileStatusNumber string  )([]b
 */
 
 	return json.MarshalIndent(mainStruct, "", "  ")
-}
+} //end getJsonResponseConsultarToken
 
 
 func getJsonResponseConsultarPayments(fileStatusMsg, fileStatusNumber string  )([]byte, error) {
@@ -192,3 +192,25 @@ func getJsonResponseConsultarPayments(fileStatusMsg, fileStatusNumber string  )(
 
 	return json.MarshalIndent(mainStruct, "", "  ")
 }
+
+func getJsonResponseConsultarHistorailClientes(fileStatusMsg, fileStatusNumber string  )([]byte, error) {
+	
+    mainStruct :=modelito.ResponseTokenFile{StatusMessage: fileStatusMsg ,Status:fileStatusNumber, CardsToken:"4"}
+
+
+			w := modelito.ExitoDataTokenLine{Line:"1", StatusMessage:"OK",Status:"OK",  Token:"69876jk", LastDigits:"4500", Marca:"MASTER", Vigencia:"0921",Bin:"670", Score:"0", Type:"DEBIT"}   //request.go
+			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
+			w2 := modelito.ExitoDataTokenLine{Line:"1", StatusMessage:"OK",Status:"OK",  Token:"12876jh", LastDigits:"4588", Marca:"VISA", Vigencia:"0919",Bin:"681", Score:"0", Type:"CREDIT"}   //request.go
+			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w2)
+
+/*
+        for _, d := range tokenLinesStatus {
+     		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.StatusMessage )
+             d.StatusMessage =  strings.Replace(d.StatusMessage, ":", "", -1)
+			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status, d.Date, d.Token, d.LastDigits, d.Marca, d.Vigencia, d.Bin, d.Score, d.Type}   //request.go
+			mainStruct.SucessDataEachRowToken = append(mainStruct.SucessDataEachRowToken, w)
+ 		}
+*/
+
+	return json.MarshalIndent(mainStruct, "", "  ")
+} //end getJsonResponseConsultarHistorailClientes

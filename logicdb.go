@@ -479,7 +479,7 @@ resultMssg=""
 
    ///create a record for file transaction
 
-      func logicProcessCreateFileTrans(miFiletrans modelito.Filetrans, errorGeneral string) (string) {
+func logicProcessCreateFileTrans(miFiletrans modelito.Filetrans, errorGeneral string) (string) {
 	////////////////////////////////////////////////process db steps
    //START  
                       
@@ -510,7 +510,7 @@ resultMssg=""
 				         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
                         //the increase was done, now try record the payment for rule (3max payments for tcd a day)
                         utilito.LevelLog(Config_env_log, "3", "About record CreateFiletrans info in DB, the customer exists, ID interno es "+miFiletrans.ID)
-                        errInsertPay:=miFiletrans.CreateFiletrans(db )
+                        errInsertPay:=miFiletrans.CreateFiletrans(db ) //model/filetrans.go
                         utilito.LevelLog(Config_env_log, "3", "regresa func  CreateFiletrans ok!\n")
                         if errInsertPay != nil {
                             utilito.LevelLog(Config_env_log, "3", "Error: Recording the CreateFiletrans info in the DB:"+ errInsertPay.Error())

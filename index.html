@@ -77,6 +77,9 @@
                      <a href="/v1/indexconsulta">
                      <button class="btn btn-primary" id="botonCtitle">Consulta</button>
                      </a>
+                     <a href="/v1/indexconsultafiles">
+                     <button class="btn btn-primary" id="botonFtitle">Consulta Files</button>
+                     </a>
               </div >
 
 <div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:100px;">
@@ -113,7 +116,7 @@
                     
    
               </div>
-              <div id='datos'> 
+              <div id='datos'>
                   </div>
               <div>
                    <span>Respuesta Validacion: </span>
@@ -389,17 +392,17 @@
 
 
                         var a="/v1/downloadfileTokeniza";
-                        //boton1.disabled = true;
-                        //boton2.disabled = true;
-                        //boton3.disabled = true;
-                        //boton4.disabled = true;
+                        boton1.disabled = true;
+                        boton2.disabled = true;
+                        boton3.disabled = true;
+                        boton4.disabled = true;
                         
                         var filetextarea = $scope.respuestaTokenization;
                         window.open(a+'?contenidofileTokeniza='+filetextarea, '_blank');
-                        //        boton1.disabled = false;
-                        //        boton2.disabled = false;
-                        //        boton3.disabled = false;
-                        //        boton4.disabled = false;
+                                boton1.disabled = false;
+                                boton2.disabled = false;
+                                boton3.disabled = false;
+                                boton4.disabled = false;
                         
 
                        

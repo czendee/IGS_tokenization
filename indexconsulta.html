@@ -77,6 +77,9 @@
                      <a href="/v1/indexconsulta">
                      <button class="btn btn-primary" id="botonCtitle">Consulta</button>
                      </a>
+                     <a href="/v1/indexconsultafiles">
+                     <button class="btn btn-primary" id="botonFtitle">Consulta Files</button>
+                     </a>
               </div >
 
 
@@ -112,7 +115,10 @@
                    <button class="btn btn-primary" id="boton2" ng-click="consulhist()">Consultar Historial Pagos del Token</button>
                     
    
-              </div> 
+              </div>
+
+              <div id='datos'> 
+                  </div>
 
                   <div id='datosresultados'> 
                   </div>
@@ -171,8 +177,7 @@
                 $scope.consultok = function(){
                         
                         var a="/v1/consultartokens";
-                        boton1.disabled = true;
-                        boton2.disabled = true;
+                        
 
                         var filetextarea = $scope.clientreference;
                         /*
@@ -193,10 +198,14 @@
                            }
                         });
                         if($scope.clientreference.length >0){
+                               boton1.disabled = true;
+                               boton2.disabled = true;
+                               document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
                                request.then(
                                  function(response){
                                   boton1.disabled = false;
                                   boton2.disabled = false;
+                                  document.getElementById("datos").innerHTML = ':)';
                                    console.log(JSON.stringify(response.data) );
                                    var statusMssg =response.data.status_message_file;
 
@@ -258,8 +267,7 @@
                 $scope.consulhist = function(){
                         
                         var a="/v1/consultarhistorialtokens";
-                        boton1.disabled = true;
-                        boton2.disabled = true;
+                        
 
                         var filetextarea = $scope.token;
                         /*
@@ -273,7 +281,7 @@
                         fd.append('token',$scope.token);
                        var request = $http ({
                            method: 'GET',
-                           url : '/v1/consultarhistorialtokens?contenidohitorialTokenk='+$scope.clientreference,
+                           url : '/v1/consultarhistorialtokens?contenidohitorialTokenk='+$scope.token,
 //                            data : fd,
 //                           transformRequest: angular.identity,
                            headers : {
@@ -281,10 +289,14 @@
                            }
                         });
                         if($scope.token.length >0){
+                               boton1.disabled = true;
+                               boton2.disabled = true;
+                               document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
                                request.then(
                                  function(response){
                                   boton1.disabled = false;
                                   boton2.disabled = false;
+                                  document.getElementById("datos").innerHTML = ':)';
 
                                    console.log(JSON.stringify(response.data) );
                                    //$scope.respuesta =  response.data;
