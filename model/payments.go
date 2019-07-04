@@ -14,7 +14,7 @@ type Payment struct {
     Amount  string    `sql:"type:bigint`
 }
 func (u *Payment) getPayment(db *sql.DB) error {
-    statement := fmt.Sprintf("SELECT token, created_at FROM banwirefilepayment WHERE id=%d", u.ID)
+    statement := fmt.Sprintf("SELECT token, created_at FROM banwirepayment WHERE id=%d", u.ID)
     return db.QueryRow(statement).Scan(&u.Token, &u.Created_at)
 }
 func GetTodayPaymentsByTokenCard(db *sql.DB, eltoken string ) ([]Payment, error) {
@@ -31,11 +31,11 @@ func GetTodayPaymentsByTokenCard(db *sql.DB, eltoken string ) ([]Payment, error)
 //--and created_at- interval '6h' >=  now()::date + interval '2minutes' 
 
 //        statement := fmt.Sprintf("SELECT token,created_at,amount FROM banwirepayment WHERE token='%s' and created_at- interval '6h' >= now()::date + interval '1minutes' ",eltoken)
-        statement := fmt.Sprintf("SELECT token,created_at,amount FROM banwirefilepayment WHERE token='%s' and created_at- interval '6h' >= (now()- interval '6h')::date + interval '1minutes' ",eltoken)
+        statement := fmt.Sprintf("SELECT token,created_at,amount FROM banwirepayment WHERE token='%s' and created_at- interval '6h' >= (now()- interval '6h')::date + interval '1minutes' ",eltoken)
         
 //        return db.QueryRow(statement).Scan(&u.Token, &u.Created_at,&u.Amount),nil
 
-log.Print("procesando GetTodayPaymentsByTokenCard"+"SELECT token,created_at,amount FROM banwirefilepayment WHERE token='%s' and created_at- interval '6h' >= (now()- interval '6h')::date + interval '1minutes' ",eltoken)
+log.Print("procesando GetTodayPaymentsByTokenCard"+"SELECT token,created_at,amount FROM banwirepayment WHERE token='%s' and created_at- interval '6h' >= (now()- interval '6h')::date + interval '1minutes' ",eltoken)
 
     rows, err := db.Query(statement)
     log.Print("GetTodayPaymentsByTokenCard 02.1!\n")
@@ -67,11 +67,11 @@ log.Print("procesando GetTodayPaymentsByTokenCard"+"SELECT token,created_at,amou
 
 func GetAllPaymentsByTokenCard(db *sql.DB, eltoken string ) (string, error) {
      	log.Print("procesando GetTodayPaymentsByTokenCard")
-        statement := fmt.Sprintf("SELECT token,created_at,amount FROM banwirefilepayment WHERE token='%s'  ",eltoken)
+        statement := fmt.Sprintf("SELECT token,created_at,amount FROM banwirepayment WHERE token='%s'  ",eltoken)
         
 //        return db.QueryRow(statement).Scan(&u.Token, &u.Created_at,&u.Amount),nil
 
-log.Print("procesando GetTodayPaymentsByTokenCard"+"SELECT token,created_at,amount FROM banwirefilepayment WHERE token='%s'  ",eltoken)
+log.Print("procesando GetTodayPaymentsByTokenCard"+"SELECT token,created_at,amount FROM banwirepayment WHERE token='%s'  ",eltoken)
 
     rows, err := db.Query(statement)
     log.Print("GetAllPaymentsByTokenCard 02.1!\n")
@@ -103,7 +103,7 @@ log.Print("procesando GetTodayPaymentsByTokenCard"+"SELECT token,created_at,amou
 
 func (u *Payment) CreatePayment(db *sql.DB) error {
 
-	    statement := fmt.Sprintf("INSERT INTO banwirefilepayment( token, created_at, amount) VALUES('%s',current_timestamp,'%s')",  u.Token, u.Amount)
+	    statement := fmt.Sprintf("INSERT INTO banwirepayment( token, created_at, amount) VALUES('%s',current_timestamp,'%s')",  u.Token, u.Amount)
 	    _, err := db.Exec(statement)
      	log.Print("exec ejecutado")
 	    if err != nil {
@@ -116,7 +116,7 @@ func (u *Payment) CreatePayment(db *sql.DB) error {
 func GetPaymentsCardsByCustomer(db *sql.DB, customer_reference string) ([]Card, error) {
 	log.Print("GetCardsByCustomer 01!\n")
 //	statement := fmt.Sprintf("SELECT id_card, token, bin,last_digits,valid_thru,brand,type_card, score FROM card WHERE id_customer= %s  order by score DESC", id_customer)
-	statement := fmt.Sprintf("SELECT id_card, token, bin,last_digits,valid_thru,brand,type_card, score  FROM banwirefilecard  c, banwirefilecustomer  a WHERE c.id_customer= a.id_customer and a.reference= '%s'  order by score DESC;", customer_reference)
+	statement := fmt.Sprintf("SELECT id_card, token, bin,last_digits,valid_thru,brand,type_card, score  FROM banwirecard  c, banwirecustomer  a WHERE c.id_customer= a.id_customer and a.reference= '%s'  order by score DESC;", customer_reference)
  	log.Print("GetCardsByCustomerb 02!\n")
     rows, err := db.Query(statement)
     log.Print("GetCardsByCustomer 02.1!\n")
