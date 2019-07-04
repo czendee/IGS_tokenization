@@ -44,6 +44,7 @@
       width:  250px;
        margin-top :30px;
 }
+
 .headerBanwire {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 20px;
@@ -56,6 +57,7 @@
   letter-spacing: normal;
   word-spacing: normal;
   word-wrap: normal;
+
   line-break: auto;
      text-align: left;
 }
@@ -65,52 +67,44 @@
 <!-- Drag and drop -->
 
               <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
-                     <span > BANWIRE: Herramienta de Consulta en Historial de Archivos </span>
+                     <span > BANWIRE: Herramienta de Tokenizacion y Pagos por Archivos </span>
+                     <a href="/v1/index">
+                        <button class="btn btn-primary" id="botonTtitle">Tokenizacion</button>
+                     </a>
+                     <a href="/v1/indexpay">
+                     <button class="btn btn-primary" id="botonPtitle">Pagos</button>
+                     </a>
+                     <a href="/v1/indexconsulta">
+                     <button class="btn btn-primary" id="botonCtitle">Consulta</button>
+                     </a>
+                     <a href="/v1/indexconsultafiles">
+                     <button class="btn btn-primary" id="botonFtitle">Consulta Files</button>
+                     </a>
               </div >
+
 
 <div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:100px;">
               <div>
                    <span >Client Reference: </span>
                     
-   
               </div> 
               <div >
                   <textarea class="textarea" ng-model="clientreference"></textarea >
                    
-              </div> 
-              <div>
-                   
-                   <button class="btn btn-primary" ng-click="consultarhistclient()">Consultar Historial de Clientes</button> 
-                       
-              </div> 
-              <div>
-                   <span >Token: </span>
-                    
-              </div> 
-              <div >
-                  <textarea class="textarea" ng-model="token"></textarea >
-                    
-              </div> 
-              <div>
-                   
-                   <button class="btn btn-primary" ng-click="consultarhisttoken()">Consultar Historial Token</button>
-                    
-              </div> 
-              <div>
-                   <span >Payment Reference: </span>
-                    
    
               </div> 
-              <div >
-                  <textarea class="textarea" ng-model="paymentreference"></textarea >
-                   
-              </div> 
               <div>
                    
-                   <button class="btn btn-primary" ng-click="consultarhistpay()">Consultar en Historial Pagos</button> 
+                   <button class="btn btn-primary" id="boton1" ng-click="consulta()">Consultar</button> 
                     
    
-              </div> 
+              </div>
+
+              <div id='datos'> 
+                  </div>
+
+                  <div id='datosresultados'> 
+                  </div>
 
               <div>
                    <span>Respuesta: </span>
@@ -119,6 +113,7 @@
                     <textarea class="textarea" ng-model="respuesta"></textarea >
    
               </div> 
+<!--              
               <div>
                    <span>Cantidad de Pagos: </span>
               </div> 
@@ -134,12 +129,19 @@
               <div>
                      <textarea class="textarea" ng-model="status"></textarea >
               </div> 
+-->              
 </div>
 
 
 <script type="text/javascript">
      (function(){
            'use strict';
+            var boton1 = document.getElementById("boton1");
+            
+            //grayout the button of the current screen
+            var botonTitle = document.getElementById("botonFtitle");
+            botonTitle.disabled = true;
+
             var module = angular.module('module',[]);
             module.controller('myCtrl',function($scope,$http){
                 $scope.files = [];
@@ -153,92 +155,83 @@
                           $scope.files =files;
                      } );
                 }
-                $scope.consultarhistclient = function(){
+
+                $scope.consulta = function(){
+                        
+                        var a="/v1/consultarhistorialClientes";
+                        
+
+                        var filetextarea = $scope.clientreference;
+                       
                         var fd = new FormData();
                         //now add other data to fd
                         fd.append('clientreference',$scope.clientreference);
                        var request = $http ({
-                           method: 'POST',
-                           url : '/v1/consultarhistorialClientes',
-                            data : fd,
-                           transformRequest: angular.identity,
+                           method: 'GET',
+                           url : '/v1/consultarhistorialClientes?contenidofileconsultaHistorialC='+$scope.clientreference,
+//                            data : fd,
+//                           transformRequest: angular.identity,
                            headers : {
                                'Content-Type' : undefined
                            }
                         });
                         if($scope.clientreference.length >0){
+                               boton1.disabled = true;
+
+                               document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
                                request.then(
                                  function(response){
+                                  boton1.disabled = false;
+                                  
+                                  document.getElementById("datos").innerHTML = ':)';
                                    console.log(JSON.stringify(response.data) );
-                                   $scope.respuesta =  response.data;
-                                   $scope.files = [];       
-                                 },
-                               )
-                               .catch(function (data) {
-                                   // Handle error here
-                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
-                                  // $scope.files = [];
-                               });
-                        }
-                }
-                $scope.consultarhisttoken = function(){
-                        var fd = new FormData();
-                        //now add other data to fd
-                        fd.append('token',$scope.token);
-                       var request = $http ({
-                           method: 'POST',
-                           url : '/v1/consultahistorialToken',
-                            data : fd,
-                           transformRequest: angular.identity,
-                           headers : {
-                               'Content-Type' : undefined
-                           }
-                        });
-                        if($scope.token.length >0){
-                               request.then(
-                                 function(response){
-                                   console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message;
+                                   var statusMssg =response.data.status_message_file;
+
+                                   var resultados =response.data.data_row;
+
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.respuesta = statusMssg;
+
                                    }else{
                                         $scope.respuesta = statusMssg;
                                         
                                    }
-                                 },
-                               )
-                               .catch(function (data) {
-                                   // Handle error here
-                                   $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
-                                  // $scope.files = [];
-                               });
-                        }
-                }
-                $scope.consultarhistpay = function(){
-                        var fd = new FormData();
-                        //now add other data to fd
-                        fd.append('paymentreference',$scope.paymentreference);
-                       var request = $http ({
-                           method: 'POST',
-                           url : '/v1/consultarhistorialPagos',
-                            data : fd,
-                           transformRequest: angular.identity,
-                           headers : {
-                               'Content-Type' : undefined
-                           }
-                        });
-                        if($scope.paymentreference.length >0){
-                               request.then(
-                                 function(response){
-                                   console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message;
-                                   if(statusMssg.indexOf("ERROR")>= 0 ){
-                                        $scope.respuesta = statusMssg;
-                                   }else{
-                                        $scope.respuesta = statusMssg;
-                                        
+                                   var tableResultados ="NADA";
+                                   var tableResultadosEnd =" ";
+                                   if(resultados.length>0){
+                                       tableResultados ="<table border='1'> ";
+                                       tableResultadosEnd ="</table> ";
                                    }
+                                   for(var i = 0; i < resultados.length; i++) {
+                                        var obj = resultados[i];
+
+                                        console.log(obj.line);
+                                        console.log(obj.status_message);
+                                        console.log(obj.card_token);
+                                        console.log(obj.card_last);
+                                        console.log(obj.card_brand);
+                                        console.log(obj.card_exp);
+                                        console.log(obj.card_bin);
+                                        console.log(obj.card_score);
+                                        console.log(obj.type_card);
+                                        tableResultados =tableResultados+"<tr> ";
+                                        tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_token+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_last+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_brand+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_exp+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_bin+"</td> ";
+                                        tableResultados =tableResultados+"<td>"+obj.card_score+"</td> ";
+                                        tableResultados =tableResultados+"</tr> ";
+ 
+
+                                    }
+                                    if(tableResultados !="NADA"){
+                                        document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
+                                    }
+                                   
                                  },
+
                                )
                                .catch(function (data) {
                                    // Handle error here
@@ -246,9 +239,12 @@
                                   // $scope.files = [];
                                });
                         }
-                }
+
+                }//end consulta
+
             });
 //for drag and drop files
+
             module.directive('fileDropzone',function(){
                   return{
                       restrict: 'A',
@@ -269,12 +265,14 @@
                                   }
                                   e.dataTransfer.effectAllowed = 'copy';
                                   element.attr('class','file-drop-zone-over');
+
                              });
                              element.bind('drop',function(e){
                                   element.attr('class','file-drop-zone');
                                   if(e !=null){
                                       e.preventDefault();
                                   }
+
                                    var fileObjectsArray =[];
                                    angular.forEach(e.dataTransfer.files, function(file){
                                        //for the sake of previewing the files on the page before uploading          
