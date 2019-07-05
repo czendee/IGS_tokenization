@@ -558,3 +558,86 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
     //return errorGeneral,errorGeneralNbr ,linesStatus
 }
 
+
+
+func ProcessGetPaymentsForToken(w http.ResponseWriter,  paramInput string) (string,string,[]modelito.Payment) {
+
+    var errorGeneral string
+    var errorGeneralNbr string
+//    	var result string
+   var valoresParaResponder  []modelito.Payment
+
+    errorGeneral=""
+
+		        
+    if errorGeneral!="" && errorGeneralNbr=="" {
+    	//prepare response with error 502
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 300. Missing parameter:"+errorGeneral)
+    	errorGeneral="ERROR_502 -Missing parameter"	+errorGeneral
+    	errorGeneralNbr="502"
+    }
+
+	////////////////////////////////////////////////DB	
+	//	    resultado,errfetchDB:= fetchFromDB ()
+	if errorGeneral==""{//continue next step
+
+       	    utilito.LevelLog(Config_env_log, "3", "CZ   STEP Consume DB")
+         valoresParaResponder,errorGeneral =logicDBGetPaymentsByToken( errorGeneral,paramInput)  //logicdb.go
+
+
+    }				    
+    if errorGeneral!="" && errorGeneralNbr==""{
+    	//prepare response with error 510
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 510. Error obtaining payments by token:"+errorGeneral)
+    	errorGeneral="ERROR_510 -  Error obtaining payments by token -"	+errorGeneral
+	    errorGeneralNbr="510"
+    }
+
+		/// END
+
+		 
+
+     return errorGeneral, errorGeneralNbr,valoresParaResponder
+}
+
+
+
+func ProcessGetTokensForCustRef(w http.ResponseWriter,  paramInput string) (string,string,[]modelito.Card) {
+
+    var errorGeneral string
+    var errorGeneralNbr string
+//    	var result string
+   var valoresParaResponder  []modelito.Card
+
+    errorGeneral=""
+
+		        
+    if errorGeneral!="" && errorGeneralNbr=="" {
+    	//prepare response with error 602
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 602. Missing parameter:"+errorGeneral)
+    	errorGeneral="ERROR_602 -Missing parameter"	+errorGeneral
+    	errorGeneralNbr="602"
+    }
+
+	////////////////////////////////////////////////DB	
+	//	    resultado,errfetchDB:= fetchFromDB ()
+	if errorGeneral==""{//continue next step
+
+       	    utilito.LevelLog(Config_env_log, "3", "CZ   STEP Consume DB")
+         valoresParaResponder,errorGeneral =logicDBGetTokensByCustRef( errorGeneral,paramInput)  //logicdb.go
+
+
+    }				    
+    if errorGeneral!="" && errorGeneralNbr==""{
+    	//prepare response with error 510
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 610. Error obtaining tokens by cust ref:"+errorGeneral)
+    	errorGeneral="ERROR_610 -  Error obtaining tokens by cust ref -"	+errorGeneral
+	    errorGeneralNbr="610"
+    }
+
+		/// END
+
+		 
+
+     return errorGeneral, errorGeneralNbr,valoresParaResponder
+}

@@ -884,7 +884,8 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
     
     var errorGeneral string
     var errorGeneralNbr string
-	
+	var  recordsFound []modelito.Card
+
     log.Print("Entra a handleGetConsultaTokens funcion boton \"Consultar tokens\" indexconsulta")
     //file := "ConsultarToken.txt"
     
@@ -892,8 +893,16 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
     paramsReceived, err:= obtainParmsConsultarTokens(r , errorGeneral) //logisrequest.go
     
     if(err!=""){
+        log.Print("CZ    Prepare Response with 601. Get Tokens done with thisToken failed:"+errorGeneral)
+    	errorGeneral="ERROR:601 -Get tokens  by cust reference- parameter:"	+errorGeneral
+    	errorGeneralNbr="601"
 
-	}//end if
+	}else{
+
+		errorGeneral,errorGeneralNbr,recordsFound= ProcessGetTokensForCustRef(w , paramsReceived) //logicbusiness.go
+
+    }
+
     log.Print("Regreso de función obtainParmsConsultarTokens")
     
     // downloadBytes:= []byte(paramsReceived)
@@ -905,25 +914,6 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
 
     log.Print("Fin obtainParmsConsultarTokens")
 
-    /*log.Print("Entra a handlePostConsultaTokens funcion boton \"Consultar token\" indexconsulta")
-
-   	var requestData modelito.RequestTokenizedCards
-
-    errorGeneral = ""
-    requestData, errorGeneral = obtainParmsConsultarTokens(r,errorGeneral) //logicrequest.go
-    
-    
-    log.Print("Regresa de obtainParmsConsultarTokens")
-
-
-	////////////////////////////////////////////////process business rules
-	/// START
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-	}
-	/// END
-*/
     if errorGeneral != ""{
     	//send error response if any
     	//prepare an error JSON Response, if any
@@ -946,7 +936,7 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
 		log.Print("CZ   STEP Get the OK response JSON ready")
 		errorGeneralNbr ="500"
 			/// START
-		fieldDataBytesJson,err := getJsonResponseConsultarToken(paramsReceived, errorGeneralNbr)
+		fieldDataBytesJson,err := getJsonResponseConsultarTokens( errorGeneral, errorGeneralNbr, recordsFound)
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
@@ -969,52 +959,39 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
 
 // handleGetConsultaHistorial  receive and handle the request from client, access DB, and web
 func handleGetConsultaHistorial(w http.ResponseWriter, r *http.Request) {
+    defer func() {
+		db.Connection.Close(nil)
+	}()
     
     log.Print("Entra a handleGetConsultaHistorial funcion boton \"Consultar historial pagos del token\" indexconsulta")
     
     var errorGeneral string
     var errorGeneralNbr string
-    
-    
-    paramsReceived, err:= obtainParmsConsultarHistPagoTokens(r , errorGeneral) //logisrequest.go
-    
-    if(err!=""){
 
-	}//end if
-    log.Print("Regreso de función obtainParmsConsultarHistPagoTokens")
+   var  recordsFound []modelito.Payment
+    
+    paramsReceived, errorGeneral:= obtainParmsConsultarHistPagoTokens(r , errorGeneral) //logisrequest.go
+    
+    if(errorGeneral!=""){
+        log.Print("CZ    Prepare Response with 501. Get Payments done with thisToken failed:"+errorGeneral)
+    	errorGeneral="ERROR:501 -Get payments by token- parameter:"	+errorGeneral
+    	errorGeneralNbr="501"
+
+	}else{
+
+		errorGeneral,errorGeneralNbr,recordsFound= ProcessGetPaymentsForToken(w , paramsReceived) //logicbusiness.go
+
+    }
+    log.Print("Regreso de función handleGetConsultaHistorial")
     
 //    downloadBytes:= []byte(paramsReceived)
 
     // Generate the server headers
 
-    log.Print("Generador de cabezeras")
 
-    log.Print("Fin obtainParmsConsultarHistPagoTokens")
+    log.Print("Entra a handlePostConsultaHistorial funcion boton \"Consultar historial pagos del token\" indexconsulta")
 
-    /*log.Print("Entra a handlePostConsultaHistorial funcion boton \"Consultar historial pagos del token\" indexconsulta")
-    defer func() {
-		db.Connection.Close(nil)
-	}()
-    var errorGeneral string
-    var errorGeneralNbr string
-    
-   	var requestData modelito.RequestTokenizedCards
 
-    errorGeneral = ""
-    requestData, errorGeneral = obtainParmsConsultarHistPagoTokens(r,errorGeneral) //logicrequest.go
-    
-    log.Print("Regresa de obtainParmsConsultarHistPagoTokens")
-    
-
-	////////////////////////////////////////////////process business rules
-	/// START
-    
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-	}
-	/// END
-*/    
     if errorGeneral != ""{
     	//send error response if any
     	//prepare an error JSON Response, if any
@@ -1037,7 +1014,7 @@ func handleGetConsultaHistorial(w http.ResponseWriter, r *http.Request) {
 		log.Print("CZ   STEP Get the OK response JSON ready")
 		errorGeneralNbr ="500"
 			/// START
-		fieldDataBytesJson,err := getJsonResponseConsultarPayments(paramsReceived, errorGeneralNbr)
+		fieldDataBytesJson,err := getJsonResponseConsultarPayments(paramsReceived, errorGeneralNbr,recordsFound) //logicresponse.go
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
@@ -1048,7 +1025,11 @@ func handleGetConsultaHistorial(w http.ResponseWriter, r *http.Request) {
 	    }
 
     }
-					
+
+    
+    log.Print("Fin obtainParmsConsultarHistPagoTokens")
+
+
 }//end handleGetConsultaHistorial
 
 //func handlePostConsultahistorialClientes
@@ -1952,3 +1933,5 @@ func handleGetConsultahistorialClientes(w http.ResponseWriter, r *http.Request) 
 
 
 }//end handleGetConsultahistorialClientes
+
+

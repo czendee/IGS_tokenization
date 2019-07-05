@@ -530,3 +530,137 @@ func logicProcessCreateFileTrans(miFiletrans modelito.Filetrans, errorGeneral st
    
    	  return  errorGeneral
    }
+
+
+
+
+
+   func logicDBGetPaymentsByToken( errorGeneral string, inputParam string) ([]modelito.Payment,string) {
+	////////////////////////////////////////////////obtain parms in JSON
+   //START    
+var resultPayments []modelito.Payment
+var errPayments error
+
+				//  START fetchFromDB
+				    var errdb error
+				    var db *sql.DB
+				    // Create connection string
+					connString := fmt.Sprintf("host=%s dbname=%s user=%s password=%s port=%d sslmode=disable",
+//						DB_SERVER,DB_NAME, DB_USER, DB_PASSWORD, DB_PORT)
+						Config_DB_server,Config_DB_name, Config_DB_user, Config_DB_pass, Config_DB_port)
+				
+				
+
+					 // Create connection pool
+					db, errdb = sql.Open("postgres", connString)
+					if errdb != nil {
+						utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
+						errorGeneral=errdb.Error()
+					}
+					// Close the database connection pool after program executes
+					 defer db.Close()
+					if errdb == nil {
+                        utilito.LevelLog(Config_env_log, "3", "Connected!\n")
+				
+					
+						errPing := db.Ping()
+						if errPing != nil {
+                            utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
+							  errorGeneral=errPing.Error()
+						}else{
+					         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
+//					         var misCards modelito.Card
+					         //GetTodayPaymentsByTokenCard(db *sql.DB, eltoken string ) ([]Payment, error)
+					         resultPayments,errPayments =modelito.GetRecordsOfTodayPaymentsByTokenCard(db,inputParam)
+
+
+					         				utilito.LevelLog(Config_env_log, "3", "regresa func  getPaymentsByToken ok!\n")
+							if errPayments != nil {
+							  utilito.LevelLog(Config_env_log, "3", "Error: :"+ errPayments.Error())
+							  errorGeneral=errPayments.Error()
+							}
+							var cuantos int
+							cuantos = 0
+				         	for _, d := range resultPayments {
+				         		utilito.LevelLog(Config_env_log, "3", "el registor trae:"+d.Token+" "+d.Amount)
+							    cuantos =1
+			         		}
+							if cuantos == 0 {
+							  utilito.LevelLog(Config_env_log, "3", "DB: records not found")
+							  errorGeneral="Not payments found for the token received"
+							}		
+
+					    }
+				
+				
+					}
+				    
+				//  END fetchFromDB
+   
+   //END
+   	  return  resultPayments, errorGeneral
+   }
+   
+   func logicDBGetTokensByCustRef( errorGeneral string, inputParam string) ([]modelito.Card,string) {
+	////////////////////////////////////////////////obtain parms in JSON
+   //START    
+var resultTokens []modelito.Card
+var errTokens error
+
+				//  START fetchFromDB
+				    var errdb error
+				    var db *sql.DB
+				    // Create connection string
+					connString := fmt.Sprintf("host=%s dbname=%s user=%s password=%s port=%d sslmode=disable",
+//						DB_SERVER,DB_NAME, DB_USER, DB_PASSWORD, DB_PORT)
+						Config_DB_server,Config_DB_name, Config_DB_user, Config_DB_pass, Config_DB_port)
+				
+				
+
+					 // Create connection pool
+					db, errdb = sql.Open("postgres", connString)
+					if errdb != nil {
+						utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
+						errorGeneral=errdb.Error()
+					}
+					// Close the database connection pool after program executes
+					 defer db.Close()
+					if errdb == nil {
+                        utilito.LevelLog(Config_env_log, "3", "Connected!\n")
+				
+					
+						errPing := db.Ping()
+						if errPing != nil {
+                            utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
+							  errorGeneral=errPing.Error()
+						}else{
+					         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
+					         resultTokens,errTokens =modelito.GetCardsByCustomer(db,inputParam)
+
+
+					         				utilito.LevelLog(Config_env_log, "3", "regresa func  logicDBGetTokensByCustRef ok!\n")
+							if errTokens != nil {
+							  utilito.LevelLog(Config_env_log, "3", "Error: :"+ errTokens.Error())
+							  errorGeneral=errTokens.Error()
+							}
+							var cuantos int
+							cuantos = 0
+				         	for _, d := range resultTokens {
+				         		utilito.LevelLog(Config_env_log, "3", "el registor trae:"+d.Token+" "+d.Type)
+							    cuantos =1
+			         		}
+							if cuantos == 0 {
+							  utilito.LevelLog(Config_env_log, "3", "DB: records not found")
+							  errorGeneral="Not payments found for the token received"
+							}		
+
+					    }
+				
+				
+					}
+				    
+				//  END fetchFromDB
+   
+   //END
+   	  return  resultTokens, errorGeneral
+   }

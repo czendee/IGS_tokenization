@@ -370,6 +370,7 @@ func obtainParmsProcessDownloadTokeniza(r *http.Request, errorGeneral string) (s
    	return lineaDatos,errorGeneral
 } //end obtainParmsProcessDownloadTokeniza
 
+
 func obtainParmsConsultarTokens(r *http.Request, errorGeneral string) (string, string){
     
     log.Print("Entra a obtainParmsConsultarTokens GET")
@@ -397,30 +398,8 @@ func obtainParmsConsultarTokens(r *http.Request, errorGeneral string) (string, s
     utilito.LevelLog(Config_env_log, "3", "Respuesta ConsultarToken GET:")
     utilito.LevelLog(Config_env_log, "3", micadenita)
 
-/*
-    cadenalimpia :=  strings.Replace(micadenita, "{", "", -1)
-
-    for _, linea := range strings.Split(strings.TrimSuffix(cadenalimpia, "}"), "}"){
-        utilito.LevelLog(Config_env_log, "3", "linea")
-            
-        linealimpia :=  strings.Replace(linea, " ", "", -1)
-            
-        utilito.LevelLog(Config_env_log, "3", linealimpia)
-
-        for _, campo := range strings.Split(strings.TrimSuffix(linealimpia, ","), ","){
-            utilito.LevelLog(Config_env_log, "3", "Campo")
-            utilito.LevelLog(Config_env_log, "3", campo)
-            dato := strings.Split(campo, ":")
-            lineaDatos = lineaDatos + dato[1] +","
-        } // end for campo
-
-        lineaDatos = lineaDatos +"\r\n"
-        utilito.LevelLog(Config_env_log, "3", lineaDatos)
-    } //end for linea
-
-  */     
     //END
-   	 lineaDatos= "ESTO LLEGO: "+micadenita
+   	 lineaDatos= micadenita
 
    	return lineaDatos,errorGeneral
 } //end obtainParmsConsultarTokens
@@ -473,8 +452,9 @@ func obtainParmsConsultarHistPagoTokens(r *http.Request, errorGeneral string) (s
     } //end for linea
     
   */
-   	 lineaDatos= "ESTO LLEGO: "+micadenita
-     
+
+//   	 lineaDatos= "ESTO LLEGO: "+micadenita
+       lineaDatos= micadenita     
     //END
    	 
    	return lineaDatos,errorGeneral

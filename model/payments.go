@@ -140,3 +140,38 @@ func GetPaymentsCardsByCustomer(db *sql.DB, customer_reference string) ([]Card, 
     log.Print("GetCardsByCustomer 04!\n")
     return cards, nil
 }
+
+
+func GetRecordsOfTodayPaymentsByTokenCard(db *sql.DB, eltoken string ) ([]Payment, error) {
+     	log.Print("procesando GetTodayPaymentsByTokenCard")
+
+        statement := fmt.Sprintf("SELECT token,created_at,amount FROM banwirepayment WHERE token='%s' ",eltoken)
+        
+log.Print("procesando GetTodayPaymentsByTokenCard"+"SELECT token,created_at,amount FROM banwirepayment WHERE token='%s' ",eltoken)
+
+    rows, err := db.Query(statement)
+    log.Print("GetTodayPaymentsByTokenCard 02.1!\n")
+    if err != nil {
+        return nil, err
+    }
+    log.Print("GetTodayPaymentsByTokenCard 02.5!\n")
+    defer rows.Close()
+    dailypayments := []Payment{}
+    for rows.Next() {
+    	 log.Print("GetTodayPaymentsByTokenCard 03!\n")
+        var u Payment
+        if err := rows.Scan( &u.Token,&u.Created_at,&u.Amount); err != nil {
+
+        	log.Print("GetTodayPaymentsByTokenCard err!\n"+err.Error())
+            return nil, err
+        }
+    	 log.Print("GetTodayPaymentsByTokenCard 03.5!\n")
+        dailypayments = append(dailypayments, u)
+    }
+    log.Print("GetTodayPaymentsByTokenCard 04!\n")
+    return dailypayments, nil
+
+  //   }else{
+  //       return errorGeneral
+  //   }
+}

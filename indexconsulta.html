@@ -207,7 +207,7 @@
                                   boton2.disabled = false;
                                   document.getElementById("datos").innerHTML = ':)';
                                    console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message_file;
+                                   var statusMssg =response.data.status_message;
 
                                    var resultados =response.data.data_row;
 
@@ -268,6 +268,7 @@
                         
                         var a="/v1/consultarhistorialtokens";
                         
+                        document.getElementById("datosresultados").innerHTML = '<center> Consultando ...</center>';                         
 
                         var filetextarea = $scope.token;
                         /*
@@ -298,53 +299,51 @@
                                   boton2.disabled = false;
                                   document.getElementById("datos").innerHTML = ':)';
 
+
                                    console.log(JSON.stringify(response.data) );
                                    //$scope.respuesta =  response.data;
                                    //$scope.files = [];       
-                                   var statusMssg =response.data.status_message_file;
+                                   var statusMssg =response.data.status_message;
 
                                    var resultados =response.data.data_row;
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.respuesta = statusMssg;
+                                        document.getElementById("datosresultados").innerHTML = '<center>'+statusMssg+' </center>'; 
 
                                    }else{
                                         $scope.respuesta = statusMssg;
+                                    var tableResultados ="NADA";
+                                    var tableResultadosEnd =" ";
+                                    if(resultados.length>0){
+                                        tableResultados ="<table border='1'> ";
+                                        tableResultadosEnd ="</table> ";
+                                    }
+                                    for(var i = 0; i < resultados.length; i++) {
+                                            var obj = resultados[i];
+
+                                            console.log(obj.line);
+                                            console.log(obj.status_message);
+                                            console.log(obj.payment_token);
+                                            console.log(obj.payment_date);
+                                            console.log(obj.payment_amount);
+                                            tableResultados =tableResultados+"<tr> ";
+                                            tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
+                                            tableResultados =tableResultados+"<td>"+obj.payment_token+"</td> ";
+                                            tableResultados =tableResultados+"<td>"+obj.payment_date+"</td> ";
+                                            tableResultados =tableResultados+"<td>"+obj.payment_amount+"</td> ";
+                                            tableResultados =tableResultados+"</tr> ";
+    
+
+                                        }
+                                        if(tableResultados !="NADA"){
+                                            document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
+                                        }else{
+                                            document.getElementById("datosresultados").innerHTML = '<center> No exiten pagos para ese token</center>'; 
+                                        }
                                         
                                    }
-                                   var tableResultados ="NADA";
-                                   var tableResultadosEnd =" ";
-                                   if(resultados.length>0){
-                                       tableResultados ="<table border='1'> ";
-                                       tableResultadosEnd ="</table> ";
-                                   }
-                                   for(var i = 0; i < resultados.length; i++) {
-                                        var obj = resultados[i];
 
-                                        console.log(obj.line);
-                                        console.log(obj.status_message);
-                                        console.log(obj.card_token);
-                                        console.log(obj.paymentreference);
-                                        console.log(obj.authcode);
-                                        console.log(obj.idtransaction);
-                                        console.log(obj.card_brand);
-                                        console.log(obj.card_bin);
-                                        console.log(obj.type_card);
-                                        tableResultados =tableResultados+"<tr> ";
-                                        tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_token+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.paymentreference+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.authcode+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.idtransaction+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_bin+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_score+"</td> ";
-                                        tableResultados =tableResultados+"</tr> ";
- 
-
-                                    }
-                                    if(tableResultados !="NADA"){
-                                        document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
-                                    }
 
                                  },
 
@@ -352,6 +351,8 @@
                                .catch(function (data) {
                                    // Handle error here
                                    $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                   document.getElementById("datosresultados").innerHTML = '<center>'+ data.status+'  : '+data.statusText+' </center>'; 
+
                                   // $scope.files = [];
                                });
                         }
