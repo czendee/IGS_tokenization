@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="utf-8">
     <title>Youtochi-Banwire File Tokenizer and Pay</title>
     <link rel="shortcut icon" type="image/x-icon" href="img/logo_purple.png"/>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
@@ -14,7 +15,23 @@
     <link rel="stylesheet" type="text/css" href="/ngToast.min.css">
     <link rel="stylesheet" type="text/css" href="/ui-bootstrap-csp.css">
     <link rel="stylesheet" type="text/css" href="/app.min.css">
+
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/slick.css" rel="stylesheet">
+    <link href="/css/responsive.css" rel="stylesheet">
+    
+    <link rel="stylesheet" type="text/css" href="/ngToast.min.css">
+    <link rel="stylesheet" type="text/css" href="/ui-bootstrap-csp.css">
+    <link rel="stylesheet" type="text/css" href="/app.min.css">
+
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+
 </head>
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
   <style type="text/css">
     #gmapsmio {
@@ -38,7 +55,7 @@
 }
 .file-description {
      vertical-align: text-top;
-     width: 250px;
+     width: 50px;
 }
 .image-container {
       width:  250px;
@@ -64,6 +81,274 @@
 <script type="text/javascript" src="/angular.min.js"></script>
 <!-- Drag and drop -->
 
+<div class="page-wrapper">
+ 	
+    
+    <div class="preloader"></div>
+ 	
+    
+    <header class="main-header header-style-two">
+    	
+    	
+        <div class="header-upper">
+        	<div class="auto-container">
+            	<div class="clearfix">
+                	
+                	<div class="pull-left logo-box">
+<!--                    	<div class="logo"><a href="index.html"><img src="/images/logo-white.png" style="width: 200px;height: 50px;" alt="" title=""></a></div>
+-->
+                    </div>
+                   	
+                   	
+			
+                   	<div class="nav-outer clearfix">
+                    
+						
+						<nav class="main-menu navbar-expand-md">
+							<div class="navbar-header">
+								<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+								</button>
+							</div>
+
+							<div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
+								<ul class="navigation clearfix">
+							        <li ><a href="/v1/index">Tokenizacion</a></li>
+									<li class="current"><a href="/v1/indexpay">Pagos</a></li>
+									<li><a href="/v1/indexconsulta">Consulta</a></li>
+									<li ><a href="/v1/indexconsultafiles">Consulta Files</a></li>								</ul>
+							</div>
+							
+						</nav>
+						
+			
+						
+				
+					</div>
+                   
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="sticky-header">
+        	<div class="auto-container clearfix">
+            	
+            	<div class="logo pull-left">
+<!--                	<a href="index.html" class="img-responsive"><img src="/images/logo-color.png"  style="width: 200px;height: 50px;" alt="" title=""></a>
+-->
+                </div>
+                
+                
+                <div class="right-col pull-right">
+                	
+                    <nav class="main-menu navbar-expand-md">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent1" aria-controls="navbarSupportedContent1" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        
+                        <div class="navbar-collapse collapse clearfix" id="navbarSupportedContent1">
+                            	<ul class="navigation clearfix">
+							        <li ><a href="/v1/index">Tokenizacion</a></li>
+									<li class="current"><a href="/v1/indexpay">Pagos</a></li>
+									<li><a href="/v1/indexconsulta">Consulta</a></li>
+									<li><a href="/v1/indexconsultafiles">Consulta Files</a></li>
+									
+
+								</ul>
+                        </div>
+                    </nav>
+                </div>
+                
+            </div>
+        </div>
+        
+    
+    </header>
+    
+
+	
+
+	<section class="contact-section" id="contact">
+		<div class="auto-container">
+			<div class="row clearfix">
+
+<div ng-app="module" ng-controller="myCtrl" style="margin-top:10px;margin-left:10px;">				
+				
+				<div class="form-column col-lg-12 col-md-12 col-sm-12">
+					<div class="inner-column">
+<!--						<h2>Consulta Archivos</h2>  -->
+<!--						<div class="title">¡Sus datos!</div>-->
+						
+                        <div class="contact-form ">
+                            
+                            <form method="post" >
+                                <div>
+                                        <span> Archivo contiene tokens para pagar: </span>
+                                </div>
+
+                                <div class ="file-drop-zone" file-dropzone files-to-upload ="files">
+                                    <span> Drag and Drop tu archivo aqui </span>
+
+                                </div>
+
+                                <div>
+                                    <div ng-repeat="file in files"> <span ng-click="remove($index)">x</span>
+
+                                        <div> Name : {{file.name}} </div>
+                                        <div> Size : {{file.size / 1024 | number:2}} KB </div>
+                                        
+                                    </div>
+                                </div>
+<!--                                <div>
+                                    <span >DComentarios: </span>                                   
+                    
+                                </div> 
+                                <div >
+                                    <textarea class="textarea" ng-model="description" rows="2" cols="20"></textarea >
+                                        
+                    
+                                </div> 
+-->
+                                <div>
+                                    <button class="theme-btn message-btn" id="boton1" ng-click="validate()">Validar</button>
+                                    <button class="theme-btn message-btn" id="boton2" ng-click="aplica_pago()">Aplicar Pagos</button>
+                                        
+                    
+                                </div>
+                                <div id='datos'> 
+                                    </div>
+                                <div>
+                                    <span>Respuesta Validacion: </span>
+                                </div> 
+                                <div>
+                                        <textarea class="textarea" rows="2" cols="100" ng-model="respuesta" disabled></textarea >
+                    
+                                </div> 
+                                <div>
+                                    <button class="btn btn-primary" id="boton3" ng-click="downloadValida();">Descargar validacion</button>
+
+                                </div>
+                                <div>
+                                    <span>Status Validacion: </span>
+                                        
+                                </div> 
+                                <div>
+                                        <textarea class="textarea" ng-model="status" disabled></textarea >
+                                </div> 
+
+                                <div>
+                                    <span>Respuesta Pagos: </span>
+                                </div> 
+                                <div>
+                                        <textarea class="textarea" rows="2" cols="50" ng-model="respuestaPayment" disabled></textarea >
+                    
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary" id="boton4" ng-click="downloadPagos()">Descargar Pagos</button>
+                                    
+                                </div> 
+
+                                <div>
+                                    <span>Cantidad de Pagos: </span>
+                                </div> 
+                                <div>
+                                        <textarea class="textarea" ng-model="numpayments" disabled></textarea >
+                    
+                                </div> 
+
+                                <div>
+                                    <span>Status Pagos: </span>
+                                        
+                                </div> 
+                                <div>
+                                        <textarea class="textarea" ng-model="statuspayment" disabled></textarea >
+                                </div> 
+                                
+<!--                                
+								<div class="form-group">
+									<input type="text" name="username" ng-model="username" placeholder="Nombre" required>
+								</div>
+
+								<div class="form-group">
+									<input type="email" name="email" ng-model="email" placeholder="Correo" required>
+								</div>
+
+					
+
+								<div class="form-group">
+									<input type="text" name="subject" placeholder="Tema" required>
+								</div>
+
+								<div class="form-group">
+									<textarea name="message" ng-model="message" placeholder="Mensaje"></textarea>
+								</div>
+
+								<div class="form-group">
+									<button class="theme-btn message-btn" type="submit" name="submit-form">Enviar</button>
+								</div>
+                                <div class="form-group">
+                                    <button class="theme-btn message-btn" ng-click="descargar()">Descargar</button>
+                                    
+                                </div> 
+    -->
+                            </form>
+    
+                        </div>
+                    	
+                        	</div> 
+
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</section>	
+	
+
+	
+    <footer class="main-footer">
+    	
+		
+        <div class="footer-bottom">
+        	<div class="auto-container">
+            	<div class="row clearfix">
+                	<div class="column col-md-6 col-sm-12 col-xs-12">
+                    	<div class="copyright">Copyrights &copy; 2019 Banwire Pagos con Archivo. Todos los derechos reservados. </div>
+                    </div>
+                    <div class="column col-md-6 col-sm-12 col-xs-12">
+                    	<ul class="footer-nav">
+                        	<li><a href="#">Política de privacidad</a></li>
+                            <li><a href="#">Términos y Condiciones</a></li>
+              
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</footer>
+	
+	
+</div>
+<div class="scroll-to-top scroll-to-target" data-target="html"><span class="fa fa-angle-double-up"></span></div>
+
+<script src="/js/jquery.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.mCustomScrollbar.concat.min.js"></script>
+<script src="/js/jquery.fancybox.js"></script>
+<script src="/js/appear.js"></script>
+<script src="/js/owl.js"></script>
+<script src="/js/wow.js"></script>
+<script src="/js/jquery-ui.js"></script>
+<script src="/js/script.js"></script>
+
+
               <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
                      <span > BANWIRE: Herramienta de Tokenizacion y Pagos por Archivos </span>
                      <a href="/v1/index">
@@ -79,7 +364,7 @@
                      <button class="btn btn-primary" id="botonFtitle">Consulta Files</button>
                      </a>
               </div >
-
+<!--
 <div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:100px;">
               <div>
                      <span> Archivo contine tokens para pagar: </span>
@@ -163,7 +448,7 @@
                      <textarea class="textarea" ng-model="statuspayment"></textarea >
               </div> 
 </div>
-
+-->
 
 <script type="text/javascript">
 
@@ -189,7 +474,7 @@ function esconde() {
             var module = angular.module('module',[]);
             module.controller('myCtrl',function($scope,$http){
                 $scope.files = [];
-                $scope.description='';
+//                $scope.description='';
                 $scope.remove = function(index){
                      var files = [];
                      angular.forEach($scope.files, function(file,key){
@@ -208,7 +493,7 @@ function esconde() {
                              fd.append(fileObject,file.file);
                         });
                         //now add other data to fd
-                        fd.append('description',$scope.description);
+//                        fd.append('description',$scope.description);
                         
                         $scope.respuesta = " "
                         $scope.respuestaPayment = " "
@@ -229,7 +514,7 @@ function esconde() {
                                boton3.disabled = true;
                                boton4.disabled = true;
                                document.getElementById("datos").innerHTML = '<center> <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></center>';
-                               setTimeout(function(){ alert('hola'); }, 10000);
+                               setTimeout(function(){ var t=1; }, 10000);
                                request.then(
                                  function(response){
                                    console.log(JSON.stringify(response.data) );
@@ -281,7 +566,7 @@ function esconde() {
                              fd.append(fileObject,file.file);
                         });
                         //now add other data to fd
-                        fd.append('description',$scope.description);
+//                        fd.append('description',$scope.description);
                         
                         $scope.respuesta = " "
                         $scope.respuestaPayment = " "

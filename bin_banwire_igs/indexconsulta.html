@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="utf-8">
     <title>Youtochi-Banwire File Tokenizer and Pay</title>
     <link rel="shortcut icon" type="image/x-icon" href="img/logo_purple.png"/>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
@@ -14,6 +15,24 @@
     <link rel="stylesheet" type="text/css" href="/ngToast.min.css">
     <link rel="stylesheet" type="text/css" href="/ui-bootstrap-csp.css">
     <link rel="stylesheet" type="text/css" href="/app.min.css">
+
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/slick.css" rel="stylesheet">
+    <link href="/css/responsive.css" rel="stylesheet">
+    
+    <link rel="stylesheet" type="text/css" href="/ngToast.min.css">
+    <link rel="stylesheet" type="text/css" href="/ui-bootstrap-csp.css">
+    <link rel="stylesheet" type="text/css" href="/app.min.css">
+
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+
 </head>
 
   <style type="text/css">
@@ -62,15 +81,257 @@
      text-align: left;
 }
   </style>
+
 <body >
 <script type="text/javascript" src="/angular.min.js"></script>
 <!-- Drag and drop -->
+<div class="page-wrapper">
+ 	
+    
+    <div class="preloader"></div>
+ 	
+    
+    <header class="main-header header-style-two">
+    	
+    	
+        <div class="header-upper">
+        	<div class="auto-container">
+            	<div class="clearfix">
+                	
+                	<div class="pull-left logo-box">
+<!--                    	<div class="logo"><a href="index.html"><img src="/images/logo-white.png" style="width: 200px;height: 50px;" alt="" title=""></a></div>
+-->
+                    </div>
+                   	
+                   	
+			
+                   	<div class="nav-outer clearfix">
+                    
+						
+						<nav class="main-menu navbar-expand-md">
+							<div class="navbar-header">
+								<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+								</button>
+							</div>
+
+							<div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
+								<ul class="navigation clearfix">
+							        <li ><a href="/v1/index">Tokenizacion</a></li>
+									<li ><a href="/v1/indexpay">Pagos</a></li>
+									<li class="current"><a href="/v1/indexconsulta">Consulta</a></li>
+									<li><a href="/v1/indexconsultafiles">Consulta Files</a></li>								</ul>
+							</div>
+							
+						</nav>
+						
+			
+						
+				
+					</div>
+                   
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="sticky-header">
+        	<div class="auto-container clearfix">
+            	
+            	<div class="logo pull-left">
+<!--                	<a href="index.html" class="img-responsive"><img src="/images/logo-color.png"  style="width: 200px;height: 50px;" alt="" title=""></a>
+-->
+                </div>
+                
+                
+                <div class="right-col pull-right">
+                	
+                    <nav class="main-menu navbar-expand-md">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent1" aria-controls="navbarSupportedContent1" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        
+                        <div class="navbar-collapse collapse clearfix" id="navbarSupportedContent1">
+                            	<ul class="navigation clearfix">
+							        <li ><a href="/v1/index">Tokenizacion</a></li>
+									<li ><a href="/v1/indexpay">Pagos</a></li>
+									<li class="current"><a href="/v1/indexconsulta">Consulta</a></li>
+									<li><a href="/v1/indexconsultafiles">Consulta Files</a></li>
+									
+
+								</ul>
+                        </div>
+                    </nav>
+                </div>
+                
+            </div>
+        </div>
+        
+    
+    </header>
+    
+
+	
+
+	<section class="contact-section" id="contact">
+		<div class="auto-container">
+			<div class="row clearfix">
+				
+				<br>
+				<div class="info-column col-lg-6 col-md-12 col-sm-12">
+					<div class="inner-column wow fadeInUp" data-wow-delay="0ms" data-wow-duration="1500ms"  style="    margin-top: 100px;">
+						<div class="content-box">
+							<h2>Resultados</h2>
+
+                                        <div id='datosresultados'> 
+                                        </div>                            
+
+						</div>
+					</div>
+				</div>
+
+
+<div ng-app="module" ng-controller="myCtrl" style="margin-top:50px;margin-left:50px;">				
+				
+				<div class="form-column col-lg-8 col-md-12 col-sm-12">
+					<div class="inner-column">
+<!--						<h2>Consulta Archivos</h2>  -->
+<!--						<div class="title">¡Sus datos!</div>-->
+						
+                        <div class="contact-form ">
+                            
+                            <form method="post" >
+              <div>
+                   <span >Client Reference: </span>
+                    
+              </div> 
+              <div >
+                  <textarea class="textarea" ng-model="clientreference"></textarea >
+                   
+   
+              </div> 
+              <div>
+                   
+                   <button class="theme-btn message-btn" id="boton1" ng-click="consultok()">Consultar Tokens</button> 
+                    
+   
+              </div> 
+              <div>
+                   <span >Token: </span>
+                    
+   
+              </div> 
+              <div >
+                  <textarea class="textarea" ng-model="token"></textarea >
+                    
+   
+              </div> 
+
+              <div>
+                   
+                   <button class="theme-btn message-btn" id="boton2" ng-click="consulhist()">Consultar Historial Pagos del Token</button>
+                    
+   
+              </div>
+
+              <div id='datos'> 
+                  </div>
+
+
+                                    <div>
+                                        <span>Respuesta: </span>
+                                    </div> 
+                                    <div>
+                                            <textarea class="textarea" ng-model="respuesta" disabled></textarea >
+                        
+                                    </div> 
+                                
+<!--                                
+								<div class="form-group">
+									<input type="text" name="username" ng-model="username" placeholder="Nombre" required>
+								</div>
+
+								<div class="form-group">
+									<input type="email" name="email" ng-model="email" placeholder="Correo" required>
+								</div>
+
+					
+
+								<div class="form-group">
+									<input type="text" name="subject" placeholder="Tema" required>
+								</div>
+
+								<div class="form-group">
+									<textarea name="message" ng-model="message" placeholder="Mensaje"></textarea>
+								</div>
+
+								<div class="form-group">
+									<button class="theme-btn message-btn" type="submit" name="submit-form">Enviar</button>
+								</div>
+                                <div class="form-group">
+                                    <button class="theme-btn message-btn" ng-click="descargar()">Descargar</button>
+                                    
+                                </div> 
+    -->
+                            </form>
+    
+                        </div>
+                    	
+                        	</div> 
+
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</section>	
+	
+
+	
+    <footer class="main-footer">
+    	
+		
+        <div class="footer-bottom">
+        	<div class="auto-container">
+            	<div class="row clearfix">
+                	<div class="column col-md-6 col-sm-12 col-xs-12">
+                    	<div class="copyright">Copyrights &copy; 2019 Banwire Pagos con Archivo. Todos los derechos reservados. </div>
+                    </div>
+                    <div class="column col-md-6 col-sm-12 col-xs-12">
+                    	<ul class="footer-nav">
+                        	<li><a href="#">Política de privacidad</a></li>
+                            <li><a href="#">Términos y Condiciones</a></li>
+              
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</footer>
+	
+	
+</div>
+<div class="scroll-to-top scroll-to-target" data-target="html"><span class="fa fa-angle-double-up"></span></div>
+
+<script src="/js/jquery.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.mCustomScrollbar.concat.min.js"></script>
+<script src="/js/jquery.fancybox.js"></script>
+<script src="/js/appear.js"></script>
+<script src="/js/owl.js"></script>
+<script src="/js/wow.js"></script>
+<script src="/js/jquery-ui.js"></script>
+<script src="/js/script.js"></script>
+
 
               <div class="headerBanwire"  style="margin-top:50px;margin-left:50px;">
                      <span > BANWIRE: Herramienta de Tokenizacion y Pagos por Archivos </span>
-                     <a href="/v1/index">
-                        <button class="btn btn-primary" id="botonTtitle">Tokenizacion</button>
-                     </a>
                      <a href="/v1/indexpay">
                      <button class="btn btn-primary" id="botonPtitle">Pagos</button>
                      </a>
@@ -88,65 +349,6 @@
                    <span >Client Reference: </span>
                     
               </div> 
-              <div >
-                  <textarea class="textarea" ng-model="clientreference"></textarea >
-                   
-   
-              </div> 
-              <div>
-                   
-                   <button class="btn btn-primary" id="boton1" ng-click="consultok()">Consultar Tokens</button> 
-                    
-   
-              </div> 
-              <div>
-                   <span >Token: </span>
-                    
-   
-              </div> 
-              <div >
-                  <textarea class="textarea" ng-model="token"></textarea >
-                    
-   
-              </div> 
-
-              <div>
-                   
-                   <button class="btn btn-primary" id="boton2" ng-click="consulhist()">Consultar Historial Pagos del Token</button>
-                    
-   
-              </div>
-
-              <div id='datos'> 
-                  </div>
-
-                  <div id='datosresultados'> 
-                  </div>
-
-              <div>
-                   <span>Respuesta: </span>
-              </div> 
-              <div>
-                    <textarea class="textarea" ng-model="respuesta"></textarea >
-   
-              </div> 
-<!--              
-              <div>
-                   <span>Cantidad de Pagos: </span>
-              </div> 
-              <div>
-                    <textarea class="textarea" ng-model="numtokenizadas"></textarea >
-   
-              </div> 
-
-              <div>
-                   <span>Status: </span>
-                    
-              </div> 
-              <div>
-                     <textarea class="textarea" ng-model="status"></textarea >
-              </div> 
--->              
 </div>
 
 
@@ -207,50 +409,54 @@
                                   boton2.disabled = false;
                                   document.getElementById("datos").innerHTML = ':)';
                                    console.log(JSON.stringify(response.data) );
-                                   var statusMssg =response.data.status_message_file;
+                                   var statusMssg =response.data.status_message;
 
                                    var resultados =response.data.data_row;
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.respuesta = statusMssg;
-
+                                        document.getElementById("datosresultados").innerHTML = '<center>'+statusMssg+' </center>'; 
                                    }else{
                                         $scope.respuesta = statusMssg;
+                                        var tableResultados ="NADA";
+                                        var tableResultadosEnd =" ";
+                                        if(resultados.length>0){
+                                            tableResultados ="<table border='1'> ";
+                                            tableResultadosEnd ="</table> ";
+                                        }
+                                        for(var i = 0; i < resultados.length; i++) {
+                                                var obj = resultados[i];
+
+                                                console.log(obj.line);
+                                                console.log(obj.status_message);
+                                                console.log(obj.card_token);
+                                                console.log(obj.card_last);
+                                                console.log(obj.card_brand);
+                                                console.log(obj.card_exp);
+                                                console.log(obj.card_bin);
+                                                console.log(obj.card_score);
+                                                console.log(obj.type_card);
+                                                tableResultados =tableResultados+"<tr> ";
+                                                tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
+                                                tableResultados =tableResultados+"<td>"+obj.card_token+"</td> ";
+                                                tableResultados =tableResultados+"<td>"+obj.card_last+"</td> ";
+                                                tableResultados =tableResultados+"<td>"+obj.card_brand+"</td> ";
+                                                tableResultados =tableResultados+"<td>"+obj.card_exp+"</td> ";
+                                                tableResultados =tableResultados+"<td>"+obj.card_bin+"</td> ";
+                                                tableResultados =tableResultados+"<td>"+obj.card_score+"</td> ";
+                                                tableResultados =tableResultados+"</tr> ";
+        
+
+                                            }
+                                            if(tableResultados !="NADA"){
+                                                document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
+                                            }else{
+                                                document.getElementById("datosresultados").innerHTML = '<center> No exiten pagos para ese token</center>'; 
+                                            }    
+                                        
+
                                         
                                    }
-                                   var tableResultados ="NADA";
-                                   var tableResultadosEnd =" ";
-                                   if(resultados.length>0){
-                                       tableResultados ="<table border='1'> ";
-                                       tableResultadosEnd ="</table> ";
-                                   }
-                                   for(var i = 0; i < resultados.length; i++) {
-                                        var obj = resultados[i];
-
-                                        console.log(obj.line);
-                                        console.log(obj.status_message);
-                                        console.log(obj.card_token);
-                                        console.log(obj.card_last);
-                                        console.log(obj.card_brand);
-                                        console.log(obj.card_exp);
-                                        console.log(obj.card_bin);
-                                        console.log(obj.card_score);
-                                        console.log(obj.type_card);
-                                        tableResultados =tableResultados+"<tr> ";
-                                        tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_token+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_last+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_brand+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_exp+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_bin+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_score+"</td> ";
-                                        tableResultados =tableResultados+"</tr> ";
- 
-
-                                    }
-                                    if(tableResultados !="NADA"){
-                                        document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
-                                    }
                                    
                                  },
 
@@ -258,6 +464,7 @@
                                .catch(function (data) {
                                    // Handle error here
                                    $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                   document.getElementById("datosresultados").innerHTML = '<center>'+ data.status+'  : '+data.statusText+' </center>'; 
                                   // $scope.files = [];
                                });
                         }
@@ -268,6 +475,7 @@
                         
                         var a="/v1/consultarhistorialtokens";
                         
+                        document.getElementById("datosresultados").innerHTML = '<center> Consultando ...</center>';                         
 
                         var filetextarea = $scope.token;
                         /*
@@ -298,53 +506,51 @@
                                   boton2.disabled = false;
                                   document.getElementById("datos").innerHTML = ':)';
 
+
                                    console.log(JSON.stringify(response.data) );
                                    //$scope.respuesta =  response.data;
                                    //$scope.files = [];       
-                                   var statusMssg =response.data.status_message_file;
+                                   var statusMssg =response.data.status_message;
 
                                    var resultados =response.data.data_row;
 
                                    if(statusMssg.indexOf("ERROR")>= 0 ){
                                         $scope.respuesta = statusMssg;
+                                        document.getElementById("datosresultados").innerHTML = '<center>'+statusMssg+' </center>'; 
 
                                    }else{
                                         $scope.respuesta = statusMssg;
+                                    var tableResultados ="NADA";
+                                    var tableResultadosEnd =" ";
+                                    if(resultados.length>0){
+                                        tableResultados ="<table border='1'> ";
+                                        tableResultadosEnd ="</table> ";
+                                    }
+                                    for(var i = 0; i < resultados.length; i++) {
+                                            var obj = resultados[i];
+
+                                            console.log(obj.line);
+                                            console.log(obj.status_message);
+                                            console.log(obj.payment_token);
+                                            console.log(obj.payment_date);
+                                            console.log(obj.payment_amount);
+                                            tableResultados =tableResultados+"<tr> ";
+                                            tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
+                                            tableResultados =tableResultados+"<td>"+obj.payment_token+"</td> ";
+                                            tableResultados =tableResultados+"<td>"+obj.payment_date+"</td> ";
+                                            tableResultados =tableResultados+"<td>"+obj.payment_amount+"</td> ";
+                                            tableResultados =tableResultados+"</tr> ";
+    
+
+                                        }
+                                        if(tableResultados !="NADA"){
+                                            document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
+                                        }else{
+                                            document.getElementById("datosresultados").innerHTML = '<center> No exiten pagos para ese token</center>'; 
+                                        }
                                         
                                    }
-                                   var tableResultados ="NADA";
-                                   var tableResultadosEnd =" ";
-                                   if(resultados.length>0){
-                                       tableResultados ="<table border='1'> ";
-                                       tableResultadosEnd ="</table> ";
-                                   }
-                                   for(var i = 0; i < resultados.length; i++) {
-                                        var obj = resultados[i];
 
-                                        console.log(obj.line);
-                                        console.log(obj.status_message);
-                                        console.log(obj.card_token);
-                                        console.log(obj.paymentreference);
-                                        console.log(obj.authcode);
-                                        console.log(obj.idtransaction);
-                                        console.log(obj.card_brand);
-                                        console.log(obj.card_bin);
-                                        console.log(obj.type_card);
-                                        tableResultados =tableResultados+"<tr> ";
-                                        tableResultados =tableResultados+"<td>"+obj.line+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_token+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.paymentreference+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.authcode+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.idtransaction+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_bin+"</td> ";
-                                        tableResultados =tableResultados+"<td>"+obj.card_score+"</td> ";
-                                        tableResultados =tableResultados+"</tr> ";
- 
-
-                                    }
-                                    if(tableResultados !="NADA"){
-                                        document.getElementById("datosresultados").innerHTML = '<center> '+tableResultados+tableResultadosEnd+'</center>';                                        
-                                    }
 
                                  },
 
@@ -352,6 +558,8 @@
                                .catch(function (data) {
                                    // Handle error here
                                    $scope.status =  data.config.url +" "+ data.status +" "+ data.statusText;
+                                   document.getElementById("datosresultados").innerHTML = '<center>'+ data.status+'  : '+data.statusText+' </center>'; 
+
                                   // $scope.files = [];
                                });
                         }

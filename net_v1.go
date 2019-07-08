@@ -80,6 +80,51 @@ func init() {
 	//r.Handle("/v1/processpayment", netHandle(v4handleDBPostProcesspayment, nil)).Methods("POST")           //in this net_v1.go    	   
 	//r.Handle("/v1/generatetokenized", netHandle(handleDBPostGeneratetokenized, nil)).Methods("POST")     //in this net_v1.go
 
+
+//  new design
+
+        r.Handle("/css/style.css", netHandle(styleCss01, nil)).Methods("GET")     
+        r.Handle("/css/slick.css", netHandle(styleCss02, nil)).Methods("GET")     
+        r.Handle("/css/responsive.css", netHandle(styleCss03, nil)).Methods("GET")
+        r.Handle("/css/bootstrap.css", netHandle(styleCss04, nil)).Methods("GET")
+        r.Handle("/css/flaticon.css", netHandle(styleCss05, nil)).Methods("GET")
+        r.Handle("/css/owl.css", netHandle(styleCss06, nil)).Methods("GET")
+        r.Handle("/css/jquery.fancybox.min.css", netHandle(styleCss07, nil)).Methods("GET")
+        r.Handle("/css/animate.css", netHandle(styleCss08, nil)).Methods("GET")
+        r.Handle("/css/font-awesome.css", netHandle(styleCss09, nil)).Methods("GET")
+        r.Handle("/css/jquery.mCustomScrollbar.min.css", netHandle(styleCss10, nil)).Methods("GET")
+        r.Handle("/css/jquery-ui.css", netHandle(styleCss11, nil)).Methods("GET")
+        r.Handle("/ngToast.min.css", netHandle(serveCss05, nil)).Methods("GET")
+        r.Handle("/ui-bootstrap-csp.css", netHandle(serveCss07, nil)).Methods("GET")
+        r.Handle("/app.min.css", netHandle(serveCss01, nil)).Methods("GET")
+        
+        r.Handle("/images/favicon.png", netHandle(images01, nil)).Methods("GET")     
+        r.Handle("/images/logo-white.png", netHandle(images02, nil)).Methods("GET")             
+        r.Handle("/images/logo-color.png", netHandle(images03, nil)).Methods("GET")             
+        r.Handle("/images/second.png", netHandle(images04, nil)).Methods("GET")             
+        r.Handle("/images/comunidades.png", netHandle(images05, nil)).Methods("GET")
+        r.Handle("/images/main.jpg", netHandle(images06, nil)).Methods("GET")
+        r.Handle("/images/slider-alumnos-1.jpg", netHandle(images07, nil)).Methods("GET")
+        r.Handle("/images/school.svg", netHandle(images08, nil)).Methods("GET")
+        r.Handle("/images/bus.svg", netHandle(images09, nil)).Methods("GET")
+        r.Handle("/images/rocket.svg", netHandle(images10, nil)).Methods("GET")
+        r.Handle("/images/collaborate.svg", netHandle(images11, nil)).Methods("GET")
+        r.Handle("/images/teach.svg", netHandle(images12, nil)).Methods("GET")
+        r.Handle("/images/boss.svg", netHandle(images13, nil)).Methods("GET")
+        //r.Handle("/images/icons/preloader.svg", netHandle(images14, nil)).Methods("GET")
+        //r.Handle("/images/background/pattern-2.png", netHandle(images15, nil)).Methods("GET")
+
+        r.Handle("/js/jquery.js", netHandle(js01, nil)).Methods("GET")
+        r.Handle("/js/popper.min.js", netHandle(js02, nil)).Methods("GET")
+        r.Handle("/js/bootstrap.min.js", netHandle(js03, nil)).Methods("GET")
+        r.Handle("/js/jquery.mCustomScrollbar.concat.min.js", netHandle(js04, nil)).Methods("GET")
+        r.Handle("/js/jquery.fancybox.js", netHandle(js05, nil)).Methods("GET")
+        r.Handle("/js/appear.js", netHandle(js06, nil)).Methods("GET")
+        r.Handle("/js/owl.js", netHandle(js07, nil)).Methods("GET")
+        r.Handle("/js/wow.js", netHandle(js08, nil)).Methods("GET")
+        r.Handle("/js/jquery-ui.js", netHandle(js09, nil)).Methods("GET")
+        r.Handle("/js/script.js", netHandle(js10, nil)).Methods("GET")
+
 }
 
 //index html angular
@@ -178,6 +223,360 @@ func serveCss07(w http.ResponseWriter, r *http.Request) {
 func serveJs01(w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, "js/angular.min.js")
 }//end serveJs01
+
+
+
+func styleCss01(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss01")
+    http.ServeFile(w,r,"css/style.css")
+    
+    log.Print("CZ   STEP styleCss01 01")
+    
+} // end styleCss01
+
+func styleCss02(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss02")
+
+http.ServeFile(w,r,"css/slick.css")
+
+    log.Print("CZ   STEP styleCss02")
+    
+} // end styleCss02
+
+func styleCss03(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss03")
+    http.ServeFile(w,r,"css/responsive.css")
+
+    log.Print("CZ   STEP styleCss03")
+    
+} // end styleCss03
+
+func styleCss04(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss04")
+    http.ServeFile(w,r,"css/bootstrap.css")
+
+    log.Print("CZ   STEP styleCss04")
+    
+} // end styleCss04
+
+func styleCss05(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss05")
+    http.ServeFile(w,r,"css/flaticon.css")
+
+    log.Print("CZ   STEP styleCss05")
+    
+} // end styleCss05
+
+func styleCss06(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss06")
+    http.ServeFile(w,r,"css/owl.css")
+
+    log.Print("CZ   STEP styleCss06")
+    
+} // end styleCss06
+
+func styleCss07(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss07")
+    http.ServeFile(w,r,"css/jquery.fancybox.min.css")
+
+    log.Print("CZ   STEP styleCss07")
+    
+} // end styleCss07
+
+func styleCss08(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss08")
+    http.ServeFile(w,r,"css/animate.css")
+
+    log.Print("CZ   STEP styleCss08")
+    
+} // end styleCss08
+
+func styleCss09(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss09")
+    http.ServeFile(w,r,"css/font-awesome.css")
+
+    log.Print("CZ   STEP styleCss09")
+    
+} // end styleCss09
+
+func styleCss10(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss10")
+    http.ServeFile(w,r,"css/jquery.mCustomScrollbar.min.css")
+
+    log.Print("CZ   STEP styleCss10")
+    
+} // end styleCss10
+
+func styleCss11(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  styleCss11")
+    http.ServeFile(w,r,"css/jquery-ui.css")
+
+    log.Print("CZ   STEP styleCss11")
+    
+} // end styleCss11
+
+func images01(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images01")
+
+    http.ServeFile(w,r,"images/favicon.png")
+
+    log.Print("CZ   STEP images01")
+    
+} // end images01
+
+func images02(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images02")
+
+    http.ServeFile(w,r,"images/logo-white.png")
+
+    log.Print("CZ   STEP images02")
+    
+} // end images02
+
+func images03(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images03")
+
+    http.ServeFile(w,r,"images/logo-color.png")
+
+    log.Print("CZ   STEP images03")
+    
+} // end images03
+
+func images04(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images04")
+
+    http.ServeFile(w,r,"images/second.png")
+
+    log.Print("CZ   STEP images04")
+    
+} // end images04
+
+func images05(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images05")
+
+    http.ServeFile(w,r,"images/comunidades.png")
+
+    log.Print("CZ   STEP images05")
+    
+} // end images05
+
+func images06(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images06")
+
+    http.ServeFile(w,r,"images/main.jpg")
+
+    log.Print("CZ   STEP images06")
+    
+} // end images06
+
+func images07(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images07")
+
+    http.ServeFile(w,r,"images/slider-alumnos-1.jpg")
+
+    log.Print("CZ   STEP images07")
+    
+} // end images07
+
+func images08(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images08")
+
+    http.ServeFile(w,r,"images/school.svg")
+
+    log.Print("CZ   STEP images08")
+    
+} // end images08
+
+func images09(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images09")
+
+    http.ServeFile(w,r,"images/bus.svg")
+
+    log.Print("CZ   STEP images09")
+    
+} // end images09
+
+func images10(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images10")
+
+    http.ServeFile(w,r,"images/rocket.svg")
+
+    log.Print("CZ   STEP images01")
+    
+} // end images10
+
+func images11(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images11")
+
+    http.ServeFile(w,r,"images/collaborate.svg")
+
+    log.Print("CZ   STEP images11")
+    
+} // end images11
+
+func images12(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images12")
+
+    http.ServeFile(w,r,"images/teach.svg")
+
+    log.Print("CZ   STEP images12")
+    
+} // end images12
+
+func images13(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images13")
+
+    http.ServeFile(w,r,"images/boss.svg")
+
+    log.Print("CZ   STEP images13")
+    
+} // end images13
+
+/*func images14(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images14")
+
+    http.ServeFile(w,r,"images/icons/preloader.svg")
+
+    log.Print("CZ   STEP images14")
+    
+} // end images14
+
+func images15(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  images15")
+
+    http.ServeFile(w,r,"images/background/pattern-2.png")
+
+    log.Print("CZ   STEP images15")
+    
+} // end images15
+*/
+func js01(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js01")
+
+    http.ServeFile(w,r,"js/jquery.js")
+
+    log.Print("CZ   STEP js01")
+    
+} // end js01
+
+func js02(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js02")
+
+    http.ServeFile(w,r,"js/popper.min.js")
+    
+    log.Print("CZ   STEP js02")
+    
+} // end js02
+
+func js03(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js03")
+
+    http.ServeFile(w,r,"js/bootstrap.min.js")
+
+    log.Print("CZ   STEP js03")
+    
+} // end js03
+
+func js04(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js04")
+
+    http.ServeFile(w,r,"js/jquery.mCustomScrollbar.concat.min.js")
+
+    log.Print("CZ   STEP js04")
+    
+} // end js04
+
+func js05(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js05")
+
+    http.ServeFile(w,r,"js/jquery.fancybox.js")
+
+    log.Print("CZ   STEP js05")
+    
+} // end js05
+
+func js06(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js06")
+
+    http.ServeFile(w,r,"js/appear.js")
+    
+    log.Print("CZ   STEP js06")
+    
+} // end js06
+
+func js07(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js07")
+
+    http.ServeFile(w,r,"js/owl.js")
+    
+    log.Print("CZ   STEP js07")
+    
+} // end js07
+
+func js08(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js08")
+
+    http.ServeFile(w,r,"js/wow.js")
+    
+    log.Print("CZ   STEP js08")
+    
+} // end js08
+
+func js09(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js09")
+
+    http.ServeFile(w,r,"js/jquery-ui.js")
+    
+    log.Print("CZ   STEP js09")
+    
+} // end js09
+
+func js10(w http.ResponseWriter, r *http.Request) {
+
+    log.Print("cz  js10")
+
+    http.ServeFile(w,r,"js/script.js")
+    
+    log.Print("CZ   STEP js10")
+    
+} // end js10
+
+
 
     //post
 
