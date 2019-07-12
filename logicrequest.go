@@ -746,15 +746,17 @@ func valida_campo_token (campo string, numcampos int)(string, int){
                         
                     cualfallo = 1
                 }else{
-                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
+                    matched, err := regexp.MatchString(`\W`, campo)
+                    log.Print("match1: ",matched)
+                    if matched == true {
+                        log.Print("External identifier characters don´t match")
                         resultado = "External identifier characters don´t match"
                         
                         cualfallo = 1
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
                 }
 
             }else{
@@ -770,15 +772,17 @@ func valida_campo_token (campo string, numcampos int)(string, int){
 					resultado="Customer reference max lenght is 30"
                     cualfallo = 2
 			    }else{
-                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
+                    matched, err := regexp.MatchString(`\W`, campo)
+                    log.Print("match2: ",matched)
+                    if matched == true {
+                        log.Print("Customer reference characters don´t match")
                         resultado = "Customer reference characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 2
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
                 }
 
 			}else{
@@ -795,15 +799,17 @@ func valida_campo_token (campo string, numcampos int)(string, int){
 					resultado="Payment reference max lenght is 50"
                     cualfallo = 3
 			    }else{
-                    matched, err := regexp.MatchString(`[0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
+                    matched, err := regexp.MatchString(`\D`, campo)
+                    log.Print("match3: ",matched)
+                    if matched == true{
+                        log.Print("Payment reference characters don´t match")
                         resultado = "Payment reference characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 3
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
                 }
 			}else{
 				resultado="Payment reference is required"
@@ -814,15 +820,18 @@ func valida_campo_token (campo string, numcampos int)(string, int){
         if numcampos == 4{
             if campo != "" {
 				if len(campo)==16 || len(campo)==15{
-                    matched, err := regexp.MatchString(`[0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
-                        resultado = "Valid Thru characters don´t match"
+                    matched, err := regexp.MatchString(`\D`, campo)
+                    
+                    log.Print("match4: ",matched,)
+                    if matched == true {
+                        log.Print("Card Number characters don´t match")
+                        resultado = "Card Number characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 4
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
 				}else{
 					resultado="Card Number must be 16 digits:"+campo
                     cualfallo = 4
@@ -837,15 +846,18 @@ func valida_campo_token (campo string, numcampos int)(string, int){
             utilito.LevelLog(Config_env_log, "3", "\n")
             if campo != "" {
 				if  len(campo)==4 || len(campo)==5 { // 2 for the double quotes and 1 for the end of line
-                    matched, err := regexp.MatchString(`[0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
+                    matched, err := regexp.MatchString(`\D`, campo)
+                    
+                    log.Print("match5: ",matched)
+                    if matched == true {
+                        log.Print("Valid Thru characters don´t match")
                         resultado = "Valid Thru characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 5
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
 				}else{
 					resultado="Valid Thru  4 digits"
                     cualfallo = 5
@@ -880,7 +892,7 @@ func campos_payment (line string, lineas int)(string, int){
 //Función valida_campo_pay
 func valida_campo_pay (campo string, numcampos int)(string, int){
     
-    utilito.LevelLog(Config_env_log, "3", "MGR valida campo payment")
+    utilito.LevelLog(Config_env_log, "3", "MGR valida campo payment nbr"+strconv.Itoa(numcampos)+" with value: "+campo+"*")
 
     var resultado string
     var cualfallo int 
@@ -892,15 +904,17 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
                     resultado = "External identifier max leng is 30"
                     cualfallo = 1
                 }else{
-                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
-                        resultado = "External identifier don´t match"
+                    matched, err := regexp.MatchString(`\W`, campo)
+                    //log.Print(matched)
+                    if matched == true {
+                        log.Print("External identifier characters don´t match")
+                        resultado = "External identifier characters don´t match"
                         
                         cualfallo = 1
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
                 }//end if len(campo)
 
             }else{
@@ -916,15 +930,17 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
 					resultado="Client reference is required"
                     cualfallo = 2
 			    }else{
-                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
-                        resultado = "Client reference don´t match"
+                    matched, err := regexp.MatchString(`\W`, campo)
+                    //log.Print(matched)
+                    if matched == true {
+                        log.Print("Client reference characters don´t match")
+                        resultado = "Client reference characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 2
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
                 }//end if len(campo)
 			}else{
 				resultado="Client reference is required"
@@ -940,15 +956,17 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
 					resultado="Payment reference max lenght is 100"
                     cualfallo = 3
 			    }else{
-                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
-                        resultado = "Payment reference don´t match"
+                    matched, err := regexp.MatchString(`\W`, campo)
+                    //log.Print(matched)
+                    if matched == true {
+                        log.Print("Payment reference characters don´t match")
+                        resultado = "Payment reference characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 3
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
                 }//end if len(campo)
 			}else{
 				resultado="Payment reference is required"
@@ -960,15 +978,17 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
         if numcampos == 4{
             if campo != "" {
 
-                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
-                        resultado = "Token don´t match"
+                    matched, err := regexp.MatchString(`\W`, campo)
+                    //log.Print(matched)
+                    if matched == true {
+                        log.Print("Token characters don´t match")
+                        resultado = "Token characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 4
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ",err)
+                    }
 
 			}else{
 				resultado="Token is required"
@@ -981,15 +1001,17 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
             if campo != "" {
 				if len(campo)==3 ||  len(campo)==4 {
 
-                    matched, err := regexp.MatchString(`[0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
-                        resultado = "Cvv don´t match"
+                    matched, err := regexp.MatchString(`\D`, campo)
+                    //log.Print(matched)
+                    if matched == true {
+                        log.Print("Cvv characters don´t match")
+                        resultado = "Cvv characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 5
                     }
-                    log.Print(err)
+                    if err != nil{
+                        log.Print("err: ", err)
+                    }
 				}else{
 					resultado="Cvv must be 3 or 4 digits"
                     cualfallo = 5
@@ -1003,15 +1025,18 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
 		if numcampos == 6{
             if campo != "" {
 
-                    matched, err := regexp.MatchString(`[0-9]`, campo)
-                    log.Print(matched)
-                    if matched != true {
-                        log.Print("no true")
-                        resultado = "Amount don´t match"
+                    matched, err := regexp.MatchString(`\D`, campo)
+                    //matched2, err := regexp.MatchString('\.',campo)
+                    //log.Print("match2: ",matched2)
+                    if matched == true {
+                        log.Print("Amount characters don´t match")
+                        resultado = "Amount characters don´t match"
                         
-                        cualfallo = 1
+                        cualfallo = 6
                     }
-                    log.Print(err)
+                    if err != nil {
+                        log.Print("err: ", err)
+                    }
 			}else{
 				resultado="Amount is required"
                 cualfallo = 6
@@ -1059,11 +1084,12 @@ func validateAndObtainCampos_token (line string, lineas int)(modelito.RequestTok
         var campoValue string
 
         limpia := strings.Replace(campo, ":", "", -1) // para eliminar cualquier caracter de ":"
-        campoValue = strings.Replace(limpia, "\"", "", -1) // only works with a single character
+        limpia2 := strings.Replace(limpia, "\r", "", -1) //elimina cualquier retorno de carro
+        campoValue = strings.Replace(limpia2, "\"", "", -1) // only works with a single character
         log.Print("Prueba: "+campoValue)
         var largo string
         largo = strconv.Itoa ( len(campoValue))
-        utilito.LevelLog(Config_env_log, "1", "largo del campo es:"+largo+":valor del campo es:"+campoValue)
+        utilito.LevelLog(Config_env_log, "1", "largo del campo es: "+largo+" :valor del campo es: "+campoValue)
               
         resultado, cualfallo = valida_campo_token(campoValue, numcampos)
 
@@ -1128,14 +1154,22 @@ func validateAndObtainCampos_payment (line string, lineas int)(modelito.RequestP
     numcampos := 0
     var resultado string
     var cualfallo int
+    resultado = "OK"
+    cualfallo = 0
+
     for _, campo := range strings.Split(strings.TrimSuffix(line, ","), ","){
-        utilito.LevelLog(Config_env_log, "3", campo)
+        
+        //utilito.LevelLog(Config_env_log, "3", campo)
         numcampos = numcampos + 1
         //resultado, cualfallo = valida_campo_pay(campo, numcampos)
 
         var campoValue string
 
-        campoValue = strings.Replace(campo, "\"", "", -1) // only works with a single character
+        limpia := strings.Replace(campo, ".", "", -1) // para eliminar cualquier caracter de "."
+        limpia2 := strings.Replace(limpia, "\r", "", -1) // quita cualquier retorno de carro que encuentre
+        campoValue = strings.Replace(limpia2, "\"", "", -1) // only works with a single character
+
+        log.Print("Prueba: "+campoValue)
         var largo string
         largo = strconv.Itoa ( len(campoValue))
         utilito.LevelLog(Config_env_log, "1", "largo del campo es:"+largo+":valor del campo es:"+campoValue)
