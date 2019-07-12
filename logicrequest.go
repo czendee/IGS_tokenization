@@ -5,6 +5,7 @@ import (
 	"log"
     "strings"
     "strconv"
+    "regexp"
     //"io"
     //"bytes"
     utilito "banwire/services/file_tokenizer/util"
@@ -744,6 +745,16 @@ func valida_campo_token (campo string, numcampos int)(string, int){
                     resultado = "External identifier max leng is 30"
                         
                     cualfallo = 1
+                }else{
+                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "External identifier characters don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
                 }
 
             }else{
@@ -754,11 +765,22 @@ func valida_campo_token (campo string, numcampos int)(string, int){
             
         if numcampos == 2{
             if campo != "" {
-				if len(campo) >100 {
+				if len(campo) >30 {
 	
-					resultado="Customer reference max lenght is 100"
+					resultado="Customer reference max lenght is 30"
                     cualfallo = 2
-			    }
+			    }else{
+                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Customer reference characters don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
+                }
+
 			}else{
 				resultado="Client reference is required"
                 cualfallo = 2
@@ -768,11 +790,21 @@ func valida_campo_token (campo string, numcampos int)(string, int){
 
         if numcampos == 3{
             if campo != "" {
-				if len(campo) >100 {
+				if len(campo) >50 {
 	
-					resultado="Payment reference max lenght is 100"
+					resultado="Payment reference max lenght is 50"
                     cualfallo = 3
-			    }
+			    }else{
+                    matched, err := regexp.MatchString(`[0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Payment reference characters don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
+                }
 			}else{
 				resultado="Payment reference is required"
                 cualfallo = 3
@@ -782,7 +814,15 @@ func valida_campo_token (campo string, numcampos int)(string, int){
         if numcampos == 4{
             if campo != "" {
 				if len(campo)==16 || len(campo)==15{
-	
+                    matched, err := regexp.MatchString(`[0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Valid Thru characters don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
 				}else{
 					resultado="Card Number must be 16 digits:"+campo
                     cualfallo = 4
@@ -797,7 +837,15 @@ func valida_campo_token (campo string, numcampos int)(string, int){
             utilito.LevelLog(Config_env_log, "3", "\n")
             if campo != "" {
 				if  len(campo)==4 || len(campo)==5 { // 2 for the double quotes and 1 for the end of line
-	
+                    matched, err := regexp.MatchString(`[0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Valid Thru characters don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
 				}else{
 					resultado="Valid Thru  4 digits"
                     cualfallo = 5
@@ -843,6 +891,16 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
                 if len(campo) > 30 {
                     resultado = "External identifier max leng is 30"
                     cualfallo = 1
+                }else{
+                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "External identifier don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
                 }//end if len(campo)
 
             }else{
@@ -853,11 +911,21 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
             
         if numcampos == 2{
             if campo != "" {
-				if len(campo) >100 {
+				if len(campo) >30 {
 	
 					resultado="Client reference is required"
                     cualfallo = 2
-			    }//end if len(campo)
+			    }else{
+                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Client reference don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
+                }//end if len(campo)
 			}else{
 				resultado="Client reference is required"
                 cualfallo = 2
@@ -867,11 +935,21 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
 
         if numcampos == 3{
             if campo != "" {
-				if len(campo) >100 {
+				if len(campo) >30 {
 	
 					resultado="Payment reference max lenght is 100"
                     cualfallo = 3
-			    }//end if len(campo)
+			    }else{
+                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Payment reference don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
+                }//end if len(campo)
 			}else{
 				resultado="Payment reference is required"
                 cualfallo = 3
@@ -881,6 +959,16 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
 
         if numcampos == 4{
             if campo != "" {
+
+                    matched, err := regexp.MatchString(`[a-zA-Z0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Token don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
 
 			}else{
 				resultado="Token is required"
@@ -892,7 +980,16 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
                            
             if campo != "" {
 				if len(campo)==3 ||  len(campo)==4 {
-	
+
+                    matched, err := regexp.MatchString(`[0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Cvv don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
 				}else{
 					resultado="Cvv must be 3 or 4 digits"
                     cualfallo = 5
@@ -906,6 +1003,15 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
 		if numcampos == 6{
             if campo != "" {
 
+                    matched, err := regexp.MatchString(`[0-9]`, campo)
+                    log.Print(matched)
+                    if matched != true {
+                        log.Print("no true")
+                        resultado = "Amount don´t match"
+                        
+                        cualfallo = 1
+                    }
+                    log.Print(err)
 			}else{
 				resultado="Amount is required"
                 cualfallo = 6
@@ -1186,8 +1292,11 @@ func obtainParmsConsultarHistorialClientes(r *http.Request, errorGeneral string)
     } //end for linea
 
   */     
+    
+   	// lineaDatos= "ESTO LLEGO: "+micadenita
+    lineaDatos= micadenita
+
     //END
-   	 lineaDatos= "ESTO LLEGO: "+micadenita
 
    	return lineaDatos,errorGeneral
 } //end obtainParmsConsultarHistorialClientes

@@ -511,6 +511,12 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
 					                u.Status="ERROR528"
 					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Line with more than the maximum size of each record is 130"
                                     lineasWithErrors = 1
+                                }else if largoLinea < 37{
+                                    u.Line=strconv.Itoa(lineas)
+					                u.Status="ERROR528"
+					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Lines with fewer characters than expected"
+					                lineasWithErrors =1
+
                                 }else{
                                     eachLineaDataToken,respuestaRes,cualfallo =validateAndObtainCampos_token (line, lineas)  //logicrequest.go
                                 }
@@ -523,8 +529,14 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
 					                u.Status="ERROR528"
 					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Line with more than the maximum size of each record is 130"
                                     lineasWithErrors = 1
+                                }else if largoLinea < 37{
+                                    u.Line=strconv.Itoa(lineas)
+					                u.Status="ERROR528"
+					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Lines with fewer characters than expected"
+					                lineasWithErrors =1
+
                                 }else{
-                                    eachLineaDataPayment, respuestaRes,cualfallo =validateAndObtainCampos_payment (line, lineas)
+                                    eachLineaDataPayment, respuestaRes,cualfallo =validateAndObtainCampos_payment (line, lineas) //logicrequest.go
                                 }
                             }                        
 
@@ -548,106 +560,107 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                         }
 
                         if lineas == 0{
-                        
+                            
+                            lineas = lineas + 1
                             utilito.LevelLog(Config_env_log, "3", "MGR Nombres de campos")
                             utilito.LevelLog(Config_env_log, "3", line)
                             log.Print("largo linea_",lineas,": ",largoLinea)
                         
                             if typeFile =="token" {
                             
-                            //eachLineaDataToken,respuestaRes,cualfallo =validateAndObtainCampos_token (line, lineas)  //logicrequest.go
-                            if largoLinea < 56{
+                                //eachLineaDataToken,respuestaRes,cualfallo =validateAndObtainCampos_token (line, lineas)  //logicrequest.go
+                                if largoLinea < 56{
 
-                                //u.Line=strconv.Itoa(lineas)
-                            	//u.Status="ERROR526"
-                            	//u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Max number of characters in header is 56"
-                            	//lineasWithErrors =1
-
-                                errorGeneral="ERROR_526 -ERROR Header line length is short"
-				                errorGeneralNbr="526"
-                                log.Print(errorGeneral)
-                                break
-                            }else if largoLinea >56{
-
-                                //u.Line=strconv.Itoa(lineas)
-                            	//u.Status="ERROR526"
-                            	//u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Min number of characters in header is 56"
-                            	//lineasWithErrors =1
-
-                                errorGeneral="ERROR_526 -ERROR Header line length is short"
-				                errorGeneralNbr="526"
-                                log.Print(errorGeneral)
-                                break
-                            }else{
-                                
-                                compara := line
-                                //log.Print("linea compara: ",reflect.TypeOf(compara)," largo: ",len(compara))
-                                
-                                if compara == "extidentifier,clientreference,paymentreference,card,exp\r"{
-                                    //log.Print("si es igual")
-                                }else{
                                     //u.Line=strconv.Itoa(lineas)
-                            	    //u.Status="ERROR527"
-                            	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            	    //u.Status="ERROR526"
+                            	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Max number of characters in header is 56"
                             	    //lineasWithErrors =1
 
-                                    errorGeneral="ERROR_527 -ERROR Data line is not equal"
-				                    errorGeneralNbr="527"
+                                    errorGeneral="\nERROR_526 -ERROR Header line length is short"
+				                    errorGeneralNbr="526"
                                     log.Print(errorGeneral)
                                     break
-                                }//end if comparación linea
+                                }else if largoLinea >56{
+
+                                    //u.Line=strconv.Itoa(lineas)
+                            	    //u.Status="ERROR526"
+                            	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Min number of characters in header is 56"
+                            	    //lineasWithErrors =1
+
+                                    errorGeneral="\nERROR_526 -ERROR Header line length is short"
+				                    errorGeneralNbr="526"
+                                    log.Print(errorGeneral)
+                                    break
+                                }else{
                                 
-                                //log.Print("Todo Ok")
-                            }//end if largoLinea
-                        }//end if typeFile
+                                    compara := line
+                                    //log.Print("linea compara: ",reflect.TypeOf(compara)," largo: ",len(compara))
+                                
+                                    if compara == "extidentifier,clientreference,paymentreference,card,exp\r"{
+                                        //log.Print("si es igual")
+                                    }else{
+                                        //u.Line=strconv.Itoa(lineas)
+                            	        //u.Status="ERROR527"
+                            	        //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            	        //lineasWithErrors =1
+
+                                        errorGeneral="\nERROR_527 -ERROR Data line is not equal"
+				                        errorGeneralNbr="527"
+                                        log.Print(errorGeneral)
+                                        break
+                                    }//end if comparación linea
+                                
+                                    //log.Print("Todo Ok")
+                                }//end if largoLinea
+                            }//end if typeFile
                         
-                        if typeFile =="payment" {
-                            //eachLineaDataPayment, respuestaRes,cualfallo =validateAndObtainCampos_payment (line, lineas)
-                            if largoLinea < 64{
+                            if typeFile =="payment" {
+                                //eachLineaDataPayment, respuestaRes,cualfallo =validateAndObtainCampos_payment (line, lineas)
+                                if largoLinea < 64{
                                 
-                                //u.Line=strconv.Itoa(lineas)
-                            	//u.Status="ERROR526"
-                            	//u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Max number of characters in header is 64"
-                            	//lineasWithErrors =1
-
-                                errorGeneral="ERROR_526 -ERROR Header line length is short"
-				                errorGeneralNbr="526"
-                                log.Print(errorGeneral)
-                                break
-                            }else if largoLinea >64{
-                                
-                                //u.Line=strconv.Itoa(lineas)
-                            	//u.Status="ERROR526"
-                            	//u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Min number of characters in header is 64"
-                            	//lineasWithErrors =1
-
-                                errorGeneral="ERROR_526 -ERROR Header line length is short"
-				                errorGeneralNbr="526"
-                                log.Print(errorGeneral)
-                                break
-                            }else{
-                                
-                                compara := line
-                                //log.Print("linea compara: ",reflect.TypeOf(compara)," largo: ",len(compara))
-                                
-                                if compara == "extidentifier,clientreference,paymentreference,token,cvv,amount\r"{
-                                    //log.Print("si es igual")
-                                }else{
-                                    
                                     //u.Line=strconv.Itoa(lineas)
-                            	    //u.Status="ERROR527"
-                            	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            	    //u.Status="ERROR526"
+                            	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Max number of characters in header is 64"
                             	    //lineasWithErrors =1
 
-                                    errorGeneral="ERROR_527 -ERROR Data line is not equal"
-				                    errorGeneralNbr="527"
+                                    errorGeneral="\nERROR_526 -ERROR Header line length is short"
+				                    errorGeneralNbr="526"
                                     log.Print(errorGeneral)
                                     break
-                                }//end if comparación linea
+                                }else if largoLinea >64{
                                 
-                                //log.Print("Todo Ok")
-                            }//end if largoLinea
-                        }//end if typeFile
+                                    //u.Line=strconv.Itoa(lineas)
+                            	    //u.Status="ERROR526"
+                            	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Min number of characters in header is 64"
+                            	    //lineasWithErrors =1
+
+                                    errorGeneral="\nERROR_526 -ERROR Header line length is short"
+				                    errorGeneralNbr="526"
+                                    log.Print(errorGeneral)
+                                    break
+                                }else{
+                                
+                                    compara := line
+                                    //log.Print("linea compara: ",reflect.TypeOf(compara)," largo: ",len(compara))
+                                
+                                    if compara == "extidentifier,clientreference,paymentreference,token,cvv,amount\r"{
+                                        //log.Print("si es igual")
+                                    }else{
+                                    
+                                        //u.Line=strconv.Itoa(lineas)
+                            	        //u.Status="ERROR527"
+                            	        //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                            	        //lineasWithErrors =1
+
+                                        errorGeneral="\nERROR_527 -ERROR Data line is not equal"
+				                        errorGeneralNbr="527"
+                                        log.Print(errorGeneral)
+                                        break
+                                    }//end if comparación linea
+                                
+                                    //log.Print("Todo Ok")
+                                }//end if largoLinea
+                            }//end if typeFile
 
                             if cualfallo == 0 {  //exito, todos los campos de la linea OK, y no errores previos
                                 u.Line=strconv.Itoa(lineas)
@@ -667,7 +680,6 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                             //linesDataTokens = append(linesDataTokens,eachLineaDataToken);
                             //linesDataPayments = append(linesDataPayments,eachLineaDataPayment);
                         
-                            lineas = lineas + 1
                         }    
 
                     }//end  -loop through the lines
