@@ -657,12 +657,13 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
              log.Print("info lienaProcess: ",lineaProcess)
              var responseGeneral string
 
-            responseGeneral,errorGeneralNbr,resultadoTokenJson= ProcessGeneratetokenized(w , d) //logicbusiness.go
+            responseGeneral,errorGeneralNbr,resultadoTokenJson = ProcessGeneratetokenized(w , d) //logicbusiness.go
 
-             var u modelito.ExitoDataTokenLine
+            var u modelito.ExitoDataTokenLine
 
             if responseGeneral !=""{
                       if strings.Contains(responseGeneral, "ERROR") {
+                          log.Print("strings.Contains")
                             u.Line=strconv.Itoa(lineaProcess)
                             u.Status="ERROR540"
                             u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(lineaProcess)+" - "+responseGeneral
@@ -676,9 +677,10 @@ func handlePostProcessTokenFile(w http.ResponseWriter, r *http.Request) {
 	                        u.Score = "0"
 	                        u.Type = "0"
                             lineasWithErrors =1
-                        utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer ERROR line:"+responseGeneral)
+                            
+                            utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer ERROR line:"+responseGeneral)
                         
-                           errorGeneral="ERROR555"
+                            errorGeneral="ERROR555"
                       }else{
                           utilito.LevelLog(Config_env_log, "3"," ProcessTokenFile File -Process tokenizer OK line:")
                          //sucess for this line/tokenizer
@@ -902,7 +904,6 @@ func handlePostVaidateFiles(w http.ResponseWriter, r *http.Request) {
 
 }//end handlePostVaidateFiles
 
-//  handlePostProcessTokenFile
 
 func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
     
@@ -964,22 +965,21 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
     if errorGeneral=="" {   //process business Tokenization
         // use this structuire inputDataToken to call methods for the tokenization
      
-         //the results of each of the tokanizations, will be returned here
+        //the results of each of the tokanizations, will be returned here
 
 
+        utilito.LevelLog(Config_env_log, "1","CZ  ProcessPaymentFile  STEP Get the File")
+        utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File Upload Endpoint Hit")
+        //for each token in the array, call this method
 
-    utilito.LevelLog(Config_env_log, "1","CZ  ProcessPaymentFile  STEP Get the File")
-    utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File Upload Endpoint Hit")
-    //for each token in the array, call this method
 
+        lineaProcess := 1
 
-    lineaProcess := 1
+        var howmany int
+        howmany = len(inputDataToken)
+        howmany = howmany+1
 
-    var howmany int
-    howmany = len(inputDataToken)
-    howmany = howmany+1
-
-    for _, d := range inputDataPayment {
+        for _, d := range inputDataPayment {
      		lineaProcess =lineaProcess +1
              
              var responseGeneral string
@@ -1041,9 +1041,9 @@ func handlePostProcessPaymentFile(w http.ResponseWriter, r *http.Request) {
                 utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File -Process - NOT expected:")
             }
             // add this tokenization into the sattus for all the lines
-           utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File -before line:"+u.StatusMessage )
+            utilito.LevelLog(Config_env_log, "3"," ProcessPaymentFile File -before line:"+u.StatusMessage )
 
-           processLinesStatus = append(processLinesStatus,u)
+            processLinesStatus = append(processLinesStatus,u)
 
  		}//end for
 
@@ -1281,11 +1281,12 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
 		db.Connection.Close(nil)
 	}()
     
+    log.Print("Entra a handleGetConsultaTokens funcion boton \"Consultar tokens\" indexconsulta")
+
     var errorGeneral string
     var errorGeneralNbr string
-	var  recordsFound []modelito.Card
+	var recordsFound []modelito.Card
 
-    log.Print("Entra a handleGetConsultaTokens funcion boton \"Consultar tokens\" indexconsulta")
     //file := "ConsultarToken.txt"
     
     
@@ -1335,7 +1336,7 @@ func handleGetConsultaTokens(w http.ResponseWriter, r *http.Request) {
 		log.Print("CZ   STEP Get the OK response JSON ready")
 		errorGeneralNbr ="500"
 			/// START
-		fieldDataBytesJson,err := getJsonResponseConsultarTokens( errorGeneral, errorGeneralNbr, recordsFound)
+		fieldDataBytesJson,err := getJsonResponseConsultarTokens( errorGeneral, errorGeneralNbr, recordsFound)//logicresponse.go
 		//////////    write the response (ERROR)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(fieldDataBytesJson)	
@@ -2254,48 +2255,40 @@ func handleGetConsultahistorialClientes(w http.ResponseWriter, r *http.Request) 
 		db.Connection.Close(nil)
 	}()
     
+    log.Print("Entra a handleGetConsultahistorialClientes funcion boton \"Consultar\" indexconsultafiles")
+
     var errorGeneral string
     var errorGeneralNbr string
-	
-    log.Print("Entra a handleGetConsultahistorialClientes funcion boton \"Consultar\" indexconsultafiles")
-    //file := "ConsultarToken.txt"
+    //var recordsFound []modelito.Payment//preguntar el tipo de modelito
     
+    paramsReceived, errorGeneral:= obtainParmsConsultarHistorialClientes(r , errorGeneral) //logisrequest.go
     
-    paramsReceived, err:= obtainParmsConsultarHistorialClientes(r , errorGeneral) //logisrequest.go
-    
-    if(err!=""){
-
-	}//end if
     log.Print("Regreso de función obtainParmsConsultarHistorialClientes")
+
+    if(errorGeneral!=""){
+        log.Print("CZ    Prepare Response with 701. Get Payments done with thisToken failed:"+errorGeneral)
+    	errorGeneral="ERROR:701 -Get payments by token- parameter:"	+errorGeneral
+    	errorGeneralNbr="701"
+
+	}else{
+
+		//errorGeneral,errorGeneralNbr,recordsFound= ProcessGetPaymentsForToken(w , paramsReceived) //logicbusiness.go
+
+    }
+
+    log.Print("Regreso de función ProcessGetPaymentsForToken")
     
     // downloadBytes:= []byte(paramsReceived)
 
     // Generate the server headers
 
-    log.Print("Generador de cabezeras")
+    //log.Print("Generador de cabezeras")
 
 
-    log.Print("Fin obtainParmsConsultarHistorial")
+    //log.Print("Entra a handlePostConsultaTokens funcion boton \"Consultar token\" indexconsulta")
 
-    /*log.Print("Entra a handlePostConsultaTokens funcion boton \"Consultar token\" indexconsulta")
+   	//var requestData modelito.RequestTokenizedCards
 
-   	var requestData modelito.RequestTokenizedCards
-
-    errorGeneral = ""
-    requestData, errorGeneral = obtainParmsConsultarTokens(r,errorGeneral) //logicrequest.go
-    
-    
-    log.Print("Regresa de obtainParmsConsultarTokens")
-
-
-	////////////////////////////////////////////////process business rules
-	/// START
-    if errorGeneral=="" {
-
-		errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-	}
-	/// END
-*/
     if errorGeneral != ""{
     	//send error response if any
     	//prepare an error JSON Response, if any
@@ -2330,7 +2323,5 @@ func handleGetConsultahistorialClientes(w http.ResponseWriter, r *http.Request) 
 
     }
 
-
+    log.Print("Fin handleGetConsultahistorialClientes")
 }//end handleGetConsultahistorialClientes
-
-

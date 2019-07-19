@@ -76,7 +76,7 @@ utilito.LevelLog(Config_env_log, "3", "web api el cvv"+requestData.Cvv)
    }
    
    
-   func logicGeneratetokenizedWeb(requestData modelito.RequestTokenized, errorGeneral string) (modelito.ExitoDataTokenized,string) {
+func logicGeneratetokenizedWeb(requestData modelito.RequestTokenized, errorGeneral string) (modelito.ExitoDataTokenized,string) {
 		////////////////////////////////////////////////process db steps
 	   //START    
 
@@ -89,7 +89,7 @@ utilito.LevelLog(Config_env_log, "3", "web api el cvv"+requestData.Cvv)
 		    valoresbanwire := url.Values{
 			"method": {"add"},
 //		"user": {"pruebasbw"},  //this value was mentioned by Charly dec 05,2018
-		"user": {Config_WS_crbanwire_pass},  //this value needs to be configurable to Move to production. 22 Jan 2019        
+		    "user": {Config_WS_crbanwire_pass},  //this value needs to be configurable to Move to production. 22 Jan 2019        
 			"email": {"generalseguros@genearlseguros.com"},
 			"number": {requestData.Card},  //
 			"exp_month": {month},              //requestData.Exp  solo mes
@@ -99,7 +99,7 @@ utilito.LevelLog(Config_env_log, "3", "web api el cvv"+requestData.Cvv)
 			"name": {"generalseguros"}, 
 			"address": {"generalseguros"},
 			"postal_code": {"06000"},
-			}	
+			}//end valoresbanwire
 
 //		    response,err := http.PostForm("https://cr.banwire.com/?action=card&exists=1",
 		    response,err := http.PostForm(Config_WS_crbanwire_url+"/?action=card&exists=1",
@@ -154,27 +154,27 @@ utilito.LevelLog(Config_env_log, "3", "web api el cvv"+requestData.Cvv)
 							    resultadoService.Category  =str.Card.Category
    					        	utilito.LevelLog(Config_env_log, "3", "logicGeneratetokenizedWeb 07:"+resultadoService.Token)
    					        	utilito.LevelLog(Config_env_log, "3", "logicGeneratetokenizedWeb 07:"+resultadoService.Type)
-							}
+							}//end if str.Exists
 							
 						}else{
 							// the card tokenization fail
 		         			errorGeneral ="Error : the result of the tokenization is FALSE"
-						}
+						}//end if str.Result
 
 
 					}else{
 						// the task for the card needs to be add
 		         		errorGeneral ="Error : intenal configuration task needs to be ADD"
-					}
+					}//end if str.Task
 					
-		        }
-		    }
+		        }//end if strings.Contains
+		    }//end if err
 	   	
-	   }
+	   }//end if errorGeneral
      
 	    utilito.LevelLog(Config_env_log, "3", "web api Terminating the application...")
    	  return  resultadoService, errorGeneral
-   }
+}//end logicGeneratetokenizedWeb
    
    
  type WebResponseAdd struct {

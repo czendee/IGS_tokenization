@@ -622,25 +622,25 @@ func validaReqGenerateTokenized( parRequestData modelito.RequestTokenized) strin
     var resultado string
             
             	if parRequestData.Clientreference != "" {
-					if len(parRequestData.Paymentreference) >100 {
+					if len(parRequestData.Clientreference) > 30 {
 	
-						resultado="Customer reference max lenght is 100"
+						resultado="Client reference max lenght is 30"
 			        }
 				}else{
 					resultado="Client reference is required"
 		        }
 
 				if parRequestData.Paymentreference != "" {
-					if len(parRequestData.Paymentreference) >100 {
+					if len(parRequestData.Paymentreference) > 50 {
 	
-						resultado="Payment reference max lenght is 100"
+						resultado="Payment reference max lenght is 50"
 			        }
 				}else{
 					resultado="Payment reference is required"
 		        }
 
 				if parRequestData.Card != "" {
-					if len(parRequestData.Card)==16 || len(parRequestData.Card)==15{
+					if len(parRequestData.Card)==16 {
 	
 					}else{
 						resultado="Card Number must be 16 digits"
@@ -718,7 +718,7 @@ func campos_token (line string, lineas int)(string, int){
         largo = strconv.Itoa ( len(campoValue))
         utilito.LevelLog(Config_env_log, "3", "largo del campo es:"+largo+":valor del campo es:"+campoValue)
               
-        resultado, cualfallo = valida_campo_token(campoValue, numcampos)
+        resultado, cualfallo = valida_campo_token(campoValue, numcampos)//logicrequest.go
 
         if cualfallo >0 {
             
@@ -747,7 +747,7 @@ func valida_campo_token (campo string, numcampos int)(string, int){
                     cualfallo = 1
                 }else{
                     matched, err := regexp.MatchString(`\W`, campo)
-                    log.Print("match1: ",matched)
+                    //log.Print("match1: ",matched)
                     if matched == true {
                         log.Print("External identifier characters don´t match")
                         resultado = "External identifier characters don´t match"
@@ -773,7 +773,7 @@ func valida_campo_token (campo string, numcampos int)(string, int){
                     cualfallo = 2
 			    }else{
                     matched, err := regexp.MatchString(`\W`, campo)
-                    log.Print("match2: ",matched)
+                    //log.Print("match2: ",matched)
                     if matched == true {
                         log.Print("Customer reference characters don´t match")
                         resultado = "Customer reference characters don´t match"
@@ -800,7 +800,7 @@ func valida_campo_token (campo string, numcampos int)(string, int){
                     cualfallo = 3
 			    }else{
                     matched, err := regexp.MatchString(`\D`, campo)
-                    log.Print("match3: ",matched)
+                    //log.Print("match3: ",matched)
                     if matched == true{
                         log.Print("Payment reference characters don´t match")
                         resultado = "Payment reference characters don´t match"
@@ -819,10 +819,10 @@ func valida_campo_token (campo string, numcampos int)(string, int){
 
         if numcampos == 4{
             if campo != "" {
-				if len(campo)==16 || len(campo)==15{
+				if len(campo)==16{
                     matched, err := regexp.MatchString(`\D`, campo)
                     
-                    log.Print("match4: ",matched,)
+                    //log.Print("match4: ",matched,)
                     if matched == true {
                         log.Print("Card Number characters don´t match")
                         resultado = "Card Number characters don´t match"
@@ -848,7 +848,7 @@ func valida_campo_token (campo string, numcampos int)(string, int){
 				if  len(campo)==4 || len(campo)==5 { // 2 for the double quotes and 1 for the end of line
                     matched, err := regexp.MatchString(`\D`, campo)
                     
-                    log.Print("match5: ",matched)
+                    //log.Print("match5: ",matched)
                     if matched == true {
                         log.Print("Valid Thru characters don´t match")
                         resultado = "Valid Thru characters don´t match"
@@ -893,7 +893,7 @@ func campos_payment (line string, lineas int)(string, int){
 func valida_campo_pay (campo string, numcampos int)(string, int){
     
     utilito.LevelLog(Config_env_log, "3", "MGR valida campo payment nbr"+strconv.Itoa(numcampos)+" with value: "+campo+"*")
-
+    log.Print("leng:",len(campo))
     var resultado string
     var cualfallo int 
     cualfallo = 0
@@ -953,7 +953,7 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
             if campo != "" {
 				if len(campo) >30 {
 	
-					resultado="Payment reference max lenght is 100"
+					resultado="Payment reference max lenght is 30"
                     cualfallo = 3
 			    }else{
                     matched, err := regexp.MatchString(`\W`, campo)
@@ -977,8 +977,9 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
 
         if numcampos == 4{
             if campo != "" {
-
-                    matched, err := regexp.MatchString(`\W`, campo)
+                if len(campo) ==31 {
+	
+					matched, err := regexp.MatchString(`\W`, campo)
                     //log.Print(matched)
                     if matched == true {
                         log.Print("Token characters don´t match")
@@ -989,6 +990,12 @@ func valida_campo_pay (campo string, numcampos int)(string, int){
                     if err != nil{
                         log.Print("err: ",err)
                     }
+                    
+			    }else{
+
+                    resultado="Token lenght must be 31: "+campo
+                    cualfallo = 4
+                }//end if len(campo)
 
 			}else{
 				resultado="Token is required"
@@ -1174,7 +1181,7 @@ func validateAndObtainCampos_payment (line string, lineas int)(modelito.RequestP
         largo = strconv.Itoa ( len(campoValue))
         utilito.LevelLog(Config_env_log, "1", "largo del campo es:"+largo+":valor del campo es:"+campoValue)
               
-        resultado, cualfallo = valida_campo_pay(campoValue, numcampos)
+        resultado, cualfallo = valida_campo_pay(campoValue, numcampos)//logicrequest.go
 
 
         if cualfallo >0 {

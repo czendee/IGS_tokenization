@@ -134,10 +134,10 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 	////////////////////////////////////////////////validate parms
 	/// START
     if errorGeneral==""{//continue next step
-		    result ="OK realizarpago"+requestData.Clientreference+"    :    " +requestData.Paymentreference+"    :    " +requestData.Card+"    :    " +requestData.Exp+"    :    " +requestData.Cvv
-    		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleGeneratetokenized:"+result)
+		    result ="OK realizarpago: "+requestData.Clientreference+"    :    " +requestData.Paymentreference+"    :    " +requestData.Card+"    :    " +requestData.Exp+"    :    " +requestData.Cvv
+    		utilito.LevelLog(Config_env_log, "3", "CZ    handler Listening test handleGeneratetokenized: "+result)
 		    utilito.LevelLog(Config_env_log, "3", "CZ   STEP Validate paramters request")
-		    errorGeneral= validaReqGenerateTokenized(requestData)	
+		    errorGeneral = validaReqGenerateTokenized(requestData) //logicrequest.go
 		/// END
 
 	}	
@@ -155,41 +155,40 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
 	////////////////////////////////////////////////consume internal websrvice banwire
 	//////////////////            tokenization 
 
-    if errorGeneral==""{//continue next step
+    if errorGeneral == ""{//continue next step
 				/// START
-				obtainedDataWebservice, errorGeneral =logicGeneratetokenizedWeb(requestData, errorGeneral)
+				obtainedDataWebservice, errorGeneral = logicGeneratetokenizedWeb(requestData, errorGeneral) //logicweb.go
 				
 				/// END
-	}	
+	}//if errorGeneral	
 
     if errorGeneral!="" && errorGeneralNbr==""{
     	//prepare response with error 210
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 210. Error processing payment:"+errorGeneral)
     	errorGeneral="ERROR_210 -Error processing payment:"	+errorGeneral
 		errorGeneralNbr="210"
-    }
-
+    }//end if errorGeneal && errorGeneralNbr
 				
 				
 	////////////////////////////////////////////////DB	
 	//	    insert new record in Card , if customer doesn't exist, insert a new one?
 	//  Update if exist, if not insert in Customer
 
-    if errorGeneral==""{//continue next stepjhlkjg 
+    if errorGeneral == ""{//continue next stepjhlkjg 
         	utilito.LevelLog(Config_env_log, "3", "CZ   el  token:"+obtainedDataWebservice.Token)
-    			resultCardTokenized, errorGeneral =logicGeneratetokenizedDBV2(requestData,obtainedDataWebservice , errorGeneral)
+    		resultCardTokenized, errorGeneral = logicGeneratetokenizedDBV2(requestData,obtainedDataWebservice , errorGeneral)//logicdb.go
     						
-	}					
+	}//end if errorGeneral
 
-    if errorGeneral!="" && errorGeneralNbr==""{
+    if errorGeneral != "" && errorGeneralNbr == ""{
     	//prepare response with error 220
-    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 220. Error generating token:"+errorGeneral)
+    	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 220. Error generating token: "+errorGeneral)
     	errorGeneral="ERROR_220 -Error generating token:"	+errorGeneral
 		errorGeneralNbr="220"
     }
 
 	//response
-    if errorGeneral==""{//continue next step
+    if errorGeneral == ""{//continue next step
 		utilito.LevelLog(Config_env_log, "3", "CZ   STEP Post the response JSON ready")
 		
 			/// START
@@ -209,20 +208,17 @@ func ProcessGeneratetokenized(w http.ResponseWriter, requestData modelito.Reques
         resultadoTokenSingle = resultCardTokenized
 	}	
 
-    if errorGeneral!="" && errorGeneralNbr==""{
+    if errorGeneral != "" && errorGeneralNbr == ""{
     	//prepare response with error 230
     	utilito.LevelLog(Config_env_log, "3", "CZ    Prepare Response with 230. Error generating Response Tokenized:"+errorGeneral)
     	errorGeneral="ERROR_230 -Error generating Response Tokenized:"	+errorGeneral
 		errorGeneralNbr="230"
     }
     
-	 utilito.LevelLog(Config_env_log, "3", "CZ  ends func tokenized")
+	utilito.LevelLog(Config_env_log, "3", "CZ  ends func tokenized")
 	 
 	return errorGeneral, errorGeneralNbr, resultadoTokenSingle
-}
-
-
-
+}//end ProcessGeneratetokenized
 
 
 func GetCardType(number string) string {
@@ -473,44 +469,49 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
 
                 lineas := 0
                 lineasWithErrors := 0
+                onlyHeader := 0
 
-                if len(micadenita) <= 3306{
+                var largoLinea int
 
-                    utilito.LevelLog(Config_env_log, "4", micadenita)
-                    utilito.LevelLog(Config_env_log, "3", "MGR Paso linea por linea index")
+                var respuestaRes string
+                var cualfallo int
 
-                    for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
-                        var u modelito.ExitoDataValidaLine
-                        var largoLinea int
+                if typeFile =="token"{
 
-                        var respuestaRes string
-                        var cualfallo int
+                    if len(micadenita) <= 3306{
 
-                        largoLinea = len(line)
+                        utilito.LevelLog(Config_env_log, "4", micadenita)
+                        utilito.LevelLog(Config_env_log, "3", "MGR Paso linea por linea index")
 
-                        if lineas > 26{
-                            errorGeneral="ERROR_523 -ERROR The file have more lines than 26"
-				            errorGeneralNbr="523"
-                            log.Print(errorGeneral)
-                            break
-                        }
+                        for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
+                            var u modelito.ExitoDataValidaLine
+
+                            largoLinea = len(line)
+                            //log.Print("largoLinea llegada: ",largoLinea)
+
+                            if lineas > 25{
+                                errorGeneral="ERROR_523 -ERROR The file have more lines than 26"
+				                errorGeneralNbr="523"
+                                log.Print(errorGeneral)
+                                break
+                            }
                     
-                        if lineas >= 1{
-                            log.Print("Lineas: ", lineas)
-                            utilito.LevelLog(Config_env_log, "3", "MGR linea de datos")
-                            utilito.LevelLog(Config_env_log, "3", line)
+                            if lineas >= 1{
+                                log.Print("Lineas: ", lineas)
+                                utilito.LevelLog(Config_env_log, "3", "MGR linea de datos token")
+                                utilito.LevelLog(Config_env_log, "3", line)
 
-                            lineas = lineas + 1
+                                lineas = lineas + 1
                             
-                            eachLineaDataToken :=   modelito.RequestTokenized{}
-                            eachLineaDataPayment :=   modelito.RequestPayment{}
+                                eachLineaDataToken :=   modelito.RequestTokenized{}
+                                eachLineaDataPayment :=   modelito.RequestPayment{}
                             
-                            if typeFile =="token" {
                                 if largoLinea > 130{
                                     u.Line=strconv.Itoa(lineas)
 					                u.Status="ERROR528"
 					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Line with more than the maximum size of each record is 130"
                                     lineasWithErrors = 1
+
                                 }else if largoLinea < 37{
                                     u.Line=strconv.Itoa(lineas)
 					                u.Status="ERROR528"
@@ -518,81 +519,64 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
 					                lineasWithErrors =1
 
                                 }else{
-                                    eachLineaDataToken,respuestaRes,cualfallo =validateAndObtainCampos_token (line, lineas)  //logicrequest.go
-                                }
+                                    eachLineaDataToken,respuestaRes,cualfallo = validateAndObtainCampos_token (line, lineas)  //logicrequest.go
+                                }//en if largoLinea
                                 
-                            }
-
-                            if typeFile =="payment" {
-                                if largoLinea > 130{
+                                if cualfallo == 0 {  //exito, todos los campos de la linea OK, y no errores previos
                                     u.Line=strconv.Itoa(lineas)
-					                u.Status="ERROR528"
-					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Line with more than the maximum size of each record is 130"
-                                    lineasWithErrors = 1
-                                }else if largoLinea < 37{
+                                    u.Status="OK"
+                                    u.StatusMessage ="SUCESS"
+                                    //the dataToken has the data for the line to be tokenized
+                                    //the dataPaymentn has the data for the line to do the payments
+
+                                }else { //error, al menos un error en la linea
                                     u.Line=strconv.Itoa(lineas)
-					                u.Status="ERROR528"
-					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Lines with fewer characters than expected"
-					                lineasWithErrors =1
+                                    u.Status="ERROR540"
+                                    u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                                    lineasWithErrors =1
+                                    //the dataToken is set to "" when errors
+                                }//end if cualfallo
 
-                                }else{
-                                    eachLineaDataPayment, respuestaRes,cualfallo =validateAndObtainCampos_payment (line, lineas) //logicrequest.go
-                                }
-                            }                        
+                                linesStatus = append(linesStatus,u);
+                                linesDataTokens = append(linesDataTokens,eachLineaDataToken);
+                                linesDataPayments = append(linesDataPayments,eachLineaDataPayment);
+                            }//end if lineas==1
 
-                            if cualfallo == 0 {  //exito, todos los campos de la linea OK, y no errores previos
-                                u.Line=strconv.Itoa(lineas)
-                                u.Status="OK"
-                                u.StatusMessage ="SUCESS"
-                                //the dataToken has the data for the line to be tokenized
-                                //the dataPaymentn has the data for the line to do the payments
-
-                            }else { //error, al menos un error en la linea
-                                u.Line=strconv.Itoa(lineas)
-                                u.Status="ERROR540"
-                                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
-                                lineasWithErrors =1
-                                //the dataToken is set to "" when errors
-                            }
-                            linesStatus = append(linesStatus,u);
-                            linesDataTokens = append(linesDataTokens,eachLineaDataToken);
-                            linesDataPayments = append(linesDataPayments,eachLineaDataPayment);
-                        }
-
-                        if lineas == 0{
+                            if lineas == 0{
                             
-                            lineas = lineas + 1
-                            utilito.LevelLog(Config_env_log, "3", "MGR Nombres de campos")
-                            utilito.LevelLog(Config_env_log, "3", line)
-                            log.Print("largo linea_",lineas,": ",largoLinea)
-                        
-                            if typeFile =="token" {
+                                utilito.LevelLog(Config_env_log, "3", "MGR Nombres de campos")
+                                utilito.LevelLog(Config_env_log, "3", line)
+                                log.Print("largo linea_",lineas,": ",largoLinea)
+
+                                lineas = lineas + 1
                             
-                                //eachLineaDataToken,respuestaRes,cualfallo =validateAndObtainCampos_token (line, lineas)  //logicrequest.go
+                                //eachLineaDataToken,respuestaRes,cualfallo = validateAndObtainCampos_token (line, lineas)  //logicrequest.go
                                 if largoLinea < 56{
 
                                     //u.Line=strconv.Itoa(lineas)
                             	    //u.Status="ERROR526"
                             	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Max number of characters in header is 56"
-                            	    //lineasWithErrors =1
+                        	        //lineasWithErrors =1
 
                                     errorGeneral="\nERROR_526 -ERROR Header line length is short"
-				                    errorGeneralNbr="526"
+			                        errorGeneralNbr="526"
                                     log.Print(errorGeneral)
+                                    onlyHeader = 1
                                     break
                                 }else if largoLinea >56{
 
                                     //u.Line=strconv.Itoa(lineas)
                             	    //u.Status="ERROR526"
-                            	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Min number of characters in header is 56"
-                            	    //lineasWithErrors =1
+                        	        //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Min number of characters in header is 56"
+                        	        //lineasWithErrors =1
 
-                                    errorGeneral="\nERROR_526 -ERROR Header line length is short"
+                                    errorGeneral="\nERROR_526 -ERROR Header line length is long"
 				                    errorGeneralNbr="526"
                                     log.Print(errorGeneral)
+                                    onlyHeader = 1
                                     break
                                 }else{
-                                
+                        
                                     compara := line
                                     //log.Print("linea compara: ",reflect.TypeOf(compara)," largo: ",len(compara))
                                 
@@ -607,14 +591,125 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                                         errorGeneral="\nERROR_527 -ERROR Data line is not equal"
 				                        errorGeneralNbr="527"
                                         log.Print(errorGeneral)
+                                        onlyHeader = 1
                                         break
                                     }//end if comparación linea
                                 
                                     //log.Print("Todo Ok")
                                 }//end if largoLinea
-                            }//end if typeFile
+
+                                if cualfallo == 0 {  //exito, todos los campos de la linea OK, y no errores previos
+                                    u.Line=strconv.Itoa(lineas)
+                                    u.Status="OK"
+                                    u.StatusMessage ="SUCESS"
+                                    //the dataToken has the data for the line to be tokenized
+                                    //the dataPaymentn has the data for the line to do the payments
+
+                                }else { //error, al menos un error en la linea
+                                    u.Line=strconv.Itoa(lineas)
+                                    u.Status="ERROR540"
+                                    u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                                    lineasWithErrors =1
+                                    //the dataToken is set to "" when errors
+                                }
+                                linesStatus = append(linesStatus,u);
+                                //linesDataTokens = append(linesDataTokens,eachLineaDataToken);
+                                //linesDataPayments = append(linesDataPayments,eachLineaDataPayment);
                         
-                            if typeFile =="payment" {
+                            }    
+
+                        }//end  -loop through the lines
+                    
+                        log.Print("Fuera loop Lineas validadas: ",lineas)
+                        //log.Print("largoLinea_",largoLinea)
+                        
+                        if lineas == 1 && onlyHeader == 0{
+                            errorGeneral="\nERROR_526 -ERROR Only header line"
+				            errorGeneralNbr="526"
+                            log.Print(errorGeneral)
+                        }//end if lineas && onlyHeader
+                        
+                    }else{
+                    
+                        errorGeneral="ERROR_522 -ERROR The length of the file is greater than 3306 characters"
+				        errorGeneralNbr="522"
+
+                    }//end if len
+                }//end if typeFile token
+
+                if typeFile =="payment"{
+
+                    if len(micadenita) <= 3306{
+
+                        utilito.LevelLog(Config_env_log, "4", micadenita)
+                        utilito.LevelLog(Config_env_log, "3", "MGR Paso linea por linea indexpay")
+
+                        for _, line := range strings.Split(strings.TrimSuffix(micadenita, "\n"), "\n") {
+                            var u modelito.ExitoDataValidaLine
+
+                            largoLinea = len(line)
+                            //log.Print("largoLinea llegada: ",largoLinea)
+
+                            if lineas > 25{
+                                errorGeneral="ERROR_523 -ERROR The file have more lines than 26"
+				                errorGeneralNbr="523"
+                                log.Print(errorGeneral)
+                                break
+                            }
+                    
+                            if lineas >= 1{
+                                log.Print("Lineas: ", lineas)
+                                utilito.LevelLog(Config_env_log, "3", "MGR linea de datos pay")
+                                utilito.LevelLog(Config_env_log, "3", line)
+
+                                lineas = lineas + 1
+                            
+                                //eachLineaDataToken :=   modelito.RequestTokenized{}
+                                eachLineaDataPayment :=   modelito.RequestPayment{}
+
+                                if largoLinea > 130{
+                                    u.Line=strconv.Itoa(lineas)
+					                u.Status="ERROR528"
+					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Line with more than the maximum size of each record is 130"
+                                    lineasWithErrors = 1
+
+                                }else if largoLinea < 37{
+                                    u.Line=strconv.Itoa(lineas)
+					                u.Status="ERROR528"
+					                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Lines with fewer characters than expected"
+					                lineasWithErrors =1
+
+                                }else{
+                                    eachLineaDataPayment, respuestaRes,cualfallo = validateAndObtainCampos_payment (line, lineas) //logicrequest.go
+                                }
+
+                                if cualfallo == 0 {  //exito, todos los campos de la linea OK, y no errores previos
+                                    u.Line=strconv.Itoa(lineas)
+                                    u.Status="OK"
+                                    u.StatusMessage ="SUCESS"
+                                    //the dataToken has the data for the line to be tokenized
+                                    //the dataPaymentn has the data for the line to do the payments
+
+                                }else { //error, al menos un error en la linea
+                                    u.Line=strconv.Itoa(lineas)
+                                    u.Status="ERROR540"
+                                    u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                                    lineasWithErrors =1
+                                    //the dataToken is set to "" when errors
+                                }
+                                linesStatus = append(linesStatus,u);
+                                //linesDataTokens = append(linesDataTokens,eachLineaDataToken);
+                                linesDataPayments = append(linesDataPayments,eachLineaDataPayment);
+                            }
+
+                            if lineas == 0{
+                            
+                                utilito.LevelLog(Config_env_log, "3", "MGR Nombres de campos")
+                                utilito.LevelLog(Config_env_log, "3", line)
+                                log.Print("largo linea_",lineas,": ",largoLinea)
+
+                                lineas = lineas + 1
+                        
                                 //eachLineaDataPayment, respuestaRes,cualfallo =validateAndObtainCampos_payment (line, lineas)
                                 if largoLinea < 64{
                                 
@@ -623,9 +718,10 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                             	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Max number of characters in header is 64"
                             	    //lineasWithErrors =1
 
-                                    errorGeneral="\nERROR_526 -ERROR Header line length is short"
+                                    errorGeneral=" ERROR_526 -ERROR Header line length is short"
 				                    errorGeneralNbr="526"
                                     log.Print(errorGeneral)
+                                    onlyHeader = 1
                                     break
                                 }else if largoLinea >64{
                                 
@@ -634,9 +730,10 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                             	    //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - Min number of characters in header is 64"
                             	    //lineasWithErrors =1
 
-                                    errorGeneral="\nERROR_526 -ERROR Header line length is short"
+                                    errorGeneral=" ERROR_526 -ERROR Header line length is long"
 				                    errorGeneralNbr="526"
                                     log.Print(errorGeneral)
+                                    onlyHeader = 1
                                     break
                                 }else{
                                 
@@ -652,43 +749,57 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                             	        //u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
                             	        //lineasWithErrors =1
 
-                                        errorGeneral="\nERROR_527 -ERROR Data line is not equal"
+                                        errorGeneral=" ERROR_527 -ERROR Header line is not equal"
 				                        errorGeneralNbr="527"
                                         log.Print(errorGeneral)
+                                        onlyHeader = 1
                                         break
                                     }//end if comparación linea
                                 
                                     //log.Print("Todo Ok")
                                 }//end if largoLinea
-                            }//end if typeFile
+                            
 
-                            if cualfallo == 0 {  //exito, todos los campos de la linea OK, y no errores previos
-                                u.Line=strconv.Itoa(lineas)
-                                u.Status="OK"
-                                u.StatusMessage ="SUCESS"
-                                //the dataToken has the data for the line to be tokenized
-                                //the dataPaymentn has the data for the line to do the payments
+                                if cualfallo == 0 {  //exito, todos los campos de la linea OK, y no errores previos
+                                    u.Line=strconv.Itoa(lineas)
+                                    u.Status="OK"
+                                    u.StatusMessage ="SUCESS"
+                                    //the dataToken has the data for the line to be tokenized
+                                    //the dataPaymentn has the data for the line to do the payments
 
-                            }else { //error, al menos un error en la linea
-                                u.Line=strconv.Itoa(lineas)
-                                u.Status="ERROR540"
-                                u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
-                                lineasWithErrors =1
-                                //the dataToken is set to "" when errors
-                            }
-                            linesStatus = append(linesStatus,u);
-                            //linesDataTokens = append(linesDataTokens,eachLineaDataToken);
-                            //linesDataPayments = append(linesDataPayments,eachLineaDataPayment);
+                                }else { //error, al menos un error en la linea
+                                    u.Line=strconv.Itoa(lineas)
+                                    u.Status="ERROR540"
+                                    u.StatusMessage ="ERROR FIELD_"+strconv.Itoa(cualfallo)+" - "+respuestaRes
+                                    lineasWithErrors =1
+                                    //the dataToken is set to "" when errors
+                                }
+                                linesStatus = append(linesStatus,u);
+                                //linesDataTokens = append(linesDataTokens,eachLineaDataToken);
+                                //linesDataPayments = append(linesDataPayments,eachLineaDataPayment);
                         
-                        }    
+                            }    
 
-                    }//end  -loop through the lines
-                }else{
+                        }//end  -loop through the lines
                     
-                    errorGeneral="ERROR_522 -ERROR The length of the file is greater than 3306 characters"
-				    errorGeneralNbr="522"
+                        log.Print("Fuera loop Lineas validadas: ",lineas)
+                        //log.Print("largoLinea_",largoLinea)
 
-                }//end if len
+                        if lineas == 1 && onlyHeader == 0{
+                            errorGeneral="\nERROR_526 -ERROR Only header line"
+				            errorGeneralNbr="526"
+                            log.Print(errorGeneral)
+                        }//end if lineas && onlyHeader
+                        
+
+                    }else{
+                    
+                        errorGeneral="ERROR_522 -ERROR The length of the file is greater than 3306 characters"
+				        errorGeneralNbr="522"
+                    
+                    }//end if len(micadenita)
+
+                }//end if typeFile payment
 
                if  lineasWithErrors ==1 { //al menos una linea  tuvo un error
                      errorGeneral="ERROR FILE"
@@ -702,7 +813,7 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
 
                     }    
 
-               }
+               }//end if lineasWithErrors
                 //1.count number of lines in the file received
                 //2.for each line 
                 //      validate the content
@@ -710,20 +821,17 @@ func validateFiles(typeFile string, r *http.Request) ( string, string, []modelit
                 //         seq nbr ,  file name, size, content[all the bytes],commentsParam, validationStatus, validationStatusMessage,validationResponse[for each line,a response OK/Error] ,timestamp
                 //3.return result JSON
 
-
-                
-
             }//end for - all the files received
 
         }//end if    
         //errorGeneral,errorGeneralNbr= ProcessGettokenizedcards(w , requestData) //logicbusiness.go
-	}
+	}//end if errorGeneral
 
     //end   logic
     
     return errorGeneral,errorGeneralNbr ,linesStatus, linesDataTokens,linesDataPayments
     //return errorGeneral,errorGeneralNbr ,linesStatus
-}
+}//end validateFiles
 
 
 

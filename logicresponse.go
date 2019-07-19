@@ -150,13 +150,13 @@ func getJsonResponsePaymentFile(fileStatusMsg, fileStatusNumber string, validaLi
 func getJsonResponseConsultarTokens(fileStatusMsg, fileStatusNumber string ,recordsFound []modelito.Card )([]byte, error) {
 	
     
-    mainStruct :=modelito.ResponseTokensPerCustRef{StatusMessage: fileStatusMsg ,Status:fileStatusNumber}
+    mainStruct :=modelito.ResponseTokensPerCustRef{StatusMessage: fileStatusMsg ,Status:fileStatusNumber} //model/response.go
 
         for _, d := range recordsFound {
      		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.Token )
              //d.StatusMessage =  strings.Replace(d.StatusMessage, ":", "", -1)
 //			w := modelito.ExitoDataTokenLine{d.Line, d.StatusMessage,d.Status, d.Date, d.Token, d.LastDigits, d.Marca, d.Vigencia, d.Bin, d.Score, d.Type}   //request.go
-			w := modelito.ExitoDataTokensPerCustLine{"1", fileStatusMsg,"OK", "no", d.Token, d.Last, d.Brand, d.Valid, d.Bin, d.Score, d.Type}   //request.go
+			w := modelito.ExitoDataTokensPerCustLine{"1", fileStatusMsg,"OK", "no", d.Token, d.Last, d.Brand, d.Valid, d.Bin, d.Score, d.Type}   //model/response.go
 //            w := modelito.ExitoDataTokenLine{  d.Token, d.Last, d.Brand, , d.Bin, d.Score, d.Type}   //request.go
 			mainStruct.SucessDataEachRowPay = append(mainStruct.SucessDataEachRowPay, w)
  		}
@@ -167,18 +167,19 @@ func getJsonResponseConsultarTokens(fileStatusMsg, fileStatusNumber string ,reco
 
 func getJsonResponseConsultarPayments(fileStatusMsg, fileStatusNumber string,recordsFound []modelito.Payment  )([]byte, error) {
 	
-    mainStruct :=modelito.ResponsePaymentsToken{StatusMessage: fileStatusMsg ,Status:fileStatusNumber}
+    mainStruct :=modelito.ResponsePaymentsToken{StatusMessage: fileStatusMsg ,Status:fileStatusNumber} //model/response.go
+    
 
         for _, d := range recordsFound {
      		utilito.LevelLog(Config_env_log, "3"," getting json ready - line:"+d.Token )
              //d.StatusMessage =  strings.Replace(d.StatusMessage, ":", "", -1)
-			w := modelito.ExitoDataPaymentsTokenLine{Line:"1", StatusMessage:"ok",Status:"OK",Token: d.Token, Date: d.Created_at,  Amount: d.Amount}   //request.go
-			mainStruct.SucessDataEachRowPay = append(mainStruct.SucessDataEachRowPay, w)
+			w := modelito.ExitoDataPaymentsTokenLine{Line:"1", StatusMessage:"ok",Status:"OK",Token: d.Token, Date: d.Created_at,  Amount: d.Amount}   //model/response.go
+			
+            mainStruct.SucessDataEachRowPay = append(mainStruct.SucessDataEachRowPay, w)
  		}
-       
 
 	return json.MarshalIndent(mainStruct, "", "  ")
-}
+} //end getJsonResponseConsultarPayments
 
 func getJsonResponseConsultarHistorailClientes(fileStatusMsg, fileStatusNumber string  )([]byte, error) {
 	

@@ -94,7 +94,7 @@ var errCards error
 
 
 
-   func logicGeneratetokenizedDBV2(requestData  modelito.RequestTokenized, dataObtained modelito.ExitoDataTokenized ,errorGeneral string) ( modelito.Card,string) {
+func logicGeneratetokenizedDBV2(requestData  modelito.RequestTokenized, dataObtained modelito.ExitoDataTokenized ,errorGeneral string) ( modelito.Card,string) {
 	////////////////////////////////////////////////process db steps
    //START    
 		var miCard modelito.Card
@@ -104,38 +104,40 @@ var errCards error
 				    // Create connection string
 					connString := fmt.Sprintf("host=%s dbname=%s user=%s password=%s port=%d sslmode=disable",
 //						DB_SERVER,DB_NAME, DB_USER, DB_PASSWORD, DB_PORT)
-                       Config_DB_server,Config_DB_name, Config_DB_user, Config_DB_pass, Config_DB_port)
+                    Config_DB_server,Config_DB_name, Config_DB_user, Config_DB_pass, Config_DB_port)
 				
 				
 
-					 // Create connection pool
+					// Create connection pool
 					db, errdb = sql.Open("postgres", connString)
 					if errdb != nil {
 						utilito.LevelLog(Config_env_log, "3", "Error creating connection pool: " + errdb.Error())
 						errorGeneral =errdb.Error()
-					}
-					// Close the database connection pool after program executes
-					 defer db.Close()
+					}//end if errdb
+					
+                    // Close the database connection pool after program executes
+					defer db.Close()
 					if errdb == nil {
 						utilito.LevelLog(Config_env_log, "3", "Connected!\n")
-				
-					
+
 						errPing:= db.Ping()
 						if errPing != nil {
 						  utilito.LevelLog(Config_env_log, "3", "Error: Could not establish a connection with the database:"+ errPing.Error())
 						  errorGeneral= errPing.Error()
 						}else{
-						         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
-						         var miCustomer modelito.Customer
-						         miCustomer.Reference = requestData.Clientreference 
-						         errCustomer:= miCustomer.GetCustomerByReference01(db)
-						         //in miCustomer.ID is the value of the id_customer 
-								if errCustomer != nil {
-								  utilito.LevelLog(Config_env_log, "3", "Error: get customer:"+ errCustomer.Error())
-								  errorGeneral =errCustomer.Error()
+						        utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
+						        var miCustomer modelito.Customer
+						        miCustomer.Reference = requestData.Clientreference 
+						        errCustomer:= miCustomer.GetCustomerByReference01(db)
+						        //in miCustomer.ID is the value of the id_customer 
+								
+                                if errCustomer != nil {
+                                    utilito.LevelLog(Config_env_log, "3", "Error: get customer:"+ errCustomer.Error())
+                                    errorGeneral =errCustomer.Error()
 	                               
 								} else{
-						         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
+						            
+                                    utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
                                     //verifica si ya existe ese tiken con algun otro cliente
                                     //START
 //	                                 var miCard modelito.Card//to return the bin, last, brand, type_card GetCardByToken
@@ -148,8 +150,8 @@ var errCards error
 						          	utilito.LevelLog(Config_env_log, "3", " verificar si ya existe ese token en tabla cards  para el mismo cliente 02!\n")
 									if errCard != nil {
 										 if strings.Contains(errCard.Error(),"no rows in result set") {
-                                          //no existe, entocnes procede a insertarlo
-                                          utilito.LevelLog(Config_env_log, "3", " TOKEN does not exist for the same customer"+errCard.Error())
+                                            //no existe, entocnes procede a insertarlo
+                                            utilito.LevelLog(Config_env_log, "3", " TOKEN does not exist for the same customer"+errCard.Error())
 											//no existe ese token para algun customer reference, proceder a insertar en cards table
 											//START
 									             utilito.LevelLog(Config_env_log, "3", "Listo para insertar card!\n")
@@ -209,23 +211,17 @@ var errCards error
 								    }
 	
                                     //END
-                                    
 
-
-								
 								}//end else, no error del select					         
 
-
-				
 					    } //end else de no error ping
-				
 				
 					}//end if no error db
 				    
 				//  END fetchFromDB
 
    	  return  miCard, errorGeneral
-   }
+}//end logicGeneratetokenizedDBV2
 
 
 /////////////////////////////////v4
@@ -535,11 +531,11 @@ func logicProcessCreateFileTrans(miFiletrans modelito.Filetrans, errorGeneral st
 
 
 
-   func logicDBGetPaymentsByToken( errorGeneral string, inputParam string) ([]modelito.Payment,string) {
+func logicDBGetPaymentsByToken( errorGeneral string, inputParam string) ([]modelito.Payment,string) {
 	////////////////////////////////////////////////obtain parms in JSON
-   //START    
-var resultPayments []modelito.Payment
-var errPayments error
+    //START    
+    var resultPayments []modelito.Payment
+    var errPayments error
 
 				//  START fetchFromDB
 				    var errdb error
@@ -571,10 +567,10 @@ var errPayments error
 					         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
 //					         var misCards modelito.Card
 					         //GetTodayPaymentsByTokenCard(db *sql.DB, eltoken string ) ([]Payment, error)
-					         resultPayments,errPayments =modelito.GetRecordsOfTodayPaymentsByTokenCard(db,inputParam)
+					         resultPayments,errPayments =modelito.GetRecordsOfTodayPaymentsByTokenCard(db,inputParam) //model/cards.go
 
 
-					         				utilito.LevelLog(Config_env_log, "3", "regresa func  getPaymentsByToken ok!\n")
+					         		utilito.LevelLog(Config_env_log, "3", "regresa func  getPaymentsByToken ok!\n")
 							if errPayments != nil {
 							  utilito.LevelLog(Config_env_log, "3", "Error: :"+ errPayments.Error())
 							  errorGeneral=errPayments.Error()
@@ -599,9 +595,9 @@ var errPayments error
    
    //END
    	  return  resultPayments, errorGeneral
-   }
+} //end logicDBGetPaymentsByToken
    
-   func logicDBGetTokensByCustRef( errorGeneral string, inputParam string) ([]modelito.Card,string) {
+func logicDBGetTokensByCustRef( errorGeneral string, inputParam string) ([]modelito.Card,string) {
 	////////////////////////////////////////////////obtain parms in JSON
    //START    
 var resultTokens []modelito.Card
@@ -635,10 +631,10 @@ var errTokens error
 							  errorGeneral=errPing.Error()
 						}else{
 					         utilito.LevelLog(Config_env_log, "3", "Ping ok!\n")
-					         resultTokens,errTokens =modelito.GetCardsByCustomer(db,inputParam)
+					         resultTokens,errTokens =modelito.GetCardsByCustomer(db,inputParam) //model/cards.go
 
 
-					         				utilito.LevelLog(Config_env_log, "3", "regresa func  logicDBGetTokensByCustRef ok!\n")
+					         		utilito.LevelLog(Config_env_log, "3", "regresa func  logicDBGetTokensByCustRef ok!\n")
 							if errTokens != nil {
 							  utilito.LevelLog(Config_env_log, "3", "Error: :"+ errTokens.Error())
 							  errorGeneral=errTokens.Error()
@@ -663,4 +659,4 @@ var errTokens error
    
    //END
    	  return  resultTokens, errorGeneral
-   }
+   }//end logicDBGetTokensByCustRef 
